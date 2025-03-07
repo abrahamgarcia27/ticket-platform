@@ -262,4 +262,71 @@ class OrderController extends Controller
         return $pdf->download('sample.pdf');
         
     }
+
+    public function resendOrderEmail($orderId)
+    {
+        $order = Order::find($orderId);
+        if (!$order) {
+            return back()->with('error', 'Order not found.');
+        }
+
+        $ticket = $order->ticket;
+        $event = Event::where('id', $ticket->event_id)->first();
+
+        $created_at = Carbon::parse($order->created_at);
+        $fechaRestada = $created_at->subHours(6);
+
+        $orders_data = [
+            [
+                'event_title'     => $event->title,
+                'event_ubication' => $event->ubication,
+                'event_datetime'  => $event->date_time_start,
+                'order'           => $order->id,
+                'type_ticket'     => $order->ticket->type,
+                'name_ticket'     => $order->ticket->title,
+                'name_buyer'      => $order->name_buyer . ' ' . $order->last_name_buyer,
+                'order_date'      => $fechaRestada,
+                'qr'              => $order->svg_qr,
+                'website'         => $event->user->web_url
+            ]
+        ];
+
+        $pdf = PDF::loadView('pages.orders.pdf', ['orders_data' => $orders_data]);
+
+        $title = $ticket->event->title . ' - ' . date('j F, Y (h:s a)', strtotime($ticket->event->date_time_start));
+        $clock = date('j F, Y h:s a', strtotime($ticket->event->date_time_start)) . ' to ' . date('j F, Y h:s a', strtotime($ticket->event->date_time_end));
+        $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' . $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' . $ticket->event->postal_code . ', ' . $ticket->event->address_country;
+        $order_date = date('j F, Y', strtotime($fechaRestada));
+
+        $data = array(
+            'name' => $order->name_buyer,
+            'email' => 'arturoalvavi98@gmail.com',
+            'subject' => $ticket->event->title,
+            'title' => $title,
+            'clock' => $clock,
+            'location' => $location,
+            'order_id' => $order->id,
+            'order_date' => $order_date,
+            'order_quantity' => 1,
+            'ticket_price' => $ticket->price,
+            'ticket_title' => $ticket->title,
+            'ticket_type' => $ticket->type,
+            'user_name' => $ticket->event->user->username,
+            'user_email' => $ticket->event->user->email,
+            'event_image' => $ticket->event->image,
+            'organizer_image' => $ticket->event->user->image,
+            'event_location' => $ticket->event->maps_url,
+            'code' => $order->code
+        );
+
+        Mail::send('pages.email.email', $data, function ($message) use ($data, $pdf) {
+            $message->from('admin@ticketsplatform.com', $data['user_name']);
+            $message->to($data['email'], $data['name']);
+            $message->subject($data['subject']);
+            $message->priority(3);
+            $message->attachData($pdf->output(), 'Order.pdf');
+        });
+
+        return back()->with('success', 'Email sent successfully.');
+    }
 }
