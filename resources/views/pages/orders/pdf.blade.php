@@ -86,6 +86,11 @@
                                       </tr>
                                   </tbody>
                                 </table>
+                                <table class="container" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+                                  <tbody>
+                                      <p class="" style="line-height: 24px; font-size: 10px; color: #545454; width: 100%; margin: 0; padding-top: 25px; margin-left: 15px;" align="left">*All event sales are final no reimbursements.</p>
+                                  </tbody>
+                                </table>
                               </div> 
                             </div>
                           </td>
