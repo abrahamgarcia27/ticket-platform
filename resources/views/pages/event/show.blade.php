@@ -19,7 +19,7 @@
                     <div class="d-flex align-items-center">
                         <h3 class="mb-0">{{ $event->title }}</h3>
                     </div>
-                    <div class="d-flex align-items-center" style="padding-top: 20px">
+                    <div class="d-flex align-items-center" style="padding-top: 20px; text-align:justify;">
                         <h6 class="mb-0">{{ $event->summary }}</h6>
                     </div>
                 </div> 
@@ -60,10 +60,10 @@
                                     <div class="card-transparent">
                                         <div class="d-flex align-items-center justify-content-start">
                                             <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Date and Time</h6>
+                                            <h6 class="mb-0">Doors Open At</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('j F, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -87,10 +87,10 @@
                                     <div class="card-transparent">
                                         <div class="d-flex align-items-center justify-content-start">
                                             <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Date and Time</h6>
+                                            <h6 class="mb-0">Doors Open At</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('j F, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
