@@ -56,18 +56,29 @@
                         <div class="col-6" id="whDesktop">
                             <div class="row">
                                 <h4 style="padding-bottom: 20px">When and where</h4>
-                                <div class="col-sm-6">
+                                <div class="col-sm-4">
                                     <div class="card-transparent">
                                         <div class="d-flex align-items-center justify-content-start">
                                             <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Doors Open At</h6>
+                                            <h6 class="mb-0">Date</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y ', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-4">
+                                    <div class="card-transparent">
+                                        <div class="d-flex align-items-center justify-content-start">
+                                            <i class="fas fa-door-open" style="padding-right: 10px"></i>
+                                            <h6 class="mb-0">Doors</h6>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('h:s a', strtotime($event->date_time_start)) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
                                     <div class="card-transparent">
                                         <div class="d-flex align-items-center justify-content-start">
                                             <a class="" href="{{ $event->maps_url }}" target="_blank"><i class="fas fa-map-pin" style="padding-right: 10px"></i></a>
@@ -83,18 +94,29 @@
                         <div class="col-12" id="whPhone">
                             <div class="row">
                                 <h4 style="padding-bottom: 20px">When and where</h4>
-                                <div class="col-sm-6">
+                                <div class="col-sm-4">
                                     <div class="card-transparent">
                                         <div class="d-flex align-items-center justify-content-start">
                                             <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Doors Open At</h6>
+                                            <h6 class="mb-0">Date</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 locationDiv">
+                                <div class="col-sm-4 locationDiv">
+                                    <div class="card-transparent">
+                                        <div class="d-flex align-items-center justify-content-start">
+                                            <i class="fas fa-door-open" style="padding-right: 10px"></i>
+                                            <h6 class="mb-0">Doors</h6>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('h:s a', strtotime($event->date_time_start)) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 locationDiv">
                                     <div class="card-transparent">
                                         <div class="d-flex align-items-center justify-content-start">
                                             <a class="" href="{{ $event->maps_url }}" target="_blank"><i class="fas fa-map-pin" style="padding-right: 10px"></i></a>
