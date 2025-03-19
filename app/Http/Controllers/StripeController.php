@@ -112,7 +112,7 @@ class StripeController extends Controller
             $endDate = ucwords($endDate);
 
             $title = $ticket->event->title . ' - ' . $startDate . ' ' . date('(h:s a)', strtotime($ticket->event->date_time_start));
-            $clock = $startDate . ' ' . date(' h:s a', strtotime($ticket->event->date_time_start)) . ' - ' . $endDate . ' ' . date('h:s a', strtotime($ticket->event->date_time_end));
+            $clock = $startDate . ' ' . date(' h:s a', strtotime($ticket->event->date_time_start));
             $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' . $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' . $ticket->event->postal_code . ', ' . $ticket->event->address_country;
 
             $data = array(
