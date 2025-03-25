@@ -15,6 +15,9 @@
                     <li class="nav-item">
                         <a href="/privacy-policy" class="nav-link pe-0 text-white" target="_blank">Privacy Policy</a>
                     </li>
+                    <li class="nav-item">
+                        <a href="https://elaftersocialclub.com/terms-and-conditions" class="nav-link pe-0 text-white" target="_blank">Terms of Service</a>
+                    </li>
                 </ul>
             </div>
         </div>
