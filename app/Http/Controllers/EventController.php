@@ -69,7 +69,9 @@ class EventController extends Controller
         }
         $id = $event->id; 
 
-        $this->createGoogleEvent($event);
+        if (env('APP_ENV') == 'production') {
+            $this->createGoogleEvent($event);
+        }
 
         if ($request->has('external_sales')) {
             return redirect()->route('event.index')->with('succes', 'Event succesfully updated');
@@ -101,7 +103,9 @@ class EventController extends Controller
             $clonedTicket->date_time_end = Carbon::parse($originalTicket->date_time_end)->addWeek()->format('Y-m-d H:i');
             $clonedTicket->save();
         }
-        $this->createGoogleEvent($clonedEvent);
+        if (env('APP_ENV') == 'production') {
+            $this->createGoogleEvent($clonedEvent);
+        }
         // Redirigir al usuario a la página de edición del nuevo evento clonado
         return redirect()->route('event.index')->with('succes', 'Event succesfully duplicated');
     }
@@ -119,6 +123,9 @@ class EventController extends Controller
             $data['count_orders'] = 0;
 
         }
+
+        $data['tickets'] = Ticket::where('event_id', $id)->where('available', '1')->get();
+        
         $data['location'] = $data['event']->ubication . ' ' . $data['event']->street_address . ', ' . $data['event']->address_locality . ', ' . $data['event']->address_region . ' ' . $data['event']->postal_code . ', ' . $data['event']->address_country;
         $data['today'] = Carbon::now()->toDateTimeString();
         //dd($data);
@@ -169,7 +176,7 @@ class EventController extends Controller
                 'coverimage' => $image         
             ]);
         }
-        if ($event->google_event_id !== null) {
+        if (env('APP_ENV') == 'production' && $event->google_event_id !== null) {
             $this->updateGoogleEvent($event);
         }
 
@@ -182,7 +189,9 @@ class EventController extends Controller
     public function destroy(string $id)
     {
         $event = Event::find($id);
-        //$this->deleteGooogleEvent($event);
+        if (env('APP_ENV') == 'production') {
+            $this->deleteGooogleEvent($event);
+        }
         $event->delete();
         return back()->with('succes', 'Event succesfully deleted');
     }

@@ -49,6 +49,9 @@ class TicketController extends Controller
         }else {
             $all['available'] = 0;
         }
+        if ($all['type'] == 'free') {
+            $all['price'] = 0;
+        }
         $ticket = Ticket::create($all);
 
         return redirect()->route('ticket.index', [$id])->with('succes', 'Ticket created successfully!');
@@ -86,7 +89,7 @@ class TicketController extends Controller
         $all = $request->except(['_token']);
         // dd($request);
         if ($all['type'] == 'free') {
-            $all['price'] = null;
+            $all['price'] = 0;
         }
         if ($request->available) {
             $all['available'] = 1;
