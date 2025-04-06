@@ -284,40 +284,44 @@
                             </div>
                             <hr>
                             <div class="modal-body" style="padding-top: 60px">
-                                <div class="row">
-                                    <div class="col-9">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <h6>{{ $ticket->title }}</h6>
+                                @foreach($tickets as $ticket)
+                                    @if ($today < $ticket->date_time_end && $ticket->count_orders < $ticket->quantity)
+                                    <div class="row mb-4">
+                                        <div class="col-9">
+                                            <div class="d-flex align-items-center justify-content-start">
+                                                <h6>{{ $ticket->title }}</h6>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-start">
+                                                <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-start">
+                                                <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
+                                            </div>
+                                            @if (($ticket->quantity - $ticket->count_orders) <= 10)      
+                                            <div class="d-flex align-items-center justify-content-start">
+                                                <p class="mb-0 text-danger" style="font-size: 0.80rem">Only {{ $ticket->quantity - $ticket->count_orders }} left</p>
+                                            </div>
+                                            @endif
                                         </div>
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
+                                        <div class="col-3">
+                                            <div class="d-flex flex-column align-items-end">
+                                                <h6 class="mb-2">
+                                                    @if ($ticket->type == 'free')
+                                                        Free
+                                                    @else
+                                                        ${{ number_format($ticket->price, 2) }}
+                                                    @endif
+                                                </h6>
+                                                <select class="form-select mb-2 ticket-select" data-ticket-id="{{ $ticket->id }}" data-ticket-price="{{ $ticket->price }}" data-ticket-title="{{ $ticket->title }}" data-ticket-type="{{ $ticket->type }}">
+                                                    @for($i = 0; $i <= min(10, $ticket->quantity - $ticket->count_orders); $i++)
+                                                        <option value="{{ $i }}">{{ $i }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-3">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <select class="form-select" id="selectTickets" aria-label="Default select example">
-                                                <option value="1" selected>1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                                <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
-                                              </select>
-                                        </div>
-                                        @if (($ticket->quantity - $count_orders) <= '10')      
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ 'Only ' . $ticket->quantity - $count_orders . ' left'}}</p>
-                                        </div>
-                                        @endif
-                                    </div>
-                                </div>
+                                    @endif
+                                @endforeach
                             </div>
                             <div class="modal-footer" style="padding-top: 50px">
                             <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#checkout">Checkout</button>
@@ -335,18 +339,13 @@
                             <div class="d-flex align-items-center justify-content-start" style="padding-top: 30px">
                                 <p class="mb-0" style="font-size: 0.80rem"><strong>Order summary</strong></>
                             </div>
-                            <div class="d-flex align-items-center justify-content-around" style="padding-top: 10px">
-                                <p class="mb-0" style="font-size: 0.80rem" id="totalTickets">1 x {{ $ticket->title }}</>
-                                    @if ($ticket->type == 'free')
-                                    <p class="mb-0" style="font-size: 0.80rem">$0.00</>
-                                    @else
-                                    <p class="mb-0" style="font-size: 0.80rem">${{  number_format($ticket->price, 2) }}</>
-                                    @endif
+                            <div id="orderSummaryItems">
+                                <!-- Items will be dynamically added here -->
                             </div>
                             <hr>
                             <div class="d-flex align-items-center justify-content-around">
                                 <h6>Total</h6>
-                                <h6 id="totalValue">${{ number_format($ticket->price, 2) }}</h6>
+                                <h6 id="totalValue">$0.00</h6>
                             </div>
                         </div>
                     </div>
@@ -456,8 +455,9 @@
                                 </div>
                             </div>
                             <hr>
-                            <form role="form" method="POST" action="{{ $ticket->type == 'paid' ? route('stripe.checkout') : route('order.store') }}" enctype="multipart/form-data">
+                            <form id="checkoutForm" onsubmit="return handleCheckout()" role="form" method="POST" action="" enctype="multipart/form-data">
                                 @csrf
+                                <div id="selectedTicketsData"></div>
                                 <div class="modal-body" style="padding-top: 10px">
                                     <div class="row">
                                         <div class="d-flex align-items-center justify-content-start">
@@ -520,18 +520,13 @@
                             <div class="d-flex align-items-center justify-content-start" style="padding-top: 30px">
                                 <p class="mb-0" style="font-size: 0.80rem"><strong>Order summary</strong></>
                             </div>
-                            <div class="d-flex align-items-center justify-content-around" style="padding-top: 10px">
-                                <p class="mb-0" style="font-size: 0.80rem" id="totalTickets2"></>
-                                    @if ($ticket->type == 'free')
-                                    <p class="mb-0" style="font-size: 0.80rem">$0.00</>
-                                    @else
-                                    <p class="mb-0" style="font-size: 0.80rem">${{  number_format($ticket->price, 2) }}</>
-                                    @endif
+                            <div id="orderSummaryItems2">
+                                <!-- Items will be dynamically added here -->
                             </div>
                             <hr>
                             <div class="d-flex align-items-center justify-content-around">
                                 <h6>Total</h6>
-                                <h6 id="totalValue2">${{ number_format($ticket->price, 2) }}</h6>
+                                <h6 id="totalValue2">$0.00</h6>
                             </div>
                         </div>
                     </div>
@@ -709,7 +704,119 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @if ($ticket != null)   
 <script>
-   function addCommas(nStr){
+    function handleCheckout() {
+        const ticketSelects = document.querySelectorAll('.ticket-select');
+        const selectedTickets = [];
+        const csrfToken = document.querySelector('input[name="_token"]').value;
+        const checkoutForm = document.getElementById('checkoutForm');
+        let hasPaidTicket = false;
+        
+        ticketSelects.forEach(select => {
+            const quantity = parseInt(select.value);
+            if (quantity > 0) {
+                const ticketType = select.dataset.ticketType;
+                if (ticketType === 'paid') {
+                    hasPaidTicket = true;
+                }
+                selectedTickets.push({
+                    ticket_id: select.dataset.ticketId,
+                    quantity: quantity,
+                    price: parseFloat(select.dataset.ticketPrice),
+                    type: select.dataset.ticketType
+                });
+            }
+        });
+
+        checkoutForm.action = hasPaidTicket ? '{{ route("stripe.checkout") }}' : '{{ route("order.store") }}';
+        // Guardar en sesión vía AJAX
+        fetch('/save-tickets-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ tickets: selectedTickets })
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('checkoutForm').submit();
+            }
+        });
+
+        return false;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const ticketSelects = document.querySelectorAll('.ticket-select');
+        const orderSummaryItems = document.getElementById('orderSummaryItems');
+        const orderSummaryItems2 = document.getElementById('orderSummaryItems2');
+        const checkoutButton = document.getElementById('checkoutButton');
+        const getTicketsModal = document.getElementById('getTickets');
+        
+        getTicketsModal.addEventListener('show.bs.modal', function () {
+            ticketSelects.forEach(select => {
+                select.value = "0";
+            });
+            updateOrderSummary();
+        });
+
+        
+
+        ticketSelects.forEach(select => {
+            select.addEventListener('change', updateOrderSummary);
+        });
+
+        function updateOrderSummary() {
+            let total = 0;
+            let hasTickets = false;
+            orderSummaryItems.innerHTML = '';
+            orderSummaryItems2.innerHTML = '';
+            let selectedTicketsHtml = '';
+
+            ticketSelects.forEach(select => {
+                const quantity = parseInt(select.value);
+                if (quantity > 0) {
+                    hasTickets = true;
+                    const price = parseFloat(select.dataset.ticketPrice);
+                    const title = select.dataset.ticketTitle;
+                    const itemTotal = quantity * price;
+                    total += itemTotal;
+
+                    selectedTicketsHtml += `
+                        <div class="d-flex align-items-center justify-content-around" style="padding-top: 10px">
+                            <p class="mb-0" style="font-size: 0.80rem">${quantity} x ${title}</p>
+                            <p class="mb-0" style="font-size: 0.80rem">$${itemTotal.toFixed(2)}</p>
+                        </div>`;
+                }
+            });
+
+            orderSummaryItems.innerHTML = selectedTicketsHtml;
+            orderSummaryItems2.innerHTML = selectedTicketsHtml;
+            document.getElementById('totalValue').textContent = '$' + total.toFixed(2);
+            document.getElementById('totalValue2').textContent = '$' + total.toFixed(2);
+            checkoutButton.disabled = !hasTickets;
+
+            // Actualizar formulario de checkout
+            updateCheckoutForm();
+        }
+
+        function updateCheckoutForm() {
+            const selectedTicketsData = document.getElementById('selectedTicketsData');
+            if (!selectedTicketsData) return;
+
+            selectedTicketsData.innerHTML = '';
+            ticketSelects.forEach(select => {
+                const quantity = parseInt(select.value);
+                if (quantity > 0) {
+                    const ticketId = select.dataset.ticketId;
+                    const input = `<input type="hidden" name="tickets[${ticketId}]" value="${quantity}">`;
+                    selectedTicketsData.innerHTML += input;
+                }
+            });
+        }
+
+        // Función auxiliar para formatear números
+        function addCommas(nStr) {
             nStr += '';
             x = nStr.split('.');
             x1 = x[0];
@@ -719,98 +826,67 @@
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-    }
-    
-    var ticket_name = "{{ $ticket->title }}";
-    var ticket_value = "{{ $ticket->price }}";
-    
-    $('#selectTickets').change(function() {
-        var tickets = $(this).val();
-        $("#totalTickets").text(tickets + ' x ' + ticket_name );
-        $("#totalTickets2").text(tickets + ' x ' + ticket_name );
-        $("#quantity").val(tickets);
-        var total_value = (tickets * ticket_value).toFixed(2);
-        $("#totalValue").text('$' + total_value);
-        $("#totalValue2").text('$' + total_value);
-    });
-    $('.moreLess').click(function() {
-        var tickets = $('#inputTickets').val();
-        var total_value = (tickets * ticket_value).toFixed(2);
-        $("#quantityMobile").val(tickets);
-        $("#totalValueMobile").text('$' + total_value);
-        $("#totalValueMobile2").text('$' + total_value);
-       console.log(tickets);
-    });
-    
-    var element = document.getElementById('phone_buyer');  
-      var mask = IMask(element, {
-        mask: [
-            {
-        mask: '+{1}(000)000-0000',
-        startsWith: '1',
-        lazy: true,
-        country: 'Usa'
-      },
-      {
-        mask: '+{52}(000)000-0000',
-        startsWith: '52',
-        lazy: true,
-        country: 'Mexico'
-      },
-        ]
-        });
-    var element = document.getElementById('phone_buyerMobile');  
-      var mask = IMask(element, {
-        mask: [
-            {
-        mask: '+{1}(000)000-0000',
-        startsWith: '1',
-        lazy: true,
-        country: 'Usa'
-      },
-      {
-        mask: '+{52}(000)000-0000',
-        startsWith: '52',
-        lazy: true,
-        country: 'Mexico'
-      },
-        ]
-        });
-        
+        }
 
-        $('#aInfo').click(function() {
-            $('#aInfo').css('border-bottom', 'solid #D9BC73');
-            $('#aDetails').css('border-bottom', 'none');
-            $('#aOrganizer').css('border-bottom', 'none');
+        // Manejo de versión móvil
+        $('.moreLess').click(function() {
+            const input = this.parentNode.querySelector('input[type=number]');
+            const tickets = parseInt(input.value);
+            updateMobileTotal(tickets);
         });
-        $('#aDetails').click(function() {
-            $('#aInfo').css('border-bottom', 'none');
-            $('#aDetails').css('border-bottom', 'solid #D9BC73');
-            $('#aOrganizer').css('border-bottom', 'none');
-        });
-        $('#aOrganizer').click(function() {
-            $('#aInfo').css('border-bottom', 'none');
-            $('#aDetails').css('border-bottom', 'none');
-            $('#aOrganizer').css('border-bottom', 'solid #D9BC73');
-        });
-        $('#aInfo2').click(function() {
-            $('#aInfo2').css('border-bottom', 'solid #D9BC73');
-            $('#aDetails2').css('border-bottom', 'none');
-            $('#aOrganizer2').css('border-bottom', 'none');
-        });
-        $('#aDetails2').click(function() {
-            $('#aInfo2').css('border-bottom', 'none');
-            $('#aDetails2').css('border-bottom', 'solid #D9BC73');
-            $('#aOrganizer2').css('border-bottom', 'none');
-        });
-        $('#aOrganizer2').click(function() {
-            $('#aInfo2').css('border-bottom', 'none');
-            $('#aDetails2').css('border-bottom', 'none');
-            $('#aOrganizer2').css('border-bottom', 'solid #D9BC73');
-        });
-        
 
-  
+        function updateMobileTotal(tickets) {
+            const ticketSelect = document.querySelector('.ticket-select');
+            if (!ticketSelect) return;
+
+            const price = parseFloat(ticketSelect.dataset.ticketPrice);
+            const total_value = (tickets * price).toFixed(2);
+            
+            $("#quantityMobile").val(tickets);
+            $("#totalValueMobile").text('$' + total_value);
+            $("#totalValueMobile2").text('$' + total_value);
+        }
+
+        // Máscaras para teléfonos
+        const phoneElements = ['phone_buyer', 'phone_buyerMobile'];
+        phoneElements.forEach(elementId => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                IMask(element, {
+                    mask: [
+                        {
+                            mask: '+{1}(000)000-0000',
+                            startsWith: '1',
+                            lazy: true,
+                            country: 'Usa'
+                        },
+                        {
+                            mask: '+{52}(000)000-0000',
+                            startsWith: '52',
+                            lazy: true,
+                            country: 'Mexico'
+                        }
+                    ]
+                });
+            }
+        });
+
+        // Manejo de pestañas
+        const tabPairs = [
+            ['aInfo', 'aDetails', 'aOrganizer'],
+            ['aInfo2', 'aDetails2', 'aOrganizer2']
+        ];
+
+        tabPairs.forEach(tabSet => {
+            tabSet.forEach(tabId => {
+                $(`#${tabId}`).click(function() {
+                    tabSet.forEach(id => {
+                        $(`#${id}`).css('border-bottom', id === tabId ? 'solid #D9BC73' : 'none');
+                    });
+                });
+            });
+        });
+    });
 </script>
 @endif
 @endpush
