@@ -53,7 +53,7 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Invalid order data');
         }
 
-        foreach ($orderData['tickets'] as $ticket) {
+        foreach ($orderData as $ticket) {
             $ticket = Ticket::where('id', $ticket['ticket_id'])->first();
             $ordersTicket = Order::where('ticket_id', $ticket->id)->get();
             if ($ordersTicket->where('email_buyer', $orderData['email_buyer'])->count() >= 10) {
@@ -70,17 +70,17 @@ class OrderController extends Controller
         $codes = [];
         $orders_data = [];
 
-        foreach ($orderData['tickets'] as $ticketData) {
+        foreach ($orderData as $ticketData) {
 
             $ticket = Ticket::findOrFail($ticketData['ticket_id']);
             
             // Create orders for each ticket quantity
             for ($i = 0; $i < $ticketData['quantity']; $i++) {
                 $orderDetails = [
-                    'name_buyer' => $orderData['name_buyer'],
-                    'last_name_buyer' => $orderData['last_name_buyer'],
-                    'email_buyer' => $orderData['email_buyer'],
-                    'phone_buyer' => $orderData['phone_buyer'],
+                    'name_buyer' => $request['name_buyer'],
+                    'last_name_buyer' => $request['last_name_buyer'],
+                    'email_buyer' => $request['email_buyer'],
+                    'phone_buyer' => $request['phone_buyer'],
                     'ticket_id' => $ticketData['ticket_id'],
                     'code' => Str::random(5),
                 ];
@@ -127,21 +127,21 @@ class OrderController extends Controller
         $order_date = date('j F, Y', strtotime($fechaRestada));
         
         $emailData = [
-            'name' => $orderData['name_buyer'],
-            'email' => $orderData['email_buyer'],
+            'name' => $request['name_buyer'],
+            'email' => $request['email_buyer'],
             'subject' => $event,
             'title' => $title,
             'clock' => $clock,
             'location' => $location,
             'order_id' => $order->id,
             'order_date' => $fechaRestada,
-            'order_quantity' => array_sum(array_column($orderData['tickets'], 'quantity')),
+            'order_quantity' => array_sum(array_column($orderData, 'quantity')),
             'user_name' => $ticket->event->user->username,
             'user_email' => $ticket->event->user->email,
             'event_image' => $ticket->event->image,
             'organizer_image' => $ticket->event->user->image,
             'event_location' => $ticket->event->maps_url,
-            'tickets' => $orderData['tickets']
+            'tickets' => $orderData
         ];
 
         Mail::send('pages.email.email', $emailData, function ($message) use ($emailData, $pdf) {
@@ -153,7 +153,7 @@ class OrderController extends Controller
         });
 
         // Clear session data
-        $request->session()->forget(['selected_tickets', 'order_data']);
+        $request->session()->forget(['selected_tickets', 'selected_tickets']);
 
         $codes = implode('-', $codes);
         return redirect()->route('successpage', [$codes]);
