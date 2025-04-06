@@ -56,7 +56,7 @@ class OrderController extends Controller
         foreach ($orderData as $ticket) {
             $ticket = Ticket::where('id', $ticket['ticket_id'])->first();
             $ordersTicket = Order::where('ticket_id', $ticket->id)->get();
-            if ($ordersTicket->where('email_buyer', $orderData['email_buyer'])->count() >= 10) {
+            if ($ordersTicket->where('email_buyer', $request['email_buyer'])->count() >= 10) {
                 return back()->with('error', 'You have exceeded the maximum number of tickets per person.');
             }
             if ($ordersTicket->count() >= $ticket->quantity) {
