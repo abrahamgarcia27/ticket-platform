@@ -50,7 +50,7 @@ class OrderController extends Controller
     {
         $orderData = $request->session()->get('order_data');
         if (!$orderData) {
-            return redirect()->route('home')->with('error', 'Invalid order data');
+            return redirect()->back()->with('error', 'Invalid order data');
         }
 
         foreach ($orderData['tickets'] as $ticket) {
