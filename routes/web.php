@@ -73,8 +73,9 @@ Route::post('/contact-list-store', [SmsController::class, 'storeContactList'])->
 Route::get('/add-contacts/{id}-{name}', [SmsController::class, 'addContactsTo'])->middleware('auth')->name('contacts.add');
 Route::post('/add-contacts-to/{id}-{name}', [SmsController::class, 'addCcontactsToStore'])->middleware('auth')->name('addcontacts.store');
 
+Route::post('/save-tickets-session', [StripeController::class, 'saveTicketsSession']);
 Route::post('/checkout', [StripeController::class, 'checkout'])->name('stripe.checkout');
-Route::get('/success/{array}', [StripeController::class, 'success'])->name('stripe.success');
+Route::get('/success', [StripeController::class, 'success'])->name('stripe.success');
 
 
 Route::get('/', function () {return redirect('/dashboard');})->middleware('auth');

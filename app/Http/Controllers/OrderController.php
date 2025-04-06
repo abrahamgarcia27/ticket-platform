@@ -48,34 +48,59 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $all = $request->except(['_token']);
-        $ticket = Ticket::where('id', $all['ticket_id'])->first();
+        $orderData = $request->session()->get('order_data');
+        if (!$orderData) {
+            return redirect()->route('home')->with('error', 'Invalid order data');
+        }
 
-        $ordersTicket = Order::where('ticket_id', $ticket->id)->get();
-        if ($ordersTicket->where('email_buyer', $all['email_buyer'])->count() >= 10) {
-            return back()->with('error', 'You have exceeded the maximum number of tickets per person.');
-        }
-        if ($ordersTicket->count() >= $ticket->quantity) {
-            return back()->with('error', 'There are no more tickets available.');
-        }
-        if ($request->quantity > 10) {
-            return back()->with('error', 'You can not buy more than 10 tickets.');
+        foreach ($orderData['tickets'] as $ticket) {
+            $ticket = Ticket::where('id', $ticket['ticket_id'])->first();
+            $ordersTicket = Order::where('ticket_id', $ticket->id)->get();
+            if ($ordersTicket->where('email_buyer', $orderData['email_buyer'])->count() >= 10) {
+                return back()->with('error', 'You have exceeded the maximum number of tickets per person.');
+            }
+            if ($ordersTicket->count() >= $ticket->quantity) {
+                return back()->with('error', 'There are no more tickets available.');
+            }
+            if ($request->quantity > 10) {
+                return back()->with('error', 'You can not buy more than 10 tickets.');
+            }
         }
         
         $codes = [];
         $orders_data = [];
 
+        foreach ($orderData['tickets'] as $ticketData) {
 
-        for ($i=0; $i < $request->quantity; $i++) { 
-                $all['code'] = Str::random(5);
-                $order = Order::create($all);
-                QrCode::format('png')->size(200)->style('round')->backgroundColor(255, 255, 255)->generate($all['code'], '../public/storage/uploads/'. $all['code'] .'.png');
+            $ticket = Ticket::findOrFail($ticketData['ticket_id']);
+            
+            // Create orders for each ticket quantity
+            for ($i = 0; $i < $ticketData['quantity']; $i++) {
+                $orderDetails = [
+                    'name_buyer' => $orderData['name_buyer'],
+                    'last_name_buyer' => $orderData['last_name_buyer'],
+                    'email_buyer' => $orderData['email_buyer'],
+                    'phone_buyer' => $orderData['phone_buyer'],
+                    'ticket_id' => $ticketData['ticket_id'],
+                    'code' => Str::random(5),
+                ];
+
+                $order = Order::create($orderDetails);
+                
+                // Generate QR code
+                // QrCode::format('png')
+                //     ->size(200)
+                //     ->style('round')
+                //     ->backgroundColor(255, 255, 255)
+                //     ->generate($orderDetails['code'], '../public/storage/uploads/'. $orderDetails['code'] .'.png');
+                
                 $order->update([
-                    'svg_qr' => 'uploads/' . $all['code'] . '.png'
+                    'svg_qr' => 'uploads/' . $orderDetails['code'] . '.png'
                 ]);
+                
                 $codes[] = $order->code;
-                $event = Event::where('id', $order->ticket->event_id)->first(); 
-
+                
+                $event = Event::where('id', $order->ticket->event_id)->first();
                 $created_at = Carbon::parse($order->created_at);
                 $fechaRestada = $created_at->subHours(6);
 
@@ -91,42 +116,45 @@ class OrderController extends Controller
                     'qr'              => $order->svg_qr,
                     'website'         => $event->user->web_url
                 ];
-
             }
-            $pdf = PDF::loadView('pages.orders.pdf', ['orders_data' => $orders_data]);
+        }
 
-            $title = $ticket->event->title . ' - ' . date('j F, Y (h:s a)', strtotime($ticket->event->date_time_start));
-            $clock = date('j F, Y h:s a', strtotime($ticket->event->date_time_start));
-            $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' . $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' . $ticket->event->postal_code . ', ' . $ticket->event->address_country;
-            $order_date = date('j F, Y', strtotime($fechaRestada));
-            
-            $data = array(
-                'name' => $all['name_buyer'],
-                'email' => $all['email_buyer'],
-                'subject' => $ticket->event->title,
-                'title' => $title,
-                'clock' => $clock,
-                'location' => $location,
-                'order_id' => $order->id,
-                'order_date' => $order_date,
-                'order_quantity' => $request->quantity,
-                'ticket_price' => $ticket->price,
-                'ticket_title' => $ticket->title,
-                'ticket_type' => $ticket->type,
-                'user_name' => $ticket->event->user->username,
-                'user_email' => $ticket->event->user->email,
-                'event_image' => $ticket->event->image,
-                'organizer_image' => $ticket->event->user->image,
-                'event_location' => $ticket->event->maps_url,
-                'code' => $order->code
-            );
-            Mail::send('pages.email.email', $data, function ($message) use ($data, $pdf) {
-                $message->from('admin@ticketsplatform.com', $data['user_name']);
-                $message->to($data['email'], $data['name']);
-                $message->subject($data['subject']);
-                $message->priority(3);
-                $message->attachData($pdf->output(), 'Order.pdf');
-            });
+        $pdf = PDF::loadView('pages.orders.pdf', ['orders_data' => $orders_data]);
+
+        $title = $ticket->event->title . ' - ' . date('j F, Y (h:s a)', strtotime($ticket->event->date_time_start));
+        $clock = date('j F, Y h:s a', strtotime($ticket->event->date_time_start));
+        $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' . $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' . $ticket->event->postal_code . ', ' . $ticket->event->address_country;
+        $order_date = date('j F, Y', strtotime($fechaRestada));
+        
+        $emailData = [
+            'name' => $orderData['name_buyer'],
+            'email' => $orderData['email_buyer'],
+            'subject' => $event,
+            'title' => $title,
+            'clock' => $clock,
+            'location' => $location,
+            'order_id' => $order->id,
+            'order_date' => $fechaRestada,
+            'order_quantity' => array_sum(array_column($orderData['tickets'], 'quantity')),
+            'user_name' => $ticket->event->user->username,
+            'user_email' => $ticket->event->user->email,
+            'event_image' => $ticket->event->image,
+            'organizer_image' => $ticket->event->user->image,
+            'event_location' => $ticket->event->maps_url,
+            'tickets' => $orderData['tickets']
+        ];
+
+        Mail::send('pages.email.email', $emailData, function ($message) use ($emailData, $pdf) {
+            $message->from('admin@ticketsplatform.com', $emailData['user_name']);
+            $message->to($emailData['email'], $emailData['name']);
+            $message->subject($emailData['subject']);
+            $message->priority(3);
+            $message->attachData($pdf->output(), 'Order.pdf');
+        });
+
+        // Clear session data
+        $request->session()->forget(['selected_tickets', 'order_data']);
+
         $codes = implode('-', $codes);
         return redirect()->route('successpage', [$codes]);
        

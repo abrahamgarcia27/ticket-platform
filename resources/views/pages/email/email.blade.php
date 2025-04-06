@@ -119,21 +119,39 @@
                             <table class="card rounded px-4 py-8 p-sm-10" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" style="border-radius: 24px; border-collapse: separate !important; width: 100%; overflow: hidden; border: 1px solid #f2f4f7; padding-top: 10px;" bgcolor="#fff">
                               <tbody>
                                 <tr>
-                                  <td align="left" style="padding-bottom: 15px; padding-left: 20px;">
-                                    <h3>Order Summary</h3>
-                                    <p>Order #{{ $order_id }} - {{ $order_date }}</p>
-                                    <p>{{ $ticket_type == 'free' ? 'Free Order' : 'Paid Order'}}</p>
-                                  </td>
+                                    <td align="left" style="padding-bottom: 15px; padding-left: 20px;">
+                                        <h3>Order Summary</h3>
+                                        <p>Order #{{ $order_id }} - {{ $order_date }}</p>
+                                    </td>
                                 </tr>
+                                
+                                @php
+                                    $total = 0;
+                                @endphp
+                                
+                                @foreach($tickets as $ticket)
+                                    @php
+                                        $subtotal = $ticket['quantity'] * $ticket['price'];
+                                        $total += $subtotal;
+                                    @endphp
+                                    <tr>
+                                        <td align="left" style="padding-bottom: 15px; padding-left: 20px;">
+                                            <p>{{ $ticket['quantity'] . ' x ' . $ticket['title'] }}</p>
+                                        </td>
+                                        <td align="left" style="padding-bottom: 15px; padding-left: 20px;">
+                                            <p>$ {{ number_format($subtotal, 2) }}</p>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                
                                 <tr>
-                                  <td align="left" style="padding-bottom: 15px; padding-left: 20px;">
-                                    <p>{{ $order_quantity . ' x ' . $ticket_title }}</p>
-                                  </td>
-                                  <td align="left" style="padding-bottom: 15px; padding-left: 20px;">
-                                    <p>$ {{ number_format($order_quantity * $ticket_price, 2) }}</p>
-                                  </td>
+                                    <td align="left" style="padding-bottom: 15px; padding-left: 20px; border-top: 1px solid #f2f4f7; padding-top: 15px;">
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td align="left" style="padding-bottom: 15px; padding-left: 20px; border-top: 1px solid #f2f4f7; padding-top: 15px;">
+                                        <strong>$ {{ number_format($total, 2) }}</strong>
+                                    </td>
                                 </tr>
-                               
                               </tbody>
                             </table>
                             <table class="s-6 w-full" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
