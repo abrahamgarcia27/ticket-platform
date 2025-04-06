@@ -48,7 +48,7 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $orderData = $request->session()->get('order_data');
+        $orderData = $request->session()->get('selected_tickets');
         if (!$orderData) {
             return redirect()->back()->with('error', 'Invalid order data');
         }
