@@ -139,12 +139,10 @@
                                     
                                     $lowestPaidPrice = $tickets->where('type', 'paid')
                                         ->where('date_time_end', '>', $today)
-                                        ->where('quantity', '>', 'count_orders')
                                         ->min('price');
                                     
                                     $hasFreeTickets = $tickets->where('type', 'free')
                                         ->where('date_time_end', '>', $today)
-                                        ->where('quantity', '>', 'count_orders')
                                         ->isNotEmpty();
                                 @endphp
 
