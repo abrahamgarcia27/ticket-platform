@@ -769,7 +769,7 @@
             }
         });
 
-        checkoutForm.action = hasPaidTicket == true ? '{{ route("stripe.checkout") }}' : '{{ route("order.store") }}';
+        checkoutForm.action = hasPaidTicket ? '{{ route("stripe.checkout") }}' : '{{ route("order.store") }}';
         // Guardar en sesión vía AJAX
         fetch('/save-tickets-session', {
             method: 'POST',
