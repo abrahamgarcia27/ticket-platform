@@ -130,17 +130,31 @@
                             </div>
                         </div>
                         <div class="col-6 d-flex align-items-center justify-content-end" id="cardGetTickets">
-                            @if ($ticket !== null)    
+                            @if ($tickets->isNotEmpty())    
                             <div class="card-transpatent" style="width: 20rem;">
-                                @if ($today < $ticket->date_time_end)
-                                    @if ($count_orders < $ticket->quantity) 
+                                @php
+                                    $hasAvailableTickets = $tickets->some(function($ticket) use ($today) {
+                                        return $today < $ticket->date_time_end && $ticket->count_orders < $ticket->quantity;
+                                    });
+                                    
+                                    $lowestPaidPrice = $tickets->where('type', 'paid')
+                                        ->where('date_time_end', '>', $today)
+                                        ->where('quantity', '>', 'count_orders')
+                                        ->min('price');
+                                    
+                                    $hasFreeTickets = $tickets->where('type', 'free')
+                                        ->where('date_time_end', '>', $today)
+                                        ->where('quantity', '>', 'count_orders')
+                                        ->isNotEmpty();
+                                @endphp
+
+                                @if ($hasAvailableTickets)
                                     <div class="card-body">
                                         <div class="d-flex align-items-center justify-content-center">
-                                            @if ($ticket->type == 'free')
-                                            <h4>Free</h4>
-                                            @endif
-                                            @if ($ticket->type == 'paid')
-                                            <h4>${{ $ticket->price }}</h4>
+                                            @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
+                                                <h4>Free</h4>
+                                            @elseif ($lowestPaidPrice)
+                                                <h4>From ${{ number_format($lowestPaidPrice, 2) }}</h4>
                                             @endif
                                         </div>
                                         <div class="d-grid gap-2" style="padding-top: 10px">
@@ -149,7 +163,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    @else
+                                @else
                                     <div class="card-body">
                                         <div class="d-flex align-items-center justify-content-center">
                                             <h4>Sales Ended</h4>
@@ -160,21 +174,9 @@
                                             </button>
                                         </div>
                                     </div>
-                                    @endif    
-                                @else
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center justify-content-center">
-                                        <h4>Sales Ended</h4>
-                                    </div>
-                                    <div class="d-grid gap-2" style="padding-top: 10px">
-                                        <button type="button" class="btn btn-yellow" data-bs-toggle="modal" data-bs-target="#">
-                                            Get Details
-                                        </button>
-                                    </div>
-                                </div>
                                 @endif
                             </div>
-                            @else
+                        @else
                             <div class="card-transpatent" style="width: 20rem;">
                                 <div class="card-body">
                                     <div class="d-grid gap-2" style="padding-top: 10px">
@@ -184,7 +186,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @endif
+                        @endif
                         </div>
                         
                     </div>
@@ -372,44 +374,67 @@
                                 </div>
                                 <hr>
                                 <div class="modal-body" style="padding-top: 60px">
-                                    <div class="row" style="--bs-gutter-x: -0.5rem;">
-                                        <div class="col-7">
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <h6>{{ $ticket->title }}</h6>
-                                            </div>
-                                        </div>
-                                        <div class="col-5">
-                                            <div class="d-flex align-items-center justify-content-center">                                                
-                                                <button class="btn btn-dark px-3 me-2 moreLess"
-                                                onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                                                <i class="fas fa-minus"></i>
-                                                </button>
-                                                <div class="form-outline" style="margin-bottom: 0.5rem;">
-                                                <input id="inputTickets" min="1"  max="10" name="quantity" value="1" type="number" class="form-control" style="-webkit-appearance: none;
-                                                margin: 0;"/>
+                                    @foreach($tickets as $ticket)
+                                        @if ($today < $ticket->date_time_end && $ticket->count_orders < $ticket->quantity)
+                                            <div class="row mb-4" style="--bs-gutter-x: -0.5rem;">
+                                                <div class="col-7">
+                                                    <div class="d-flex align-items-center justify-content-start">
+                                                        <h6>{{ $ticket->title }}</h6>
+                                                    </div>
                                                 </div>
-                                                <button class="btn btn-dark px-3 ms-2 moreLess"
-                                                onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                                                <i class="fas fa-plus"></i>
-                                                </button>
+                                                <div class="col-5">
+                                                    <div class="d-flex align-items-center justify-content-center">                                                
+                                                        <button class="btn btn-dark px-3 me-2"
+                                                            onclick="decrementTicket(this, {{ $ticket->id }})">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                        <div class="form-outline" style="margin-bottom: 0.5rem;">
+                                                            <input class="form-control ticket-select-mobile" 
+                                                                id="ticket-input-{{ $ticket->id }}"
+                                                                data-ticket-id="{{ $ticket->id }}" 
+                                                                data-ticket-price="{{ $ticket->price }}" 
+                                                                data-ticket-title="{{ $ticket->title }}" 
+                                                                data-ticket-type="{{ $ticket->type }}"
+                                                                min="0" 
+                                                                max="{{ min(10, $ticket->quantity - $ticket->count_orders) }}" 
+                                                                value="0" 
+                                                                type="number" 
+                                                                style="-webkit-appearance: none; margin: 0;"
+                                                                onchange="updateTotal()"/>
+                                                        </div>
+                                                        <button class="btn btn-dark px-3 ms-2"
+                                                            onclick="incrementTicket(this, {{ $ticket->id }})">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-9">
+                                                    <div class="d-flex align-items-center justify-content-start">
+                                                        <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
+                                                    </div>
+                                                    <div class="d-flex align-items-center justify-content-start">
+                                                        <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-3">
+                                                    <div class="d-flex align-items-center justify-content-end">
+                                                        <h6>
+                                                            @if ($ticket->type == 'free')
+                                                                Free
+                                                            @else
+                                                                ${{ number_format($ticket->price, 2) }}
+                                                            @endif
+                                                        </h6>
+                                                    </div>
+                                                    @if (($ticket->quantity - $ticket->count_orders) <= 10)       
+                                                        <div class="d-flex align-items-center justify-content-end">
+                                                            <p class="mb-0 text-danger" style="font-size: 0.80rem">Only {{ $ticket->quantity - $ticket->count_orders }} left</p>
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-9">
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></>
-                                            </div>
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-3">
-                                            @if (($ticket->quantity - $count_orders) <= '10')       
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <p class="mb-0" style="font-size: 0.80rem">{{ 'Only ' . $ticket->quantity - $count_orders . ' left'}}</p>
-                                            </div>
-                                            @endif
-                                        </div>
-                                    </div>
+                                        @endif
+                                    @endforeach
                                 </div>
                                 <hr>
                                 <nav class="fixed-bottom navbar-dark" id="getTicketsBottom">    
@@ -455,7 +480,7 @@
                                 </div>
                             </div>
                             <hr>
-                            <form id="checkoutForm" onsubmit="return handleCheckout()" role="form" method="POST" action="" enctype="multipart/form-data">
+                            <form id="checkoutForm" onsubmit="return handleCheckout(event)" role="form" method="POST" action="" enctype="multipart/form-data">
                                 @csrf
                                 <div id="selectedTicketsData"></div>
                                 <div class="modal-body" style="padding-top: 10px">
@@ -552,7 +577,7 @@
                                 </div>
                             </div>
                             <hr>
-                            <form role="form" method="POST" action="{{ $ticket->type == 'paid' ? route('stripe.checkout') : route('order.store') }}" enctype="multipart/form-data">
+                            <form id="checkoutFormMobile" onsubmit="return handleCheckout(event)" role="form" method="POST" action="" enctype="multipart/form-data">
                                 @csrf
                                 <div class="modal-body" style="padding-top: 10px">
                                     <div class="row">
@@ -704,11 +729,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @if ($ticket != null)   
 <script>
-    function handleCheckout() {
-        const ticketSelects = document.querySelectorAll('.ticket-select');
+    function handleCheckout(event) {
+        const isMobile = event.target.id === 'checkoutFormMobile';
+        const ticketSelects = isMobile ? document.querySelectorAll('.ticket-select-mobile') : document.querySelectorAll('.ticket-select');
         const selectedTickets = [];
         const csrfToken = document.querySelector('input[name="_token"]').value;
-        const checkoutForm = document.getElementById('checkoutForm');
+        const checkoutForm = event.target;
         let hasPaidTicket = false;
         
         ticketSelects.forEach(select => {
@@ -739,19 +765,55 @@
         }).then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.getElementById('checkoutForm').submit();
+                checkoutForm.submit();
             }
         });
 
         return false;
     }
+    // Manejo de versión móvil
+    function incrementTicket(button, ticketId) {
+        const input = document.getElementById(`ticket-input-${ticketId}`);
+        const currentValue = parseInt(input.value);
+        const maxValue = parseInt(input.max);
+        
+        if (currentValue < maxValue) {
+            input.value = currentValue + 1;
+            input.dispatchEvent(new Event('change'));
+        }
+    }
 
+    function decrementTicket(button, ticketId) {
+        const input = document.getElementById(`ticket-input-${ticketId}`);
+        const currentValue = parseInt(input.value);
+        const minValue = parseInt(input.min);
+        
+        if (currentValue > minValue) {
+            input.value = currentValue - 1;
+            input.dispatchEvent(new Event('change'));
+        }
+    }
+
+    function updateTotal() {
+        let total = 0;
+        const inputs = document.querySelectorAll('.ticket-select-mobile');
+        inputs.forEach(input => {
+            const price = parseFloat(input.dataset.ticketPrice);
+            const quantity = parseInt(input.value);
+            total += price * quantity;
+        });
+        
+        document.getElementById('totalValueMobile').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('totalValueMobile2').textContent = `$${total.toFixed(2)}`;
+    }
     document.addEventListener('DOMContentLoaded', function() {
         const ticketSelects = document.querySelectorAll('.ticket-select');
+        const ticketSelectsMobile = document.querySelectorAll('.ticket-select-mobile');
         const orderSummaryItems = document.getElementById('orderSummaryItems');
         const orderSummaryItems2 = document.getElementById('orderSummaryItems2');
         const checkoutButton = document.getElementById('checkoutButton');
         const getTicketsModal = document.getElementById('getTickets');
+        const getTicketsMobileModal = document.getElementById('getTicketsMobile');
         
         getTicketsModal.addEventListener('show.bs.modal', function () {
             ticketSelects.forEach(select => {
@@ -760,7 +822,12 @@
             updateOrderSummary();
         });
 
-        
+        getTicketsMobileModal.addEventListener('show.bs.modal', function () {
+            ticketSelectsMobile.forEach(select => {
+                select.value = "0";
+            });
+            updateTotal();
+        });
 
         ticketSelects.forEach(select => {
             select.addEventListener('change', updateOrderSummary);
@@ -826,25 +893,6 @@
                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
             return x1 + x2;
-        }
-
-        // Manejo de versión móvil
-        $('.moreLess').click(function() {
-            const input = this.parentNode.querySelector('input[type=number]');
-            const tickets = parseInt(input.value);
-            updateMobileTotal(tickets);
-        });
-
-        function updateMobileTotal(tickets) {
-            const ticketSelect = document.querySelector('.ticket-select');
-            if (!ticketSelect) return;
-
-            const price = parseFloat(ticketSelect.dataset.ticketPrice);
-            const total_value = (tickets * price).toFixed(2);
-            
-            $("#quantityMobile").val(tickets);
-            $("#totalValueMobile").text('$' + total_value);
-            $("#totalValueMobile2").text('$' + total_value);
         }
 
         // Máscaras para teléfonos

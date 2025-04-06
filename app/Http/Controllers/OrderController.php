@@ -88,11 +88,11 @@ class OrderController extends Controller
                 $order = Order::create($orderDetails);
                 
                 // Generate QR code
-                // QrCode::format('png')
-                //     ->size(200)
-                //     ->style('round')
-                //     ->backgroundColor(255, 255, 255)
-                //     ->generate($orderDetails['code'], '../public/storage/uploads/'. $orderDetails['code'] .'.png');
+                QrCode::format('png')
+                    ->size(200)
+                    ->style('round')
+                    ->backgroundColor(255, 255, 255)
+                    ->generate($orderDetails['code'], '../public/storage/uploads/'. $orderDetails['code'] .'.png');
                 
                 $order->update([
                     'svg_qr' => 'uploads/' . $orderDetails['code'] . '.png'
