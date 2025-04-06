@@ -23,7 +23,6 @@ class StripeController extends Controller
     public function saveTicketsSession(Request $request)
     {
         $request->session()->put('selected_tickets', $request->tickets);
-        dd($request->session()->get('selected_tickets'));
         return response()->json(['success' => true]);
     }
 
