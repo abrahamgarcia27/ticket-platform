@@ -53,8 +53,10 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Invalid order data');
         }
 
-        foreach ($orderData as $ticket) {
-            $ticket = Ticket::where('id', $ticket['ticket_id'])->first();
+        foreach ($orderData as &$ticketData) {
+            $ticket = Ticket::where('id', $ticketData['ticket_id'])->first();
+            $ticketData['title'] = $ticket->title; // Agregar el título al array original
+            
             $ordersTicket = Order::where('ticket_id', $ticket->id)->get();
             if ($ordersTicket->where('email_buyer', $request['email_buyer'])->count() >= 10) {
                 return back()->with('error', 'You have exceeded the maximum number of tickets per person.');
@@ -66,6 +68,7 @@ class OrderController extends Controller
                 return back()->with('error', 'You can not buy more than 10 tickets.');
             }
         }
+        unset($ticketData);
         
         $codes = [];
         $orders_data = [];
