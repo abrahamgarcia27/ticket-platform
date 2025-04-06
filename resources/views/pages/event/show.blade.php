@@ -325,9 +325,7 @@
                                     @endif
                                 @endforeach
                             </div>
-                            <div class="modal-footer" style="padding-top: 50px">
-                            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#checkout">Checkout</button>
-                            </div>
+                            <button type="button" class="btn btn-dark" data-bs-target="#checkout" onclick="if(validateTicketSelection(event)) { $('#getTickets').modal('hide'); $('#checkout').modal('show'); }">Checkout</button>
                         </div>
                         <div class="col-4">
                             <div class="d-flex align-items-center justify-content-end">
@@ -451,7 +449,7 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                                                <button type="button" class="btn btn-dark btn-lg" data-bs-toggle="modal" data-bs-target="#checkoutMobile">
+                                                <button type="button" class="btn btn-dark btn-lg" data-bs-target="#checkoutMobile" onclick="if(validateTicketSelection(event)) { $('#getTicketsMobile').modal('hide'); $('#checkoutMobile').modal('show'); }">
                                                     Checkout
                                                 </button>
                                             </div>
@@ -729,7 +727,27 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @if ($ticket != null)   
 <script>
+    function validateTicketSelection(event) {
+        const isMobile = event.target.closest('[data-bs-target="#checkoutMobile"]') !== null;
+        const ticketSelects = isMobile ? document.querySelectorAll('.ticket-select-mobile') : document.querySelectorAll('.ticket-select');
+        let hasSelectedTickets = false;
+        
+        ticketSelects.forEach(select => {
+            if (parseInt(select.value) > 0) {
+                hasSelectedTickets = true;
+            }
+        });
+        
+        if (!hasSelectedTickets) {
+            event.preventDefault();
+            event.stopPropagation();
+            alert('Please select at least one ticket');
+            return false;
+        }
+        return true;
+}
     function handleCheckout(event) {
+        event.preventDefault();
         const isMobile = event.target.id === 'checkoutFormMobile';
         const ticketSelects = isMobile ? document.querySelectorAll('.ticket-select-mobile') : document.querySelectorAll('.ticket-select');
         const selectedTickets = [];
@@ -753,7 +771,7 @@
             }
         });
 
-        checkoutForm.action = hasPaidTicket ? '{{ route("stripe.checkout") }}' : '{{ route("order.store") }}';
+        checkoutForm.action = hasPaidTicket == true ? '{{ route("stripe.checkout") }}' : '{{ route("order.store") }}';
         // Guardar en sesión vía AJAX
         fetch('/save-tickets-session', {
             method: 'POST',
