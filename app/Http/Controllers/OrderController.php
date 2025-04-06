@@ -124,29 +124,35 @@ class OrderController extends Controller
 
         $pdf = PDF::loadView('pages.orders.pdf', ['orders_data' => $orders_data]);
 
-        $title = $ticket->event->title . ' - ' . date('j F, Y (h:s a)', strtotime($ticket->event->date_time_start));
-        $clock = date('j F, Y h:s a', strtotime($ticket->event->date_time_start));
-        $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' . $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' . $ticket->event->postal_code . ', ' . $ticket->event->address_country;
-        $order_date = date('j F, Y', strtotime($fechaRestada));
-        
+        $event = $orders_data[0]['event_title'];
+        Carbon::setLocale('es');
+        $startDate = Carbon::parse($ticket->event->date_time_start)->isoFormat('D [de] MMMM, YYYY');
+        $startDate = ucwords($startDate);
+
+        $title = $event . ' - ' . $startDate . ' ' . date('(h:s a)', strtotime($ticket->event->date_time_start));
+        $clock = $startDate . ' ' . date(' h:s a', strtotime($ticket->event->date_time_start));
+        $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' . 
+                    $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' . 
+                    $ticket->event->postal_code . ', ' . $ticket->event->address_country;
+
         $emailData = [
-            'name' => $request['name_buyer'],
-            'email' => $request['email_buyer'],
+            'name' => $orderData['name_buyer'],
+            'email' => $orderData['email_buyer'],
             'subject' => $event,
             'title' => $title,
             'clock' => $clock,
             'location' => $location,
             'order_id' => $order->id,
             'order_date' => $fechaRestada,
-            'order_quantity' => array_sum(array_column($orderData, 'quantity')),
+            'order_quantity' => array_sum(array_column($orderData['tickets'], 'quantity')),
             'user_name' => $ticket->event->user->username,
             'user_email' => $ticket->event->user->email,
             'event_image' => $ticket->event->image,
             'organizer_image' => $ticket->event->user->image,
             'event_location' => $ticket->event->maps_url,
-            'tickets' => $orderData
+            'tickets' => $orderData['tickets']
         ];
-
+        
         Mail::send('pages.email.email', $emailData, function ($message) use ($emailData, $pdf) {
             $message->from('admin@ticketsplatform.com', $emailData['user_name']);
             $message->to($emailData['email'], $emailData['name']);
