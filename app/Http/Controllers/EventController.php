@@ -45,14 +45,17 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {   
-        
+        $request->validate([
+            'date_time_start' => 'required|date',
+            'date_time_end' => 'required|date|after:date_time_start'
+        ]);
+
         $all = $request->except(['_token', 'image']);
         $all['created_by'] = Auth::id();
         
         if (!$request->has('external_sales')) {
             $all['link_external_sales'] = null;
         }
-        
         $event = Event::create($all);
     
         if ($request->hasFile('image')) {
