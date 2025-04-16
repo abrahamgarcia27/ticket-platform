@@ -2,13 +2,13 @@
 
 @section('content')
     <main class="main-content mt-0">
-        {{-- <div id="alert">
-            @include('components.alert')
-        </div> --}}
         <div class="header">
             <a href="/list-events">
                 <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo">
             </a>
+        </div>
+        <div id="alert">
+            @include('components.alert')
         </div>
         <div class="card-transparent shadow-lg mt-0">
             <div class="card-body p-3">
@@ -134,7 +134,7 @@
                             <div class="card-transpatent" style="width: 20rem;">
                                 @php
                                     $hasAvailableTickets = $tickets->some(function($ticket) use ($today) {
-                                        return $today < $ticket->date_time_end && $ticket->count_orders < $ticket->quantity;
+                                        return $today < $ticket->date_time_end && $ticket->orders_count < $ticket->quantity;
                                     });
                                     
                                     $lowestPaidPrice = $tickets->where('type', 'paid')
