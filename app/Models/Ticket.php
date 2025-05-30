@@ -30,4 +30,9 @@ class Ticket extends Model
     {
         return $this->hasMany(Order::class, 'ticket_id', 'id');
     }
+
+    public function getSoldTicketsAttribute()
+    {
+        return $this->orders()->count();
+    }
 }

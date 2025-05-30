@@ -20,6 +20,7 @@
                             <tr>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Qunatity</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tickets Sold</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date and Time start</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-4">Actions</th>
                             </tr>
@@ -32,6 +33,9 @@
                                 </td>
                                 <td>
                                     <p class="text-sm font-weight-bold mb-0">{{ $ticket->quantity }}</p>
+                                </td>
+                                <td>
+                                    <p class="text-sm font-weight-bold mb-0">{{ $ticket->sold_tickets }}</p>
                                 </td>
                                 <td>
                                     <p class="text-sm font-weight-bold mb-0">{{ $ticket->date_time_start }}</p>
