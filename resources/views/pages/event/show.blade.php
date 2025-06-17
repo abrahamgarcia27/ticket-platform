@@ -285,23 +285,30 @@
                             <hr>
                             <div class="modal-body" style="padding-top: 60px">
                                 @foreach($tickets as $ticket)
-                                    @if ($today < $ticket->date_time_end && $ticket->count_orders < $ticket->quantity)
+                                    @if ($today < $ticket->date_time_end)
                                     <div class="row mb-4">
-                                        <div class="col-9">
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <h6>{{ $ticket->title }}</h6>
-                                            </div>
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
-                                            </div>
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
-                                            </div>
-                                            @if (($ticket->quantity - $ticket->count_orders) <= 10)      
-                                            <div class="d-flex align-items-center justify-content-start">
-                                                <p class="mb-0 text-danger" style="font-size: 0.80rem">Only {{ $ticket->quantity - $ticket->count_orders }} left</p>
+                                        <div class="col-9 position-relative">
+                                            @if($ticket->orders_count >= $ticket->quantity)
+                                            <div class="sold-out-overlay">
+                                                <img src="{{ asset('img/sold-out.png') }}" alt="Sold Out" class="img-fluid-sold-out">
                                             </div>
                                             @endif
+                                            <div class="@if($ticket->orders_count >= $ticket->quantity) opacity-25 @endif">
+                                                <div class="d-flex align-items-center justify-content-start">
+                                                    <h6>{{ $ticket->title }}</h6>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-start">
+                                                    <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-start">
+                                                    <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
+                                                </div>
+                                                @if (($ticket->quantity - $ticket->orders_count) <= 10)      
+                                                <div class="d-flex align-items-center justify-content-start">
+                                                    <p class="mb-0 text-danger" style="font-size: 0.80rem">Only {{ $ticket->quantity - $ticket->orders_count }} left</p>
+                                                </div>
+                                                @endif
+                                            </div>
                                         </div>
                                         <div class="col-3">
                                             <div class="d-flex flex-column align-items-end">
@@ -312,7 +319,7 @@
                                                         ${{ number_format($ticket->price, 2) }}
                                                     @endif
                                                 </h6>
-                                                <select class="form-select mb-2 ticket-select" data-ticket-id="{{ $ticket->id }}" data-ticket-price="{{ $ticket->price }}" data-ticket-title="{{ $ticket->title }}" data-ticket-type="{{ $ticket->type }}">
+                                                <select class="form-select mb-2 ticket-select" data-ticket-id="{{ $ticket->id }}" data-ticket-price="{{ $ticket->price }}" data-ticket-title="{{ $ticket->title }}" data-ticket-type="{{ $ticket->type }}" @if($ticket->orders_count >= $ticket->quantity) disabled @endif>
                                                     @for($i = 0; $i <= min(10, $ticket->quantity - $ticket->count_orders); $i++)
                                                         <option value="{{ $i }}">{{ $i }}</option>
                                                     @endfor
@@ -371,21 +378,26 @@
                                 <hr>
                                 <div class="modal-body" style="padding-top: 60px">
                                     @foreach($tickets as $ticket)
-                                        @if ($today < $ticket->date_time_end && $ticket->count_orders < $ticket->quantity)
-                                            <div class="row mb-4" style="--bs-gutter-x: -0.5rem;">
+                                        @if ($today < $ticket->date_time_end)
+                                            <div class="row mb-4 position-relative @if($ticket->orders_count >= $ticket->quantity) opacity-25 @endif" style="--bs-gutter-x: -0.5rem;">
+                                                @if($ticket->orders_count >= $ticket->quantity)
+                                                <div class="sold-out-overlay">
+                                                    <img src="{{ asset('img/sold-out.png') }}" alt="Sold Out" class="img-fluid-sold-out">
+                                                </div>
+                                                @endif 
                                                 <div class="col-7">
                                                     <div class="d-flex align-items-center justify-content-start">
                                                         <h6>{{ $ticket->title }}</h6>
                                                     </div>
                                                 </div>
                                                 <div class="col-5">
-                                                    <div class="d-flex align-items-center justify-content-center">                                                
+                                                    <div @if($ticket->orders_count >= $ticket->quantity) disabled @endif class="d-flex align-items-center justify-content-center">                                                
                                                         <button class="btn btn-dark px-3 me-2"
                                                             onclick="decrementTicket(this, {{ $ticket->id }})">
                                                             <i class="fas fa-minus"></i>
                                                         </button>
                                                         <div class="form-outline" style="margin-bottom: 0.5rem;">
-                                                            <input class="form-control ticket-select-mobile" 
+                                                            <input @if($ticket->orders_count >= $ticket->quantity) disabled @endif class="form-control ticket-select-mobile" 
                                                                 id="ticket-input-{{ $ticket->id }}"
                                                                 data-ticket-id="{{ $ticket->id }}" 
                                                                 data-ticket-price="{{ $ticket->price }}" 
@@ -398,7 +410,7 @@
                                                                 style="-webkit-appearance: none; margin: 0;"
                                                                 onchange="updateTotal()"/>
                                                         </div>
-                                                        <button class="btn btn-dark px-3 ms-2"
+                                                        <button @if($ticket->orders_count >= $ticket->quantity) disabled @endif class="btn btn-dark px-3 ms-2"
                                                             onclick="incrementTicket(this, {{ $ticket->id }})">
                                                             <i class="fas fa-plus"></i>
                                                         </button>
@@ -422,9 +434,9 @@
                                                             @endif
                                                         </h6>
                                                     </div>
-                                                    @if (($ticket->quantity - $ticket->count_orders) <= 10)       
+                                                    @if (($ticket->quantity - $ticket->orders_count) <= 10)       
                                                         <div class="d-flex align-items-center justify-content-end">
-                                                            <p class="mb-0 text-danger" style="font-size: 0.80rem">Only {{ $ticket->quantity - $ticket->count_orders }} left</p>
+                                                            <p class="mb-0 text-danger" style="font-size: 0.80rem">Only {{ $ticket->quantity - $ticket->orders_count }} left</p>
                                                         </div>
                                                     @endif
                                                 </div>

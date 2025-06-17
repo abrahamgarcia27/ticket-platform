@@ -92,6 +92,23 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.0/css/responsive.dataTables.min.css">
     
     <style>
+        .sold-out-overlay {
+            position: absolute;
+            top: 50%;
+            left: 35%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            opacity: 0.8;
+            pointer-events: none;
+            width: auto;
+        }
+        .opacity-25 {
+            opacity: 0.25;
+        }
+        .img-fluid-sold-out {
+            width: 50%;
+            height: 50%;
+        }
         .bgcolor-dark {
             background-color: #0E1012 !important;
         }
