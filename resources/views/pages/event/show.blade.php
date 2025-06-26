@@ -152,7 +152,7 @@
                                             @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
                                                 <h4>Free</h4>
                                             @elseif ($lowestPaidPrice)
-                                                <h4>From ${{ number_format($lowestPaidPrice, 2) }}</h4>
+                                                <h4></h4>
                                             @endif
                                         </div>
                                         <div class="d-grid gap-2" style="padding-top: 10px">
@@ -673,7 +673,7 @@
                                 <h4>Free</h4>
                                 @endif
                                 @if ($ticket->type == 'paid')
-                                <h4>$ {{ $ticket->price }}</h4>
+                                <h4></h4>
                                 @endif
                             </div>
                         </div>
