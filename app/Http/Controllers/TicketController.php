@@ -96,6 +96,13 @@ class TicketController extends Controller
         }else {
             $all['available'] = 0;
         }
+        if($request->has_fee)
+        {
+            $all['fee'] = $request->fee;
+        }
+        else {
+            $all['fee'] = null;
+        }
         $ticket = Ticket::find($id);
         $ticket->update($all);
         

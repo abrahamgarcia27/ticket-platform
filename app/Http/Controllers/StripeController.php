@@ -34,13 +34,11 @@ class StripeController extends Controller
         }
 
         $lineItems = [];
-        $totalAmount = 0;
         $ticketsData = [];
-
         foreach ($selectedTickets as $ticketData) {
             $ticket = Ticket::findOrFail($ticketData['ticket_id']);
             $quantity = $ticketData['quantity'];
-            
+                
             // Validate quantity and availability
             if ($quantity <= 0 || $quantity > ($ticket->quantity - $ticket->count_orders)) {
                 return redirect()->back()->with('error', 'Invalid ticket quantity');
@@ -65,12 +63,25 @@ class StripeController extends Controller
             ];
         }
 
+        if ($ticket->fee != null) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'usd',
+                    'product_data' => [
+                        'name' => 'Facility Fee',
+                    ],
+                    'unit_amount' => $ticket->fee * 100,
+                ],
+                'quantity' => $quantity,
+            ];
+        }
+    
         $orderData = [
             'name_buyer' => $request->name_buyer,
             'last_name_buyer' => $request->last_name_buyer,
             'email_buyer' => $request->email_buyer,
             'phone_buyer' => $request->phone_buyer,
-            'tickets' => $ticketsData
+            'tickets' => $ticketsData,
         ];
 
         // Store order data in session
