@@ -54,6 +54,14 @@
                             <label for="price" class="form-control-label">Price</label>
                             <input class="form-control" type="text" name="price" id="price" placeholder="$" {{ $ticket->type == 'free' ? 'disabled' : ''}} value="{{ $ticket->price }}" required>
                         </div>
+                        <div class="form-check form-switch" id="feeSwitchGroup" style="padding-bottom: 15px;">
+                            <input class="form-check-input" type="checkbox" role="switch" id="has_fee" name="has_fee" {{ $ticket->fee !== null ? 'checked' : '' }}>
+                            <label class="form-check-label" for="has_fee">Do you want to add a fee?</label>
+                        </div>
+                        <div class="form-group" id="feeInputGroup" style="display: {{ $ticket->fee !== null ? 'block' : 'none' }};">
+                            <label for="fee" class="form-control-label">Fee</label>
+                            <input class="form-control" type="number" name="fee" id="fee" placeholder="$" step="0.01" min="0" value="{{ $ticket->fee }}">
+                        </div>
                         <div class="form-check form-switch" style="padding-bottom: 15px;">
                             <input class="form-check-input" type="checkbox" role="switch" id="available" name="available" {{ $ticket->available == '1' ? 'checked' : '' }}>
                             <label class="form-check-label" for="available">Available</label>
@@ -82,21 +90,33 @@
     $("#free").on("change", function(){
         var checked = $(this).is(':checked');
         if(checked){
-            $("#price").prop("disabled", true);
+            $("#price").prop({
+                disabled: true,
+                required: false
+            });
+            $("#feeSwitchGroup, #feeInputGroup").hide();
+            $("#has_fee").prop('checked', false).trigger('change');
         }
-        else{
-            $("#price").prop("disabled", false);
-        }    
     }); 
+    
     $("#paid").on("change", function(){
         var checked = $(this).is(':checked');
         if(checked){
-            $("#price").prop("disabled", false);
+            $("#price").prop({
+                disabled: false,
+                required: true
+            });
+            $("#feeSwitchGroup").show();
         }
-        else{
-            $("#price").prop("disabled", true);
-        }    
-    }); 
+    });
+    
+    $("#has_fee").on("change", function(){
+        if($(this).is(':checked')) {
+            $("#feeInputGroup").show().find('input').prop('required', true);
+        } else {
+            $("#feeInputGroup").hide().find('input').prop('required', false).val('');
+        }
+    });
 </script>
 @endpush
 
