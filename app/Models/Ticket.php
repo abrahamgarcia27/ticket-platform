@@ -36,4 +36,9 @@ class Ticket extends Model
     {
         return $this->orders()->count();
     }
+
+    public function fees()
+    {
+        return $this->hasMany(FeeTicket::class);
+    }
 }

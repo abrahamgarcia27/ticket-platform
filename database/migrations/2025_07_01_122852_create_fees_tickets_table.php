@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tickets', function (Blueprint $table) {
-            $table->decimal('fee', 10, 2)->nullable()->after('price');
+        Schema::create('fees_tickets', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->decimal('amount', 10, 2);
+            $table->foreignId('ticket_id')->constrained('tickets')->cascadeOnDelete();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tickets', function (Blueprint $table) {
-            $table->dropColumn('fee');
-        });
+        Schema::dropIfExists('fees_tickets');
     }
 };

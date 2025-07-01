@@ -55,12 +55,59 @@
                             <input class="form-control" type="text" name="price" id="price" placeholder="$" {{ $ticket->type == 'free' ? 'disabled' : ''}} value="{{ $ticket->price }}" required>
                         </div>
                         <div class="form-check form-switch" id="feeSwitchGroup" style="padding-bottom: 15px;">
-                            <input class="form-check-input" type="checkbox" role="switch" id="has_fee" name="has_fee" {{ $ticket->fee !== null ? 'checked' : '' }}>
-                            <label class="form-check-label" for="has_fee">Do you want to add a fee?</label>
+                            <input class="form-check-input" type="checkbox" role="switch" id="has_fee" name="has_fee" {{ $ticket->fees->isNotEmpty() ? 'checked' : '' }}>
+                            <label class="form-check-label" for="has_fee">Do you want to add fees?</label>
                         </div>
-                        <div class="form-group" id="feeInputGroup" style="display: {{ $ticket->fee !== null ? 'block' : 'none' }};">
-                            <label for="fee" class="form-control-label">Fee</label>
-                            <input class="form-control" type="number" name="fee" id="fee" placeholder="$" step="0.01" min="0" value="{{ $ticket->fee }}">
+                        <div id="feesContainer" style="display: {{ $ticket->fees->isNotEmpty() ? 'block' : 'none' }};">
+                            @foreach($ticket->fees as $index => $fee)
+                            <div class="fee-row mb-3">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <label class="form-control-label">Fee Name</label>
+                                        <input type="text" name="fees[{{ $index }}][name]" class="form-control fee-name" placeholder="Fee Name" value="{{ $fee->name }}" required>
+                                    </div>
+                                    <div class="col-5">
+                                        <label class="form-control-label">Fee Amount</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" name="fees[{{ $index }}][amount]" class="form-control fee-amount" placeholder="0.00" step="0.01" min="0" value="{{ $fee->amount }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <button type="button" class="btn btn-danger btn-sm remove-fee" {{ $ticket->fees->count() <= 1 ? 'style=display:none;' : 'style=margin-bottom:0px;' }}>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                            @if($ticket->fees->isEmpty())
+                            <div class="fee-row mb-3">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <label class="form-control-label">Fee Name</label>
+                                        <input type="text" name="fees[0][name]" class="form-control fee-name" placeholder="Fee Name" required>
+                                    </div>
+                                    <div class="col-5">
+                                        <label class="form-control-label">Fee Amount</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" name="fees[0][amount]" class="form-control fee-amount" placeholder="0.00" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <button type="button" class="btn btn-danger btn-sm remove-fee" style="display: none; margin-bottom: 0px;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            <div class="text-end mb-3">
+                                <button type="button" class="btn btn-primary btn-sm" id="addFee">
+                                    <i class="fas fa-plus"></i> Add Another Fee
+                                </button>
+                            </div>
                         </div>
                         <div class="form-check form-switch" style="padding-bottom: 15px;">
                             <input class="form-check-input" type="checkbox" role="switch" id="available" name="available" {{ $ticket->available == '1' ? 'checked' : '' }}>
@@ -86,19 +133,81 @@
         altFormat: "F j, Y (h:S K)",
     });
     
+    // Fee management
+    let feeIndex = {{ $ticket->fees->count() > 0 ? $ticket->fees->count() : 1 }};
     
+    // Toggle fee container visibility
+    $("#has_fee").on("change", function(){
+        if($(this).is(':checked')) {
+            $("#feesContainer").show();
+        } else {
+            $("#feesContainer").hide();
+        }
+    });
+    
+    // Add new fee row
+    $("#addFee").on('click', function() {
+        const newRow = `
+            <div class="fee-row mb-3">
+                <div class="row">
+                    <div class="col-5">
+                        <input type="text" name="fees[${feeIndex}][name]" class="form-control fee-name" placeholder="Fee Name" required>
+                    </div>
+                    <div class="col-5">
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" name="fees[${feeIndex}][amount]" class="form-control fee-amount" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                        <button type="button" class="btn btn-danger btn-sm remove-fee">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        
+        $(newRow).insertBefore($(this).parent());
+        feeIndex++;
+        
+        // Show remove buttons if there are multiple fee rows
+        if ($('.fee-row').length > 1) {
+            $('.remove-fee').show();
+        }
+    });
+    
+    // Remove fee row
+    $(document).on('click', '.remove-fee', function() {
+        $(this).closest('.fee-row').remove();
+        
+        // Hide remove buttons if only one fee row remains
+        if ($('.fee-row').length <= 1) {
+            $('.remove-fee').hide();
+        }
+        
+        // Rename remaining inputs to maintain proper array indexing
+        $('.fee-row').each(function(index) {
+            $(this).find('.fee-name').attr('name', `fees[${index}][name]`);
+            $(this).find('.fee-amount').attr('name', `fees[${index}][amount]`);
+        });
+        
+        feeIndex = $('.fee-row').length;
+    });
+    
+    // Handle free ticket type
     $("#free").on("change", function(){
         var checked = $(this).is(':checked');
         if(checked){
             $("#price").prop({
                 disabled: true,
                 required: false
-            });
-            $("#feeSwitchGroup, #feeInputGroup").hide();
-            $("#has_fee").prop('checked', false).trigger('change');
+            }).val('0');
+            $("#feeSwitchGroup, #feesContainer").hide();
+            $("#has_fee").prop('checked', false);
         }
-    }); 
+    });
     
+    // Handle paid ticket type
     $("#paid").on("change", function(){
         var checked = $(this).is(':checked');
         if(checked){
@@ -109,14 +218,5 @@
             $("#feeSwitchGroup").show();
         }
     });
-    
-    $("#has_fee").on("change", function(){
-        if($(this).is(':checked')) {
-            $("#feeInputGroup").show().find('input').prop('required', true);
-        } else {
-            $("#feeInputGroup").hide().find('input').prop('required', false).val('');
-        }
-    });
 </script>
 @endpush
-
