@@ -61,21 +61,24 @@ class StripeController extends Controller
                 'title' => $ticket->title,
                 'price' => $ticket->price
             ];
+            
+            if ($ticket->fees) {
+                foreach ($ticket->fees as $fee) {
+                    $lineItems[] = [
+                        'price_data' => [
+                            'currency' => 'usd',
+                            'product_data' => [
+                                'name' => $fee->name,
+                            ],
+                            'unit_amount' => $fee->amount * 100,
+                        ],
+                        'quantity' => $quantity,
+                    ];
+                }
+            }
         }
 
-        if ($ticket->fee != null) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product_data' => [
-                        'name' => 'Facility Fee',
-                    ],
-                    'unit_amount' => $ticket->fee * 100,
-                ],
-                'quantity' => $quantity,
-            ];
-        }
-    
+
         $orderData = [
             'name_buyer' => $request->name_buyer,
             'last_name_buyer' => $request->last_name_buyer,
