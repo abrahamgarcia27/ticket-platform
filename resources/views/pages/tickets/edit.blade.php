@@ -64,13 +64,13 @@
                                 <div class="row">
                                     <div class="col-5">
                                         <label class="form-control-label">Fee Name</label>
-                                        <input type="text" name="fees[{{ $index }}][name]" class="form-control fee-name" placeholder="Fee Name" value="{{ $fee->name }}" required>
+                                        <input type="text" name="fees[{{ $index }}][name]" class="form-control fee-name" placeholder="Fee Name" value="{{ $fee->name }}">
                                     </div>
                                     <div class="col-5">
                                         <label class="form-control-label">Fee Amount</label>
                                         <div class="input-group">
                                             <span class="input-group-text">$</span>
-                                            <input type="number" name="fees[{{ $index }}][amount]" class="form-control fee-amount" placeholder="0.00" step="0.01" min="0" value="{{ $fee->amount }}" required>
+                                            <input type="number" name="fees[{{ $index }}][amount]" class="form-control fee-amount" placeholder="0.00" step="0.01" min="0" value="{{ $fee->amount }}">
                                         </div>
                                     </div>
                                     <div class="col-2 d-flex align-items-center justify-content-center">
