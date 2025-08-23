@@ -170,6 +170,9 @@ class StripeController extends Controller
                 $orders_data[] = $order_data;
             }
             $order_data['quantity'] = $ticketData['quantity'];
+            $order_data['email_buyer'] = $order->email_buyer;
+            $order_data['phone_buyer'] = $order->phone_buyer;
+
             // Send order data to Pabbly
             $connectPabblyService = new ConnectPabblyService();
             $connectPabblyService->sendOrderData($order_data);
