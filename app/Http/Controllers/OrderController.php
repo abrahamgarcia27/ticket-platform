@@ -12,6 +12,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Stripe;
 use PDF;
 use Carbon\Carbon;
+use App\Services\ConnectPabblyService;
 
 class OrderController extends Controller
 {
@@ -107,7 +108,7 @@ class OrderController extends Controller
                 $created_at = Carbon::parse($order->created_at);
                 $fechaRestada = $created_at->subHours(6);
 
-                $orders_data[] = [
+                $order_data = [
                     'event_title'     => $event->title,
                     'event_ubication' => $event->ubication,
                     'event_datetime'  => $event->date_time_start,
@@ -119,7 +120,12 @@ class OrderController extends Controller
                     'qr'              => $order->svg_qr,
                     'website'         => $event->user->web_url
                 ];
+                $orders_data[] = $order_data;
             }
+            $order_data['quantity'] = $ticketData['quantity'];
+            // Send order data to Pabbly
+            $connectPabblyService = new ConnectPabblyService();
+            $connectPabblyService->sendOrderData($order_data);
         }
 
         $pdf = PDF::loadView('pages.orders.pdf', ['orders_data' => $orders_data]);
