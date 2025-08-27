@@ -13,7 +13,7 @@ class ConnectPabblyService
         $curl = curl_init();
         $data = json_encode($order_data, true);
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://connect.pabbly.com/workflow/sendwebhookdata/IjU3NjYwNTZhMDYzZTA0M2Q1MjZkNTUzNjUxMzQi_pc',
+            CURLOPT_URL => env('WEBHOOK_URL_ORDERS'),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
