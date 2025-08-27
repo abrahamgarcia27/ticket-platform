@@ -125,6 +125,18 @@ class OrderController extends Controller
             $order_data['quantity'] = $ticketData['quantity'];
             $order_data['email_buyer'] = $order->email_buyer;
             $order_data['phone_buyer'] = $order->phone_buyer;
+            $order_data['event_address'] = $event->street_address;
+            $order_data['event_city'] = $event->address_locality;
+            $order_data['event_state'] = $event->address_region;
+            $order_data['event_postal_code'] = $event->postal_code;
+            $order_data['event_country'] = $event->address_country;
+            $order_data['event_maps_url'] = $event->maps_url;
+            $order_data['event_date_time_end'] = $event->date_time_end;
+            $order_data['event_summary'] = $event->summary;
+            $order_data['event_about'] = $event->about;
+            $order_data['event_meta_title'] = $event->meta_title;
+            $order_data['event_meta_description'] = $event->meta_description;
+            $order_data['event_link_external'] = $event->link_external_Sales;
 
             // Send order data to Pabbly
             $connectPabblyService = new ConnectPabblyService();
