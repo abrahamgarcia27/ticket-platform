@@ -384,16 +384,15 @@
             }
 
             .mobile-bottom-nav .nav-link:hover::before,
-            .mobile-bottom-nav .nav-link.active::before {
+            .mobile-bottom-nav .nav-link.temp-active::before {
                 opacity: 1;
             }
 
             .mobile-bottom-nav .nav-link:hover,
-            .mobile-bottom-nav .nav-link.active {
+            .mobile-bottom-nav .nav-link.temp-active {
                 color: #fff;
                 transform: translateY(-3px);
                 box-shadow: 0 8px 25px rgba(217, 188, 115, 0.4);
-                border-color: #D9BC73;
             }
 
             .mobile-bottom-nav .nav-link i {
@@ -405,7 +404,7 @@
             }
 
             .mobile-bottom-nav .nav-link:hover i,
-            .mobile-bottom-nav .nav-link.active i {
+            .mobile-bottom-nav .nav-link.temp-active i {
                 transform: scale(1.1);
             }
 
@@ -429,6 +428,54 @@
             /* Adjust the get tickets bottom bar position */
             #getTicketsBottom1 {
                 bottom: 80px !important; /* Above the navigation bar */
+            }
+        }
+
+        /* Event Summary Styling */
+        .event-summary-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-left: 4px solid #D9BC73;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .event-summary-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #495057;
+            font-weight: 400;
+            text-align: left;
+            font-family: 'Open Sans', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        @media (max-width: 768px) {
+            .event-summary-container {
+                padding: 15px 20px;
+                margin: 8px 0;
+            }
+            
+            .event-summary-content {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+        }
+
+        /* Section Divider Styling */
+        .section-divider {
+            width: 90%;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.15);
+            margin: 30px auto 25px auto;
+            border-radius: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .section-divider {
+                width: 90%;
+                margin: 20px auto 20px auto;
             }
         }
     </style>

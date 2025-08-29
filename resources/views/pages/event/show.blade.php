@@ -16,11 +16,13 @@
                     <div class="d-flex align-items-center">
                         <h5 class="mb-0">{{ date('F j, Y', strtotime($event->date_time_start)) }}</h5>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <h3 class="mb-0">{{ $event->title }}</h3>
+                    <div class="d-flex align-items-center" style="padding-top: 15px;">
+                        <h3 class="mb-0" style="text-align: left;">{{ $event->title }}</h3>
                     </div>
-                    <div class="d-flex align-items-center" style="padding-top: 20px; text-align:justify;">
-                        <h6 class="mb-0">{{ $event->summary }}</h6>
+                    <div class="event-summary-container" style="padding-top: 25px;">
+                        <div class="event-summary-content">
+                            {{ $event->summary }}
+                        </div>
                     </div>
                 </div> 
                 <div class="card-body pb-0">                 
@@ -51,7 +53,9 @@
                                 </li>
                             </ul>  
                         </div>
-                    </nav>            
+                    </nav>
+                    <!-- Section divider -->
+                    <div class="section-divider"></div>
                     <div class="row" id="whenandwhere">
                         <div class="col-6" id="whDesktop">
                             <div class="row">
@@ -736,7 +740,7 @@
             <div class="container-fluid">
                 <ul class="nav justify-content-around">
                     <li class="nav-item">
-                        <a class="nav-link active" id="aMobileInfo" href="#whenandwhere">
+                        <a class="nav-link" id="aMobileInfo" href="#whenandwhere">
                             <i class="fas fa-info-circle"></i>
                             <span>Info</span>
                         </a>
@@ -745,6 +749,12 @@
                         <a class="nav-link" id="aMobileDetails" href="#about">
                             <i class="fas fa-list-alt"></i>
                             <span>Details</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="aMobileTicket" href="#" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span>Ticket</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -994,13 +1004,43 @@
         if (window.innerWidth <= 959) {
             const sections = ['whenandwhere', 'about', 'organizer'];
             const navLinks = ['aMobileInfo', 'aMobileDetails', 'aMobileOrganizer'];
+            const allNavLinks = ['aMobileInfo', 'aMobileDetails', 'aMobileTicket', 'aMobileOrganizer'];
             
-            // Smooth scroll for mobile nav
+            // Handle ticket button (modal, no scroll)
+            $('#aMobileTicket').click(function(e) {
+                // Remove any existing temp-active class from all buttons
+                allNavLinks.forEach(id => {
+                    $(`#${id}`).removeClass('temp-active');
+                });
+                
+                // Add temporary active state for visual feedback
+                $(this).addClass('temp-active');
+                
+                // Remove temp-active after modal interaction
+                setTimeout(() => {
+                    $(this).removeClass('temp-active');
+                }, 200);
+            });
+            
+            // Smooth scroll for mobile nav (excluding ticket button)
             navLinks.forEach((linkId, index) => {
                 $(`#${linkId}`).click(function(e) {
                     e.preventDefault();
                     const targetSection = sections[index];
                     const targetElement = document.getElementById(targetSection);
+                    
+                    // Remove any existing temp-active class from all buttons
+                    allNavLinks.forEach(id => {
+                        $(`#${id}`).removeClass('temp-active');
+                    });
+                    
+                    // Add temporary active state for visual feedback
+                    $(this).addClass('temp-active');
+                    
+                    // Remove active state after brief moment
+                    setTimeout(() => {
+                        $(this).removeClass('temp-active');
+                    }, 200);
                     
                     if (targetElement) {
                         const offsetTop = targetElement.offsetTop - 30; // Offset for navbar
@@ -1010,43 +1050,6 @@
                         });
                     }
                 });
-            });
-            
-            // Highlight active section on scroll
-            function updateActiveNavLink() {
-                const scrollPosition = window.scrollY + 150; // Offset for better detection
-                
-                sections.forEach((sectionId, index) => {
-                    const section = document.getElementById(sectionId);
-                    if (section) {
-                        const sectionTop = section.offsetTop;
-                        const sectionBottom = sectionTop + section.offsetHeight;
-                        
-                        if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-                            // Remove active class from all mobile nav links
-                            navLinks.forEach(linkId => {
-                                const element = document.getElementById(linkId);
-                                if (element) element.classList.remove('active');
-                            });
-                            // Add active class to current section link
-                            const activeElement = document.getElementById(navLinks[index]);
-                            if (activeElement) activeElement.classList.add('active');
-                        }
-                    }
-                });
-            }
-            
-            // Initial call to set active state
-            updateActiveNavLink();
-            
-            // Update on scroll
-            window.addEventListener('scroll', updateActiveNavLink);
-            
-            // Update on window resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth <= 959) {
-                    updateActiveNavLink();
-                }
             });
         }
     });
