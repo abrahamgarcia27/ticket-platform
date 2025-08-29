@@ -330,6 +330,107 @@
                 width: 200px;
             }
         }
+
+        /* Mobile Navigation Bottom Bar */
+        @media (max-width: 959px) {
+            .mobile-bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #fff;
+                border-top: 2px solid #D9BC73;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 1050;
+                padding: 12px 0;
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-bottom-nav .container-fluid {
+                padding: 0 15px;
+            }
+
+            .mobile-bottom-nav .nav-link {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 10px 8px;
+                color: #6c757d;
+                text-decoration: none;
+                border-radius: 12px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                font-size: 0.7rem;
+                font-weight: 600;
+                background: transparent;
+                border: 2px solid transparent;
+                min-height: 60px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .mobile-bottom-nav .nav-link::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, #D9BC73, #E8D399);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                border-radius: 10px;
+                z-index: -1;
+            }
+
+            .mobile-bottom-nav .nav-link:hover::before,
+            .mobile-bottom-nav .nav-link.active::before {
+                opacity: 1;
+            }
+
+            .mobile-bottom-nav .nav-link:hover,
+            .mobile-bottom-nav .nav-link.active {
+                color: #fff;
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(217, 188, 115, 0.4);
+                border-color: #D9BC73;
+            }
+
+            .mobile-bottom-nav .nav-link i {
+                font-size: 1.3rem;
+                margin-bottom: 4px;
+                transition: transform 0.3s ease;
+                z-index: 1;
+                position: relative;
+            }
+
+            .mobile-bottom-nav .nav-link:hover i,
+            .mobile-bottom-nav .nav-link.active i {
+                transform: scale(1.1);
+            }
+
+            .mobile-bottom-nav .nav-link span {
+                z-index: 1;
+                position: relative;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Hide original mobile nav */
+            #navPhone {
+                display: none !important;
+            }
+
+            /* Add bottom margin to prevent content overlap with fixed navbar and tickets button */
+            .main-content {
+                margin-bottom: 160px !important; /* Space for both navbars */
+            }
+
+            /* Adjust the get tickets bottom bar position */
+            #getTicketsBottom1 {
+                bottom: 80px !important; /* Above the navigation bar */
+            }
+        }
     </style>
     
 </head>

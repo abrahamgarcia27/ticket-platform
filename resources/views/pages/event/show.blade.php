@@ -14,7 +14,7 @@
             <div class="card-body p-3">
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
-                        <h5 class="mb-0">{{ date('j F, Y', strtotime($event->date_time_start)) }}</h5>
+                        <h5 class="mb-0">{{ date('F j, Y', strtotime($event->date_time_start)) }}</h5>
                     </div>
                     <div class="d-flex align-items-center">
                         <h3 class="mb-0">{{ $event->title }}</h3>
@@ -38,7 +38,7 @@
                                 </li>
                             </ul>  
                         </div>
-                        <div class="col-12" id="navPhone">
+                        <div class="col-12" id="navPhone" style="display: none;">
                             <ul class="nav justify-content-around">
                                 <li class="nav-item">
                                     <a class="nav-link" id="aInfo2" href="#whenandwhere">Info</a>
@@ -63,7 +63,7 @@
                                             <h6 class="mb-0">Date</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y ', strtotime($event->date_time_start)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@
                                             <h6 class="mb-0">Date</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y', strtotime($event->date_time_start)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -730,6 +730,32 @@
                 </div>    
             @endif
         </nav>
+        
+        <!-- Mobile Bottom Navigation (only visible on mobile) -->
+        <nav class="mobile-bottom-nav d-md-none">
+            <div class="container-fluid">
+                <ul class="nav justify-content-around">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="aMobileInfo" href="#whenandwhere">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Info</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="aMobileDetails" href="#about">
+                            <i class="fas fa-list-alt"></i>
+                            <span>Details</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="aMobileOrganizer" href="#organizer">
+                            <i class="fas fa-user"></i>
+                            <span>Organizer</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </main>
     @include('layouts.footers.guest.footer')
 @endsection
@@ -950,7 +976,8 @@
         // Manejo de pestañas
         const tabPairs = [
             ['aInfo', 'aDetails', 'aOrganizer'],
-            ['aInfo2', 'aDetails2', 'aOrganizer2']
+            ['aInfo2', 'aDetails2', 'aOrganizer2'],
+            ['aMobileInfo', 'aMobileDetails', 'aMobileOrganizer']
         ];
 
         tabPairs.forEach(tabSet => {
@@ -962,6 +989,66 @@
                 });
             });
         });
+
+        // Mobile bottom nav scroll behavior
+        if (window.innerWidth <= 959) {
+            const sections = ['whenandwhere', 'about', 'organizer'];
+            const navLinks = ['aMobileInfo', 'aMobileDetails', 'aMobileOrganizer'];
+            
+            // Smooth scroll for mobile nav
+            navLinks.forEach((linkId, index) => {
+                $(`#${linkId}`).click(function(e) {
+                    e.preventDefault();
+                    const targetSection = sections[index];
+                    const targetElement = document.getElementById(targetSection);
+                    
+                    if (targetElement) {
+                        const offsetTop = targetElement.offsetTop - 30; // Offset for navbar
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Highlight active section on scroll
+            function updateActiveNavLink() {
+                const scrollPosition = window.scrollY + 150; // Offset for better detection
+                
+                sections.forEach((sectionId, index) => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const sectionTop = section.offsetTop;
+                        const sectionBottom = sectionTop + section.offsetHeight;
+                        
+                        if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                            // Remove active class from all mobile nav links
+                            navLinks.forEach(linkId => {
+                                const element = document.getElementById(linkId);
+                                if (element) element.classList.remove('active');
+                            });
+                            // Add active class to current section link
+                            const activeElement = document.getElementById(navLinks[index]);
+                            if (activeElement) activeElement.classList.add('active');
+                        }
+                    }
+                });
+            }
+            
+            // Initial call to set active state
+            updateActiveNavLink();
+            
+            // Update on scroll
+            window.addEventListener('scroll', updateActiveNavLink);
+            
+            // Update on window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 959) {
+                    updateActiveNavLink();
+                }
+            });
+        }
     });
 </script>
 @endif
