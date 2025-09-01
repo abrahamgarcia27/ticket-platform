@@ -331,45 +331,44 @@
             }
         }
 
-        /* Mobile Navigation Bottom Bar */
+        /* Mobile Navigation Top Bar */
         @media (max-width: 959px) {
-            .mobile-bottom-nav {
+            .mobile-top-nav {
                 position: fixed;
-                bottom: 0;
+                top: 0;
                 left: 0;
                 right: 0;
                 background: #fff;
-                border-top: 2px solid #D9BC73;
-                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+                border-bottom: 2px solid #D9BC73;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
                 z-index: 1050;
-                padding: 12px 0;
+                padding: 8px 0;
                 backdrop-filter: blur(10px);
             }
 
-            .mobile-bottom-nav .container-fluid {
+            .mobile-top-nav .container-fluid {
                 padding: 0 15px;
             }
 
-            .mobile-bottom-nav .nav-link {
+            .mobile-top-nav .nav-link {
                 display: flex;
-                flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                padding: 10px 8px;
+                padding: 8px 12px;
                 color: #6c757d;
                 text-decoration: none;
-                border-radius: 12px;
+                border-radius: 20px;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                font-size: 0.7rem;
+                font-size: 0.8rem;
                 font-weight: 600;
                 background: transparent;
                 border: 2px solid transparent;
-                min-height: 60px;
+                min-height: 40px;
                 position: relative;
                 overflow: hidden;
             }
 
-            .mobile-bottom-nav .nav-link::before {
+            .mobile-top-nav .nav-link::before {
                 content: '';
                 position: absolute;
                 top: 0;
@@ -379,45 +378,73 @@
                 background: linear-gradient(135deg, #D9BC73, #E8D399);
                 opacity: 0;
                 transition: opacity 0.3s ease;
-                border-radius: 10px;
+                border-radius: 18px;
                 z-index: -1;
             }
 
-            .mobile-bottom-nav .nav-link:hover::before,
-            .mobile-bottom-nav .nav-link.temp-active::before {
+            .mobile-top-nav .nav-link:hover::before,
+            .mobile-top-nav .nav-link.temp-active::before {
                 opacity: 1;
             }
 
-            .mobile-bottom-nav .nav-link:hover,
-            .mobile-bottom-nav .nav-link.temp-active {
+            .mobile-top-nav .nav-link:hover,
+            .mobile-top-nav .nav-link.temp-active {
                 color: #fff;
-                transform: translateY(-3px);
-                box-shadow: 0 8px 25px rgba(217, 188, 115, 0.4);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(217, 188, 115, 0.4);
             }
 
-            .mobile-bottom-nav .nav-link i {
-                font-size: 1.3rem;
-                margin-bottom: 4px;
-                transition: transform 0.3s ease;
-                z-index: 1;
-                position: relative;
-            }
-
-            .mobile-bottom-nav .nav-link:hover i,
-            .mobile-bottom-nav .nav-link.temp-active i {
-                transform: scale(1.1);
-            }
-
-            .mobile-bottom-nav .nav-link span {
+            .mobile-top-nav .nav-link span {
                 z-index: 1;
                 position: relative;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
 
+            /* Mobile Bottom Get Tickets Button */
+            .mobile-bottom-ticket {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #fff;
+                border-top: 2px solid #D9BC73;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 1050;
+                padding: 15px;
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-bottom-ticket .btn-yellow {
+                background: linear-gradient(135deg, #D9BC73, #E8D399);
+                border: none;
+                border-radius: 25px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(217, 188, 115, 0.3);
+            }
+
+            .mobile-bottom-ticket .btn-yellow:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(217, 188, 115, 0.5);
+            }
+
+            /* Adjust main content padding for fixed navbars */
+            .main-content {
+                padding-top: 60px !important;
+                padding-bottom: 120px !important;
+            }
+
             /* Hide original mobile nav */
             #navPhone {
                 display: none !important;
+            }
+
+            /* Add extra margin to last content section to ensure visibility */
+            .main-content .row:last-of-type {
+                margin-bottom: 40px !important;
             }
 
             /* Add bottom margin to prevent content overlap with fixed navbar and tickets button */
