@@ -543,10 +543,65 @@
             display: none !important; /* Hidden on all devices now */
         }
 
+        /* Mobile Ticket Selection Styling */
         @media (max-width: 768px) {
             .section-divider {
                 width: 90%;
                 margin: 20px auto 20px auto;
+            }
+
+            /* Improve mobile ticket selector visibility */
+            .ticket-select-mobile {
+                font-size: 1.1rem !important;
+                font-weight: 600 !important;
+                text-align: center !important;
+                min-width: 60px !important;
+                height: 45px !important;
+                border: 2px solid #D9BC73 !important;
+                border-radius: 8px !important;
+                background-color: #fff !important;
+                color: #333 !important;
+            }
+
+            /* Make +/- buttons smaller but still touchable */
+            .btn.px-3 {
+                padding: 8px 12px !important;
+                font-size: 0.9rem !important;
+                min-width: 40px !important;
+                height: 40px !important;
+            }
+
+            /* Ensure proper spacing in ticket selection container */
+            .d-flex.align-items-center.justify-content-center {
+                gap: 8px !important;
+            }
+
+            /* Fix mobile modal bottom navigation positioning */
+            #getTicketsBottom {
+                bottom: 15px !important; /* Move up from bottom edge */
+                padding: 15px 0 !important; /* More internal padding */
+                height: auto !important; /* Auto height instead of fixed 80px */
+                min-height: 100px !important; /* Minimum height for content */
+                background-color: #fff !important;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+            }
+
+            /* Ensure buttons have proper spacing and visibility */
+            #getTicketsBottom .btn-lg {
+                padding: 12px 20px !important;
+                font-size: 1rem !important;
+                margin-bottom: 10px !important; /* Space from bottom */
+            }
+
+            /* Add padding to modal body to prevent content overlap with fixed bottom */
+            .modal-fullscreen .modal-body {
+                padding-bottom: 140px !important; /* Ensure content doesn't hide behind bottom nav */
+            }
+
+            /* Adjust total display spacing */
+            #getTicketsBottom .row {
+                margin-bottom: 10px !important;
+                padding: 0 5px !important;
             }
         }
     </style>
