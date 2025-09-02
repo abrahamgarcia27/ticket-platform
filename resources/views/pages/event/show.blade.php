@@ -50,7 +50,7 @@
                 </div> 
                 <div class="card-body pb-0">                 
                     <nav class="navbar sticky-top navbar-dark nav-event">
-                        <div class="col-6" id="navDesktop">
+                        <div class="col-12" id="navDesktop">
                             <ul class="nav justify-content-around" id="mi-ul">
                                 <li class="nav-item">
                                     <a class="nav-link" id="aInfo" href="#whenandwhere">Info</a>
@@ -248,10 +248,35 @@
                     <div class="row" style="padding-top: 40px" id="organizer">
                         <div class="card-transparent" style="width: 40rem">                          
                             <h4 style="padding-bottom: 20px">Other events you may like</h4>                           
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 40px">
+                            <div class="card-body d-flex flex-column" style="min-height: 10vh; justify-content: space-between;">
+                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 10px; padding-bottom: 5px;">
                                     <a href="/list-events" class="btn btn-dark">View Events</a>
                                 </div>
+                                
+                                <!-- Mobile Footer -->
+                                <footer class="mobile-footer">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="copyright">
+                                                    © <script>
+                                                        document.write(new Date().getFullYear())
+                                                    </script>,
+                                                    Copyright 2024 by <a href="/list-events" class="font-weight-bold text-muted" target="_blank">Laravel</a>
+                                                     - All right reserved.
+                                                </div>
+                                                <ul class="nav nav-footer">
+                                                    <li class="nav-item">
+                                                        <a href="/privacy-policy" class="nav-link" target="_blank">Privacy Policy</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a href="https://elaftersocialclub.com/terms-and-conditions" class="nav-link" target="_blank">Terms of Service</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </footer>
                             </div>
                         </div>
                     </div>
@@ -607,7 +632,7 @@
                                         <h6>Checkout</h6>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('F j, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
+                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('F j, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -690,7 +715,7 @@
             </div>
             @endif
         </div>
-        <nav class="fixed-bottom navbar-dark" id="getTicketsBottom1">
+        {{-- <nav class="fixed-bottom navbar-dark" id="getTicketsBottom1">
             @if ($ticket !=null)   
                 @if ($today < $ticket->date_time_end) 
                     @if ($count_orders < $ticket->quantity)
@@ -756,14 +781,34 @@
                     </div>
                 </div>    
             @endif
-        </nav>
+        </nav> --}}
         
         <!-- Mobile Bottom Get Tickets Button (only visible on mobile) -->
         <div class="mobile-bottom-ticket d-md-none">
             <div class="container-fluid">
-                <button type="button" class="btn btn-yellow btn-lg w-100" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
-                    Get Tickets
-                </button>
+                @php
+                    $today = now();
+                    $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
+                    $lowestPaidPrice = $tickets->where('type', 'paid')
+                        ->where('date_time_end', '>', $today)
+                        ->min('price');
+                    $hasFreeTickets = $tickets->where('type', 'free')
+                        ->where('date_time_end', '>', $today)
+                        ->isNotEmpty();
+                @endphp
+                
+                @if ($hasAvailableTickets)
+                    {{-- Show "Free" only when event is free --}}
+                    @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
+                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
+                            <h4 style="margin: 0; color: #333;">Free</h4>
+                        </div>
+                    @endif
+                    
+                    <button type="button" class="btn btn-yellow btn-lg w-100" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
+                        Get Tickets
+                    </button>
+                @endif
             </div>
         </div>
     </main>

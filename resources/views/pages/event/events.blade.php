@@ -18,13 +18,14 @@
                                 <div class="card-transparent list-event">
                                     <div class="image-container">
                                         <img src="{{ asset('storage/' .  $event->coverimage) }}" class="card-img-top" alt="...">
-                                        <div class="row event-title-container">
-                                            <div class="event-date-circle">
-                                                <p class="event-date mt-3">{{ strtoupper(\Carbon\Carbon::parse($event->date_time_start)->format('D d')) }}</p>
-                                                <p class="event-date">{{ strtoupper(\Carbon\Carbon::parse($event->date_time_start)->format('M')) }}</p>
-                                            </div>
-                                            <div class="event-title">{{ $event->title }}</div>
+                                    </div>
+                                    <!-- Event info moved outside and below the image -->
+                                    <div class="event-info-container">
+                                        <div class="event-date-circle">
+                                            <p class="event-date mt-2">{{ strtoupper(\Carbon\Carbon::parse($event->date_time_start)->format('D d')) }}</p>
+                                            <p class="event-date">{{ strtoupper(\Carbon\Carbon::parse($event->date_time_start)->format('M')) }}</p>
                                         </div>
+                                        <div class="event-title">{{ $event->title }}</div>
                                     </div>
                                 </div>
                             </a>

@@ -189,12 +189,12 @@
             }
             #getTicketsBottom {
                display: block;
-               height: 140px; 
+               height: 80px; 
                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.16);
             }
             #getTicketsBottom1{
                display: block;
-               height: 140px; 
+               height: 80px; 
                position: sticky !important;
                background-color: #ffff;
             }
@@ -250,10 +250,15 @@
         .list-event {
             width: 380px;
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            border-radius: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             .image-container {
                 position: relative;
-                border-radius: 25px;
+                border-radius: 25px 25px 0 0;
                 overflow: hidden;
             }
             .image-container::before {
@@ -263,48 +268,73 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0, 0, 0, 0.1); /* Fondo semitransparente */
+                background-color: rgba(0, 0, 0, 0.05); /* Ligero overlay */
+                z-index: 1;
             }   
             .card-img-top{
-                border-radius: 25px;
-                height: 380px;
+                border-radius: 25px 25px 0 0;
+                height: auto;
                 width: 100%;
-                object-fit: cover;
+                object-fit: contain;
+                max-height: 500px;
+                display: block;
             }
-            .event-title-container {
-                position: absolute;
-                bottom: 10px;
-                left: 10%;
-                transform: translateX(-10%);
+
+            /* New event info container below image */
+            .event-info-container {
                 display: flex;
                 align-items: center;
-                z-index: 1;
-                width: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                margin: 0px;
+                padding: 15px 20px;
+                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                border-radius: 0 0 25px 25px;
+                gap: 15px;
+                min-height: 80px;
             }
 
             .event-date-circle {
-                background-color: #D9BC73;
-                border: 1px solid #ffff;
+                background: linear-gradient(135deg, #D9BC73, #E8D399);
+                border: 2px solid #fff;
                 border-radius: 50%;
                 color: white;
                 text-align: center;
-                width: 80px;
-                height: 80px;
+                width: 70px;
+                height: 70px;
+                flex-shrink: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 4px 10px rgba(217, 188, 115, 0.3);
                 .event-date {
-                    margin:0px;
+                    margin: 0;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    line-height: 1;
                 }
             }
 
             .event-title {
-                color: white;
+                color: #2d3748;
                 font-size: 1rem;
-                margin-left: 10px;
-                width: 280px;
-                font-weight: bold;
+                font-weight: 600;
+                line-height: 1.3;
+                flex: 1;
+                text-align: left;
+                margin: 0;
             }
 
+            /* Hover effects */
+            &:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                .event-date-circle {
+                    transform: scale(1.05);
+                    box-shadow: 0 6px 15px rgba(217, 188, 115, 0.4);
+                }
+                .event-title {
+                    color: #D9BC73;
+                }
+            }
         }
         .events-container {
             padding: 0px !important;
@@ -316,18 +346,25 @@
         @media only screen and (max-width: 1400px) {
            .list-event {
             width: 300px;
+            margin-bottom: 25px;
             .card-img-top{
-                height: 300px;
+                height: auto;
+                max-height: 400px;
             }
             .event-date-circle {
                 width: 60px;
                 height: 60px;
                 .event-date {
-                    font-size: 12px;
+                    font-size: 0.65rem;
                 }
            }
            .event-title {
-                width: 200px;
+                font-size: 0.9rem;
+            }
+           .event-info-container {
+                padding: 12px 15px;
+                gap: 12px;
+                min-height: 70px;
             }
         }
 
@@ -411,19 +448,21 @@
                 border-top: 2px solid #D9BC73;
                 box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
                 z-index: 1050;
-                padding: 15px;
+                padding: 8px 15px;
                 backdrop-filter: blur(10px);
             }
 
             .mobile-bottom-ticket .btn-yellow {
                 background: linear-gradient(135deg, #D9BC73, #E8D399);
                 border: none;
-                border-radius: 25px;
+                border-radius: 20px;
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 transition: all 0.3s ease;
                 box-shadow: 0 4px 15px rgba(217, 188, 115, 0.3);
+                padding: 10px 20px;
+                font-size: 0.9rem;
             }
 
             .mobile-bottom-ticket .btn-yellow:hover {
@@ -434,7 +473,7 @@
             /* Adjust main content padding for fixed navbars */
             .main-content {
                 padding-top: 60px !important;
-                padding-bottom: 120px !important;
+                padding-bottom: 0 !important; /* Use margin-bottom on last element instead */
             }
 
             /* Hide original mobile nav */
@@ -442,19 +481,19 @@
                 display: none !important;
             }
 
-            /* Add extra margin to last content section to ensure visibility */
+            /* Control exact scroll limit - no footer, just button container at bottom */
             .main-content .row:last-of-type {
-                margin-bottom: 40px !important;
+                margin-bottom: 80px !important; /* Exactly navbar height - no extra space */
             }
 
-            /* Add bottom margin to prevent content overlap with fixed navbar and tickets button */
+            /* Remove conflicting bottom margin */
             .main-content {
-                margin-bottom: 160px !important; /* Space for both navbars */
+                margin-bottom: 0 !important; /* Remove extra margin, use precise control above */
             }
 
             /* Adjust the get tickets bottom bar position */
             #getTicketsBottom1 {
-                bottom: 80px !important; /* Above the navigation bar */
+                bottom: 0px !important; /* Directly at bottom now */
             }
         }
 
@@ -497,6 +536,11 @@
             background: rgba(0, 0, 0, 0.15);
             margin: 30px auto 25px auto;
             border-radius: 1px;
+        }
+
+        /* Mobile Footer Styling - DISABLED */
+        .mobile-footer {
+            display: none !important; /* Hidden on all devices now */
         }
 
         @media (max-width: 768px) {
