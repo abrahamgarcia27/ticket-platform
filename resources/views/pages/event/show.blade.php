@@ -2,6 +2,29 @@
 
 @section('content')
     <main class="main-content mt-0">
+        <!-- Mobile Top Navigation (only visible on mobile) -->
+        <nav class="mobile-top-nav d-md-none">
+            <div class="container-fluid">
+                <ul class="nav justify-content-around">
+                    <li class="nav-item">
+                        <a class="nav-link" id="aMobileInfo" href="#whenandwhere">
+                            <span>Info</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="aMobileDetails" href="#about">
+                            <span>Details</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="aMobileOrganizer" href="#organizer">
+                            <span>Organizer</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
         <div class="header">
             <a href="/list-events">
                 <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo">
@@ -14,18 +37,20 @@
             <div class="card-body p-3">
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
-                        <h5 class="mb-0">{{ date('j F, Y', strtotime($event->date_time_start)) }}</h5>
+                        <h5 class="mb-0">{{ date('F j, Y', strtotime($event->date_time_start)) }}</h5>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <h3 class="mb-0">{{ $event->title }}</h3>
+                    <div class="d-flex align-items-center" style="padding-top: 15px;">
+                        <h3 class="mb-0" style="text-align: left;">{{ $event->title }}</h3>
                     </div>
-                    <div class="d-flex align-items-center" style="padding-top: 20px; text-align:justify;">
-                        <h6 class="mb-0">{{ $event->summary }}</h6>
+                    <div class="event-summary-container" style="padding-top: 25px;">
+                        <div class="event-summary-content">
+                            {{ $event->summary }}
+                        </div>
                     </div>
                 </div> 
                 <div class="card-body pb-0">                 
                     <nav class="navbar sticky-top navbar-dark nav-event">
-                        <div class="col-6" id="navDesktop">
+                        <div class="col-12" id="navDesktop">
                             <ul class="nav justify-content-around" id="mi-ul">
                                 <li class="nav-item">
                                     <a class="nav-link" id="aInfo" href="#whenandwhere">Info</a>
@@ -38,7 +63,7 @@
                                 </li>
                             </ul>  
                         </div>
-                        <div class="col-12" id="navPhone">
+                        <div class="col-12" id="navPhone" style="display: none;">
                             <ul class="nav justify-content-around">
                                 <li class="nav-item">
                                     <a class="nav-link" id="aInfo2" href="#whenandwhere">Info</a>
@@ -51,7 +76,9 @@
                                 </li>
                             </ul>  
                         </div>
-                    </nav>            
+                    </nav>
+                    <!-- Section divider -->
+                    <div class="section-divider"></div>
                     <div class="row" id="whenandwhere">
                         <div class="col-6" id="whDesktop">
                             <div class="row">
@@ -63,7 +90,7 @@
                                             <h6 class="mb-0">Date</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y ', strtotime($event->date_time_start)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -101,7 +128,7 @@
                                             <h6 class="mb-0">Date</h6>
                                         </div>
                                         <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y', strtotime($event->date_time_start)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -221,10 +248,35 @@
                     <div class="row" style="padding-top: 40px" id="organizer">
                         <div class="card-transparent" style="width: 40rem">                          
                             <h4 style="padding-bottom: 20px">Other events you may like</h4>                           
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 40px">
+                            <div class="card-body d-flex flex-column" style="min-height: 10vh; justify-content: space-between;">
+                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 10px; padding-bottom: 5px;">
                                     <a href="/list-events" class="btn btn-dark">View Events</a>
                                 </div>
+                                
+                                <!-- Mobile Footer -->
+                                <footer class="mobile-footer">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="copyright">
+                                                    © <script>
+                                                        document.write(new Date().getFullYear())
+                                                    </script>,
+                                                    Copyright 2024 by <a href="/list-events" class="font-weight-bold text-muted" target="_blank">Laravel</a>
+                                                     - All right reserved.
+                                                </div>
+                                                <ul class="nav nav-footer">
+                                                    <li class="nav-item">
+                                                        <a href="/privacy-policy" class="nav-link" target="_blank">Privacy Policy</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a href="https://elaftersocialclub.com/terms-and-conditions" class="nav-link" target="_blank">Terms of Service</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </footer>
                             </div>
                         </div>
                     </div>
@@ -278,7 +330,7 @@
                                         <h6>{{ $event->title }}</h6>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('j F, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
+                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('F j, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -371,7 +423,7 @@
                                             <h6>{{ $event->title }}</h6>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('j F, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
+                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('F j, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -421,7 +473,7 @@
                                                         <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
                                                     </div>
                                                     <div class="d-flex align-items-center justify-content-start">
-                                                        <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
+                                                        <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('F j, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
                                                     </div>
                                                 </div>
                                                 <div class="col-3">
@@ -483,7 +535,7 @@
                                         <h6>Checkout</h6>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('j F, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
+                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('F j, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -580,7 +632,7 @@
                                         <h6>Checkout</h6>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('j F, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('j F, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
+                                        <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y (h:s a)', strtotime($event->date_time_start)) . ' - ' . date('F j, Y (h:s a)', strtotime($event->date_time_end)) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -663,7 +715,7 @@
             </div>
             @endif
         </div>
-        <nav class="fixed-bottom navbar-dark" id="getTicketsBottom1">
+        {{-- <nav class="fixed-bottom navbar-dark" id="getTicketsBottom1">
             @if ($ticket !=null)   
                 @if ($today < $ticket->date_time_end) 
                     @if ($count_orders < $ticket->quantity)
@@ -729,7 +781,36 @@
                     </div>
                 </div>    
             @endif
-        </nav>
+        </nav> --}}
+        
+        <!-- Mobile Bottom Get Tickets Button (only visible on mobile) -->
+        <div class="mobile-bottom-ticket d-md-none">
+            <div class="container-fluid">
+                @php
+                    $today = now();
+                    $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
+                    $lowestPaidPrice = $tickets->where('type', 'paid')
+                        ->where('date_time_end', '>', $today)
+                        ->min('price');
+                    $hasFreeTickets = $tickets->where('type', 'free')
+                        ->where('date_time_end', '>', $today)
+                        ->isNotEmpty();
+                @endphp
+                
+                @if ($hasAvailableTickets)
+                    {{-- Show "Free" only when event is free --}}
+                    @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
+                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
+                            <h4 style="margin: 0; color: #333;">Free</h4>
+                        </div>
+                    @endif
+                    
+                    <button type="button" class="btn btn-yellow btn-lg w-100" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
+                        Get Tickets
+                    </button>
+                @endif
+            </div>
+        </div>
     </main>
     @include('layouts.footers.guest.footer')
 @endsection
@@ -947,7 +1028,7 @@
             }
         });
 
-        // Manejo de pestañas
+        // Manejo de pestañas (solo para desktop, no para mobile top nav)
         const tabPairs = [
             ['aInfo', 'aDetails', 'aOrganizer'],
             ['aInfo2', 'aDetails2', 'aOrganizer2']
@@ -961,6 +1042,68 @@
                     });
                 });
             });
+        });
+
+        // Mobile top nav scroll behavior
+        if (window.innerWidth <= 959) {
+            const sections = ['whenandwhere', 'about', 'organizer'];
+            const navLinks = ['aMobileInfo', 'aMobileDetails', 'aMobileOrganizer'];
+            
+            // Smooth scroll for mobile nav
+            navLinks.forEach((linkId, index) => {
+                $(`#${linkId}`).click(function(e) {
+                    e.preventDefault();
+                    const targetSection = sections[index];
+                    const targetElement = document.getElementById(targetSection);
+                    
+                    // Remove any existing temp-active class from all buttons
+                    navLinks.forEach(id => {
+                        $(`#${id}`).removeClass('temp-active');
+                    });
+                    
+                    // Add temporary active state for visual feedback
+                    $(this).addClass('temp-active');
+                    
+                    // Remove active state after brief moment
+                    setTimeout(() => {
+                        $(this).removeClass('temp-active');
+                    }, 200);
+                    
+                    if (targetElement) {
+                        const offsetTop = targetElement.offsetTop - 80; // Offset for top navbar
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Hide/Show mobile bottom button when modals open/close
+        const mobileBottomButton = document.querySelector('.mobile-bottom-ticket');
+        const modalsToHideButton = ['#getTickets', '#getTicketsMobile', '#checkout', '#checkoutMobile'];
+        let openModalsCount = 0;
+        
+        modalsToHideButton.forEach(modalId => {
+            const modal = document.querySelector(modalId);
+            if (modal) {
+                modal.addEventListener('show.bs.modal', function () {
+                    openModalsCount++;
+                    if (mobileBottomButton) {
+                        mobileBottomButton.style.display = 'none';
+                    }
+                });
+                
+                modal.addEventListener('hidden.bs.modal', function () {
+                    openModalsCount--;
+                    // Only show the button if no other related modals are open
+                    if (openModalsCount <= 0 && mobileBottomButton) {
+                        mobileBottomButton.style.display = 'block';
+                        openModalsCount = 0; // Reset counter to prevent negative values
+                    }
+                });
+            }
         });
     });
 </script>
