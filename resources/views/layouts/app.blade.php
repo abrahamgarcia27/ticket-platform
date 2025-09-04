@@ -555,15 +555,185 @@
                 font-size: 1.1rem !important;
                 font-weight: 600 !important;
                 text-align: center !important;
-                min-width: 60px !important;
-                height: 45px !important;
-                border: 2px solid #D9BC73 !important;
+                min-width: 50px !important;
+                height: 40px !important;
+                border: none !important;
                 border-radius: 8px !important;
                 background-color: #fff !important;
                 color: #333 !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
             }
 
-            /* Make +/- buttons smaller but still touchable */
+            /* Modern ticket card design similar to reference image */
+            .ticket-card-mobile {
+                background-color: #fff !important;
+                border-radius: 12px !important;
+                padding: 0 !important;
+                margin-bottom: 16px !important;
+                border: 1px solid #e9ecef !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+                overflow: hidden !important;
+                transition: box-shadow 0.3s ease !important;
+            }
+
+            .ticket-card-mobile:hover {
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16) !important;
+            }
+
+            /* Top section - ticket type */
+            .ticket-type-section {
+                background-color: #f8f9fa !important;
+                padding: 12px 16px !important;
+                border-bottom: 1px solid #e9ecef !important;
+            }
+
+            /* Bottom section - event title and controls */
+            .ticket-controls-section {
+                background-color: #fff !important;
+                padding: 16px !important;
+            }
+
+            /* Ticket type styling */
+            .ticket-type-mobile {
+                font-size: 1rem !important;
+                font-weight: 600 !important;
+                color: #495057 !important;
+                margin: 0 !important;
+            }
+
+            /* Event title styling */
+            .event-title-mobile {
+                font-size: 0.9rem !important;
+                font-weight: 500 !important;
+                color: #6c757d !important;
+                margin-bottom: 12px !important;
+                line-height: 1.3 !important;
+                word-wrap: break-word !important;
+            }
+
+            /* Ticket price styling */
+            .ticket-price-mobile {
+                font-size: 1.2rem !important;
+                font-weight: 700 !important;
+                color: #343a40 !important;
+                margin-bottom: 2px !important;
+            }
+
+            .ticket-fee-mobile {
+                font-size: 0.8rem !important;
+                color: #6c757d !important;
+                margin-left: 4px !important;
+            }
+
+            /* Sales end date styling - moved down */
+            .ticket-sales-end {
+                font-size: 0.75rem !important;
+                color: #6c757d !important;
+                margin-top: 6px !important;
+                line-height: 1.2 !important;
+            }
+
+            /* Square buttons with proper colors */
+            .btn-ticket-minus {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 6px !important;
+                border: none !important;
+                background-color: #dee2e6 !important;
+                color: #6c757d !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease !important;
+                flex-shrink: 0 !important;
+            }
+
+            .btn-ticket-plus {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 6px !important;
+                border: none !important;
+                background-color: #343a40 !important;
+                color: #fff !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease !important;
+                flex-shrink: 0 !important;
+            }
+
+            .btn-ticket-minus:hover {
+                background-color: #ced4da !important;
+                color: #495057 !important;
+            }
+
+            .btn-ticket-plus:hover {
+                background-color: #495057 !important;
+                color: #fff !important;
+            }
+
+            .btn-ticket-minus:disabled,
+            .btn-ticket-plus:disabled {
+                background-color: #f8f9fa !important;
+                color: #adb5bd !important;
+                cursor: not-allowed !important;
+            }
+
+            /* Ticket controls container - better centered */
+            .ticket-controls-mobile {
+                display: flex !important;
+                align-items: flex-start !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+
+            .ticket-info-section {
+                flex: 1 !important;
+                min-width: 0 !important;
+                padding-right: 8px !important;
+            }
+
+            .ticket-quantity-controls {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                flex-shrink: 0 !important;
+                margin-left: auto !important;
+            }
+
+            /* Responsive adjustments for small phones */
+            @media (max-width: 360px) {
+                .ticket-controls-section {
+                    padding: 12px !important;
+                }
+                
+                .ticket-info-section {
+                    padding-right: 6px !important;
+                }
+                
+                .ticket-quantity-controls {
+                    gap: 8px !important;
+                }
+                
+                .btn-ticket-minus,
+                .btn-ticket-plus {
+                    width: 32px !important;
+                    height: 32px !important;
+                    font-size: 0.8rem !important;
+                }
+                
+                .ticket-select-mobile {
+                    min-width: 45px !important;
+                    height: 32px !important;
+                    font-size: 1rem !important;
+                }
+            }
+
+            /* Override old button styles for mobile tickets */
             .btn.px-3 {
                 padding: 8px 12px !important;
                 font-size: 0.9rem !important;

@@ -428,28 +428,65 @@
                                     </div>
                                 </div>
                                 <hr>
-                                <div class="modal-body" style="padding-top: 60px">
+                                <div class="modal-body" style="padding-top: 20px">
+                                    <!-- Date and Time Header -->
+                                    <div class="text-center mb-3">
+                                        <div style="color: #343a40; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px;">
+                                            <i class="fas fa-calendar-alt me-2"></i>{{ date('D, M j', strtotime($event->date_time_start)) }}
+                                        </div>
+                                        <div style="color: #343a40; font-size: 0.9rem; font-weight: 600;">
+                                            <i class="fas fa-clock me-2"></i>{{ date('g:i A', strtotime($event->date_time_start)) }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Tickets Section Header -->
+                                    <div class="d-flex align-items-center mb-3" style="color: #343a40; font-size: 1rem; font-weight: 600;">
+                                        <i class="fas fa-ticket-alt me-2"></i>Tickets
+                                    </div>
+
                                     @foreach($tickets as $ticket)
                                         @if ($today < $ticket->date_time_end)
-                                            <div class="row mb-4 position-relative @if($ticket->orders_count >= $ticket->quantity) opacity-25 @endif" style="--bs-gutter-x: -0.5rem;">
+                                            <div class="ticket-card-mobile position-relative @if($ticket->orders_count >= $ticket->quantity) opacity-25 @endif">
                                                 @if($ticket->orders_count >= $ticket->quantity)
                                                 <div class="sold-out-overlay">
                                                     <img src="{{ asset('img/sold-out.png') }}" alt="Sold Out" class="img-fluid-sold-out">
                                                 </div>
                                                 @endif 
-                                                <div class="col-7">
-                                                    <div class="d-flex align-items-center justify-content-start">
-                                                        <h6>{{ $ticket->title }}</h6>
-                                                    </div>
+                                                
+                                                <!-- Top section - Ticket Type -->
+                                                <div class="ticket-type-section">
+                                                    <div class="ticket-type-mobile">{{ $ticket->title }}</div>
                                                 </div>
-                                                <div class="col-5">
-                                                    <div @if($ticket->orders_count >= $ticket->quantity) disabled @endif class="d-flex align-items-center justify-content-center">                                                
-                                                        <button class="btn btn-dark px-3 me-2"
-                                                            onclick="decrementTicket(this, {{ $ticket->id }})">
-                                                            <i class="fas fa-minus"></i>
-                                                        </button>
-                                                        <div class="form-outline" style="margin-bottom: 0.5rem;">
-                                                            <input @if($ticket->orders_count >= $ticket->quantity) disabled @endif class="form-control ticket-select-mobile" 
+                                                
+                                                <!-- Bottom section - Event Title and Controls -->
+                                                <div class="ticket-controls-section">
+                                                    <div class="event-title-mobile">{{ $event->title }}</div>
+                                                    
+                                                    <div class="ticket-controls-mobile">
+                                                        <div class="ticket-info-section">
+                                                            <div class="ticket-price-mobile">
+                                                                @if ($ticket->type == 'free')
+                                                                    Free
+                                                                @else
+                                                                    ${{ number_format($ticket->price, 2) }}
+                                                                    @if ($ticket->type == 'paid')
+                                                                        <span class="ticket-fee-mobile">+$3.05 Fee</span>
+                                                                    @endif
+                                                                @endif
+                                                            </div>
+                                                            <div class="ticket-sales-end">
+                                                                Sales end on {{ date('M j, Y', strtotime($ticket->date_time_end)) }}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="ticket-quantity-controls">
+                                                            <button @if($ticket->orders_count >= $ticket->quantity) disabled @endif 
+                                                                class="btn-ticket-minus"
+                                                                onclick="decrementTicket(this, {{ $ticket->id }})">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <input @if($ticket->orders_count >= $ticket->quantity) disabled @endif 
+                                                                class="form-control ticket-select-mobile" 
                                                                 id="ticket-input-{{ $ticket->id }}"
                                                                 data-ticket-id="{{ $ticket->id }}" 
                                                                 data-ticket-price="{{ $ticket->price }}" 
@@ -461,36 +498,13 @@
                                                                 type="number" 
                                                                 style="-webkit-appearance: none; margin: 0;"
                                                                 onchange="updateTotal()"/>
+                                                            <button @if($ticket->orders_count >= $ticket->quantity) disabled @endif 
+                                                                class="btn-ticket-plus"
+                                                                onclick="incrementTicket(this, {{ $ticket->id }})">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
                                                         </div>
-                                                        <button @if($ticket->orders_count >= $ticket->quantity) disabled @endif class="btn btn-dark px-3 ms-2"
-                                                            onclick="incrementTicket(this, {{ $ticket->id }})">
-                                                            <i class="fas fa-plus"></i>
-                                                        </button>
                                                     </div>
-                                                </div>
-                                                <div class="col-9">
-                                                    <div class="d-flex align-items-center justify-content-start">
-                                                        <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
-                                                    </div>
-                                                    <div class="d-flex align-items-center justify-content-start">
-                                                        <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('F j, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-3">
-                                                    <div class="d-flex align-items-center justify-content-end">
-                                                        <h6>
-                                                            @if ($ticket->type == 'free')
-                                                                Free
-                                                            @else
-                                                                ${{ number_format($ticket->price, 2) }}
-                                                            @endif
-                                                        </h6>
-                                                    </div>
-                                                    @if (($ticket->quantity - $ticket->orders_count) <= 10)       
-                                                        <div class="d-flex align-items-center justify-content-end">
-                                                            <p class="mb-0 text-danger" style="font-size: 0.80rem">Only {{ $ticket->quantity - $ticket->orders_count }} left</p>
-                                                        </div>
-                                                    @endif
                                                 </div>
                                             </div>
                                         @endif
