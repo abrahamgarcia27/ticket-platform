@@ -180,7 +180,7 @@
         .card-no-border{
             border-radius: 0px !important;
         }
-        @media only screen and (max-width: 959px) {
+        @media only screen and (max-width: 991.98px) {
             .coverimg {
                 background-repeat: round !important;
             }
@@ -368,8 +368,42 @@
             }
         }
 
+        /* Tablet Modal Fixes */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            /* Modal GetTickets - usar layout desktop pero más pequeño */
+            #getTickets .modal-dialog {
+                max-width: 95% !important;
+                margin: 1rem auto !important;
+            }
+            
+            #getTickets .modal-content {
+                max-height: 85vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Modal Checkout - usar layout desktop pero más pequeño */
+            #checkout .modal-dialog {
+                max-width: 95% !important;
+                margin: 1rem auto !important;
+            }
+            
+            #checkout .modal-content {
+                max-height: 85vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Ocultar versiones móviles en tablets */
+            #getTicketsMobile {
+                display: none !important;
+            }
+            
+            #checkoutMobile {
+                display: none !important;
+            }
+        }
+
         /* Mobile Navigation Top Bar */
-        @media (max-width: 959px) {
+        @media (max-width: 991.98px) {
             .mobile-top-nav {
                 position: fixed;
                 top: 0;

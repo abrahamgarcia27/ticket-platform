@@ -3,7 +3,7 @@
 @section('content')
     <main class="main-content mt-0">
         <!-- Mobile Top Navigation (only visible on mobile) -->
-        <nav class="mobile-top-nav d-md-none">
+        <nav class="mobile-top-nav d-lg-none">
             <div class="container-fluid">
                 <ul class="nav justify-content-around">
                     <li class="nav-item">
@@ -382,7 +382,7 @@
                                     @endif
                                 @endforeach
                             </div>
-                            <button type="button" class="btn btn-dark" data-bs-target="#checkout" onclick="if(validateTicketSelection(event)) { $('#getTickets').modal('hide'); $('#checkout').modal('show'); }">Checkout</button>
+                            <button type="button" class="btn btn-dark" id="desktopCheckoutBtn">Checkout</button>
                         </div>
                         <div class="col-4">
                             <div class="d-flex align-items-center justify-content-end">
@@ -795,7 +795,7 @@
         </nav> --}}
         
         <!-- Mobile Bottom Get Tickets Button (only visible on mobile) -->
-        <div class="mobile-bottom-ticket d-md-none">
+        <div class="mobile-bottom-ticket d-lg-none">
             <div class="container-fluid">
                 @php
                     $today = now();
@@ -816,7 +816,7 @@
                         </div>
                     @endif
                     
-                    <button type="button" class="btn btn-yellow btn-lg w-100" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
+                    <button type="button" class="btn btn-yellow btn-lg w-100" id="mobileGetTicketsBtn">
                         Get Tickets
                     </button>
                 @endif
@@ -1116,6 +1116,36 @@
                 });
             }
         });
+    });
+    
+    // Handle mobile/tablet Get Tickets button
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileGetTicketsBtn = document.getElementById('mobileGetTicketsBtn');
+        const desktopCheckoutBtn = document.getElementById('desktopCheckoutBtn');
+        
+        if (mobileGetTicketsBtn) {
+            mobileGetTicketsBtn.addEventListener('click', function() {
+                // Check if screen width is tablet (768px - 991px) to use desktop modal
+                if (window.innerWidth >= 768 && window.innerWidth <= 991) {
+                    // Use desktop modal for tablets
+                    const desktopModal = new bootstrap.Modal(document.getElementById('getTickets'));
+                    desktopModal.show();
+                } else {
+                    // Use mobile modal for smaller screens
+                    const mobileModal = new bootstrap.Modal(document.getElementById('getTicketsMobile'));
+                    mobileModal.show();
+                }
+            });
+        }
+        
+        if (desktopCheckoutBtn) {
+            desktopCheckoutBtn.addEventListener('click', function(event) {
+                if (validateTicketSelection(event)) {
+                    $('#getTickets').modal('hide');
+                    $('#checkout').modal('show');
+                }
+            });
+        }
     });
 </script>
 @endif
