@@ -252,31 +252,6 @@
                                 <div class="d-flex align-items-center justify-content-center" style="padding-top: 10px; padding-bottom: 5px;">
                                     <a href="/list-events" class="btn btn-dark">View Events</a>
                                 </div>
-                                
-                                <!-- Mobile Footer -->
-                                <footer class="mobile-footer">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="copyright">
-                                                    © <script>
-                                                        document.write(new Date().getFullYear())
-                                                    </script>,
-                                                    Copyright 2024 by <a href="/list-events" class="font-weight-bold text-muted" target="_blank">Laravel</a>
-                                                     - All right reserved.
-                                                </div>
-                                                <ul class="nav nav-footer">
-                                                    <li class="nav-item">
-                                                        <a href="/privacy-policy" class="nav-link" target="_blank">Privacy Policy</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a href="https://elaftersocialclub.com/terms-and-conditions" class="nav-link" target="_blank">Terms of Service</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </footer>
                             </div>
                         </div>
                     </div>
