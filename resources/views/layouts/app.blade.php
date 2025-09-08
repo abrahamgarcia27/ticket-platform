@@ -441,14 +441,14 @@
             /* Mobile Bottom Get Tickets Button */
             .mobile-bottom-ticket {
                 position: fixed;
-                bottom: 0;
+                bottom: 0px; /* Lowered to extend more towards bottom */
                 left: 0;
                 right: 0;
                 background: #fff;
                 border-top: 2px solid #D9BC73;
                 box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
                 z-index: 1050;
-                padding: 8px 15px;
+                padding: 15px 15px 50px 15px; /* Extended bottom padding even more */
                 backdrop-filter: blur(10px);
             }
 
@@ -481,9 +481,9 @@
                 display: none !important;
             }
 
-            /* Control exact scroll limit - no footer, just button container at bottom */
+            /* Control exact scroll limit - account for increased height */
             .main-content .row:last-of-type {
-                margin-bottom: 80px !important; /* Exactly navbar height - no extra space */
+                margin-bottom: 110px !important; /* Increased for even taller navbar */
             }
 
             /* Remove conflicting bottom margin */

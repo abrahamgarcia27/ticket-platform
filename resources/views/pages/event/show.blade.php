@@ -353,7 +353,7 @@
                                                     <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
                                                 </div>
                                                 <div class="d-flex align-items-center justify-content-start">
-                                                    <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
+                                                    <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('F j, Y (h:i a)', strtotime($ticket->date_time_end)) }}</p>
                                                 </div>
                                                 @if (($ticket->quantity - $ticket->orders_count) <= 10)      
                                                 <div class="d-flex align-items-center justify-content-start">
@@ -469,9 +469,6 @@
                                                                     Free
                                                                 @else
                                                                     ${{ number_format($ticket->price, 2) }}
-                                                                    @if ($ticket->type == 'paid')
-                                                                        <span class="ticket-fee-mobile">+$3.05 Fee</span>
-                                                                    @endif
                                                                 @endif
                                                             </div>
                                                             <div class="ticket-sales-end">
@@ -812,7 +809,7 @@
                 @endphp
                 
                 @if ($hasAvailableTickets)
-                    {{-- Show "Free" only when event is free --}}
+                    {{-- Show "Free" ONLY for free events --}}
                     @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
                         <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
                             <h4 style="margin: 0; color: #333;">Free</h4>
