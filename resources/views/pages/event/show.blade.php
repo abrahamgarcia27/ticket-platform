@@ -772,28 +772,35 @@
         <!-- Mobile Bottom Get Tickets Button (only visible on mobile) -->
         <div class="mobile-bottom-ticket d-lg-none">
             <div class="container-fluid">
-                @php
-                    $today = now();
-                    $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
-                    $lowestPaidPrice = $tickets->where('type', 'paid')
-                        ->where('date_time_end', '>', $today)
-                        ->min('price');
-                    $hasFreeTickets = $tickets->where('type', 'free')
-                        ->where('date_time_end', '>', $today)
-                        ->isNotEmpty();
-                @endphp
-                
-                @if ($hasAvailableTickets)
-                    {{-- Show "Free" ONLY for free events --}}
-                    @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
-                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
-                            <h4 style="margin: 0; color: #333;">Free</h4>
-                        </div>
-                    @endif
+                @if ($ticket != null)
+                    @php
+                        $today = now();
+                        $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
+                        $lowestPaidPrice = $tickets->where('type', 'paid')
+                            ->where('date_time_end', '>', $today)
+                            ->min('price');
+                        $hasFreeTickets = $tickets->where('type', 'free')
+                            ->where('date_time_end', '>', $today)
+                            ->isNotEmpty();
+                    @endphp
                     
-                    <button type="button" class="btn btn-yellow btn-lg w-100" id="mobileGetTicketsBtn">
+                    @if ($hasAvailableTickets)
+                        {{-- Show "Free" ONLY for free events --}}
+                        @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
+                            <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
+                                <h4 style="margin: 0; color: #333;">Free</h4>
+                            </div>
+                        @endif
+                        
+                        <button type="button" class="btn btn-yellow btn-lg w-100" id="mobileGetTicketsBtn">
+                            Get Tickets
+                        </button>
+                    @endif
+                @else
+                    {{-- External Sales Button for Mobile --}}
+                    <a type="button" class="btn btn-yellow btn-lg w-100" href="{{ $event->link_external_sales }}" target="_blank">
                         Get Tickets
-                    </button>
+                    </a>
                 @endif
             </div>
         </div>
