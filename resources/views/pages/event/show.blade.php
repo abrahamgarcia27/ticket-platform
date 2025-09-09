@@ -3,7 +3,7 @@
 @section('content')
     <main class="main-content mt-0">
         <!-- Mobile Top Navigation (only visible on mobile) -->
-        <nav class="mobile-top-nav d-md-none">
+        <nav class="mobile-top-nav d-lg-none">
             <div class="container-fluid">
                 <ul class="nav justify-content-around">
                     <li class="nav-item">
@@ -252,31 +252,6 @@
                                 <div class="d-flex align-items-center justify-content-center" style="padding-top: 10px; padding-bottom: 5px;">
                                     <a href="/list-events" class="btn btn-dark">View Events</a>
                                 </div>
-                                
-                                <!-- Mobile Footer -->
-                                <footer class="mobile-footer">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="copyright">
-                                                    © <script>
-                                                        document.write(new Date().getFullYear())
-                                                    </script>,
-                                                    Copyright 2024 by <a href="/list-events" class="font-weight-bold text-muted" target="_blank">Laravel</a>
-                                                     - All right reserved.
-                                                </div>
-                                                <ul class="nav nav-footer">
-                                                    <li class="nav-item">
-                                                        <a href="/privacy-policy" class="nav-link" target="_blank">Privacy Policy</a>
-                                                    </li>
-                                                    <li class="nav-item">
-                                                        <a href="https://elaftersocialclub.com/terms-and-conditions" class="nav-link" target="_blank">Terms of Service</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </footer>
                             </div>
                         </div>
                     </div>
@@ -353,7 +328,7 @@
                                                     <p class="mb-0" style="font-size: 0.80rem"><strong>{{ $ticket->type }}</strong></p>
                                                 </div>
                                                 <div class="d-flex align-items-center justify-content-start">
-                                                    <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('j F, Y (h:s a)', strtotime($ticket->date_time_end)) }}</p>
+                                                    <p class="mb-0" style="font-size: 0.80rem">Sales end on {{ date('F j, Y (h:i a)', strtotime($ticket->date_time_end)) }}</p>
                                                 </div>
                                                 @if (($ticket->quantity - $ticket->orders_count) <= 10)      
                                                 <div class="d-flex align-items-center justify-content-start">
@@ -382,7 +357,7 @@
                                     @endif
                                 @endforeach
                             </div>
-                            <button type="button" class="btn btn-dark" data-bs-target="#checkout" onclick="if(validateTicketSelection(event)) { $('#getTickets').modal('hide'); $('#checkout').modal('show'); }">Checkout</button>
+                            <button type="button" class="btn btn-dark" id="desktopCheckoutBtn">Checkout</button>
                         </div>
                         <div class="col-4">
                             <div class="d-flex align-items-center justify-content-end">
@@ -469,9 +444,6 @@
                                                                     Free
                                                                 @else
                                                                     ${{ number_format($ticket->price, 2) }}
-                                                                    @if ($ticket->type == 'paid')
-                                                                        <span class="ticket-fee-mobile">+$3.05 Fee</span>
-                                                                    @endif
                                                                 @endif
                                                             </div>
                                                             <div class="ticket-sales-end">
@@ -798,30 +770,37 @@
         </nav> --}}
         
         <!-- Mobile Bottom Get Tickets Button (only visible on mobile) -->
-        <div class="mobile-bottom-ticket d-md-none">
+        <div class="mobile-bottom-ticket d-lg-none">
             <div class="container-fluid">
-                @php
-                    $today = now();
-                    $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
-                    $lowestPaidPrice = $tickets->where('type', 'paid')
-                        ->where('date_time_end', '>', $today)
-                        ->min('price');
-                    $hasFreeTickets = $tickets->where('type', 'free')
-                        ->where('date_time_end', '>', $today)
-                        ->isNotEmpty();
-                @endphp
-                
-                @if ($hasAvailableTickets)
-                    {{-- Show "Free" only when event is free --}}
-                    @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
-                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
-                            <h4 style="margin: 0; color: #333;">Free</h4>
-                        </div>
-                    @endif
+                @if ($ticket != null)
+                    @php
+                        $today = now();
+                        $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
+                        $lowestPaidPrice = $tickets->where('type', 'paid')
+                            ->where('date_time_end', '>', $today)
+                            ->min('price');
+                        $hasFreeTickets = $tickets->where('type', 'free')
+                            ->where('date_time_end', '>', $today)
+                            ->isNotEmpty();
+                    @endphp
                     
-                    <button type="button" class="btn btn-yellow btn-lg w-100" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
+                    @if ($hasAvailableTickets)
+                        {{-- Show "Free" ONLY for free events --}}
+                        @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
+                            <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
+                                <h4 style="margin: 0; color: #333;">Free</h4>
+                            </div>
+                        @endif
+                        
+                        <button type="button" class="btn btn-yellow btn-lg w-100" id="mobileGetTicketsBtn">
+                            Get Tickets
+                        </button>
+                    @endif
+                @else
+                    {{-- External Sales Button for Mobile --}}
+                    <a type="button" class="btn btn-yellow btn-lg w-100" href="{{ $event->link_external_sales }}" target="_blank">
                         Get Tickets
-                    </button>
+                    </a>
                 @endif
             </div>
         </div>
@@ -1119,6 +1098,36 @@
                 });
             }
         });
+    });
+    
+    // Handle mobile/tablet Get Tickets button
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileGetTicketsBtn = document.getElementById('mobileGetTicketsBtn');
+        const desktopCheckoutBtn = document.getElementById('desktopCheckoutBtn');
+        
+        if (mobileGetTicketsBtn) {
+            mobileGetTicketsBtn.addEventListener('click', function() {
+                // Check if screen width is tablet (768px - 991px) to use desktop modal
+                if (window.innerWidth >= 768 && window.innerWidth <= 991) {
+                    // Use desktop modal for tablets
+                    const desktopModal = new bootstrap.Modal(document.getElementById('getTickets'));
+                    desktopModal.show();
+                } else {
+                    // Use mobile modal for smaller screens
+                    const mobileModal = new bootstrap.Modal(document.getElementById('getTicketsMobile'));
+                    mobileModal.show();
+                }
+            });
+        }
+        
+        if (desktopCheckoutBtn) {
+            desktopCheckoutBtn.addEventListener('click', function(event) {
+                if (validateTicketSelection(event)) {
+                    $('#getTickets').modal('hide');
+                    $('#checkout').modal('show');
+                }
+            });
+        }
     });
 </script>
 @endif

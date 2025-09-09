@@ -180,7 +180,7 @@
         .card-no-border{
             border-radius: 0px !important;
         }
-        @media only screen and (max-width: 959px) {
+        @media only screen and (max-width: 991.98px) {
             .coverimg {
                 background-repeat: round !important;
             }
@@ -368,8 +368,42 @@
             }
         }
 
+        /* Tablet Modal Fixes */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            /* Modal GetTickets - usar layout desktop pero más pequeño */
+            #getTickets .modal-dialog {
+                max-width: 95% !important;
+                margin: 1rem auto !important;
+            }
+            
+            #getTickets .modal-content {
+                max-height: 85vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Modal Checkout - usar layout desktop pero más pequeño */
+            #checkout .modal-dialog {
+                max-width: 95% !important;
+                margin: 1rem auto !important;
+            }
+            
+            #checkout .modal-content {
+                max-height: 85vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Ocultar versiones móviles en tablets */
+            #getTicketsMobile {
+                display: none !important;
+            }
+            
+            #checkoutMobile {
+                display: none !important;
+            }
+        }
+
         /* Mobile Navigation Top Bar */
-        @media (max-width: 959px) {
+        @media (max-width: 991.98px) {
             .mobile-top-nav {
                 position: fixed;
                 top: 0;
@@ -441,14 +475,14 @@
             /* Mobile Bottom Get Tickets Button */
             .mobile-bottom-ticket {
                 position: fixed;
-                bottom: 0;
+                bottom: 0px; /* Lowered to extend more towards bottom */
                 left: 0;
                 right: 0;
                 background: #fff;
                 border-top: 2px solid #D9BC73;
                 box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
                 z-index: 1050;
-                padding: 8px 15px;
+                padding: 15px 15px 50px 15px; /* Extended bottom padding even more */
                 backdrop-filter: blur(10px);
             }
 
@@ -481,9 +515,9 @@
                 display: none !important;
             }
 
-            /* Control exact scroll limit - no footer, just button container at bottom */
+            /* Control exact scroll limit - account for increased height */
             .main-content .row:last-of-type {
-                margin-bottom: 80px !important; /* Exactly navbar height - no extra space */
+                margin-bottom: 110px !important; /* Increased for even taller navbar */
             }
 
             /* Remove conflicting bottom margin */
