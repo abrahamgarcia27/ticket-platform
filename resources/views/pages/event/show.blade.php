@@ -567,7 +567,7 @@
                                                 <input class="form-check-input" type="checkbox" value="" id="checkAccept" required>
                                                 @if (env('APP_URL') == 'https://tickets.elaftersocialclub.com')
                                                 <label class="form-check-label" for="checkAccept">
-                                                    I agree to <a class="" target="_blank" href="https://elaftersocialclub.com/terms-and-conditions">tems and conditions.</a>
+                                                    I agree to <a class="" target="_blank" href="https://elaftersocialclub.com/terms-and-conditions">terms and conditions.</a>
                                                 </label>
                                                 @endif
                                               </div>
@@ -663,7 +663,7 @@
                                                 <input class="form-check-input" type="checkbox" value="" id="checkAccept" required>
                                                 @if (env('APP_URL') == 'https://tickets.elaftersocialclub.com')
                                                 <label class="form-check-label" for="checkAccept">
-                                                    I agree to <a class="" target="_blank" href="https://elaftersocialclub.com/terms-and-conditions">tems and conditions.</a>
+                                                    I agree to <a class="" target="_blank" href="https://elaftersocialclub.com/terms-and-conditions">terms and conditions.</a>
                                                 </label>
                                                 @endif
                                               </div>
