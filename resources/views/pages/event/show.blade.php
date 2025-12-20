@@ -795,6 +795,13 @@
                         <button type="button" class="btn btn-yellow btn-lg w-100" id="mobileGetTicketsBtn">
                             Get Tickets
                         </button>
+                    @else
+                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
+                            <h4 style="margin: 0; color: #333;">Sales Ended</h4>
+                        </div>
+                        <button type="button" class="btn btn-yellow btn-lg w-100">
+                            Get Details
+                        </button>
                     @endif
                 @else
                     {{-- External Sales Button for Mobile --}}
