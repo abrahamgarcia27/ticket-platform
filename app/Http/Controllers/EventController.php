@@ -166,6 +166,11 @@ class EventController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'date_time_start' => 'required|date',
+            'date_time_end' => 'required|date|after:date_time_start'
+        ]);
+
         $all = $request->except(['_token', 'image']);
         $event = Event::find($id);
         if (!$request->has('external_sales')) {
