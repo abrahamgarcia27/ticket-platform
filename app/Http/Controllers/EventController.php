@@ -95,6 +95,7 @@ class EventController extends Controller
         $clonedEvent->created_by = Auth::id();
         $clonedEvent->date_time_start = Carbon::parse($originalEvent->date_time_start)->addWeek()->format('Y-m-d H:i');
         $clonedEvent->date_time_end = Carbon::parse($originalEvent->date_time_end)->addWeek()->format('Y-m-d H:i');
+        $clonedEvent->google_event_id = null;
         $clonedEvent->save();
 
         // Clonar los tickets del evento original
