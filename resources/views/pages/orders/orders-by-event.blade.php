@@ -22,6 +22,7 @@
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Phone</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Ticket</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Ticket type</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Price</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-4">Code</th>
                             </tr>
                         </thead>
@@ -42,6 +43,9 @@
                                 </td>
                                 <td>
                                     <p class="text-sm font-weight-bold mb-0">{{ $order->stripe_data == null ? 'Free' : 'Paid' }}</p>
+                                </td>
+                                <td>
+                                    <p class="text-sm font-weight-bold mb-0">{{ $order->ticket->price }}</p>
                                 </td>
                                 <td>
                                     <p class="text-sm font-weight-bold mb-0">{{ $order->code }}</p>
