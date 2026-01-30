@@ -19,23 +19,23 @@
 </head>
 <body>
     <div class="container">
-        <h1>Reporte diario: Eventos finalizados ayer</h1>
-        <p>Listado de eventos que tuvieron fecha de finalización el día anterior. Puedes descargar el PDF de órdenes de cada evento desde el enlace correspondiente.</p>
+        <h1>Daily report: Events that ended yesterday</h1>
+        <p>List of events that ended the previous day. You can download the orders PDF for each event using the link below.</p>
 
         @if(count($events) > 0)
             <ul>
                 @foreach($events as $event)
                     <li>
                         <span class="event-title">{{ $event->title }}</span><br>
-                        <a href="{!! $event->pdf_url !!}" target="_blank">Descargar PDF de órdenes</a>
+                        <a href="{!! $event->pdf_url !!}" target="_blank">Download orders PDF</a>
                     </li>
                 @endforeach
             </ul>
         @else
-            <p class="no-events">No hubo eventos con fecha de finalización el día anterior.</p>
+            <p class="no-events">There were no events that ended the previous day.</p>
         @endif
 
-        <p class="footer">Este es un correo automático generado por Ticket Platform. Los enlaces de descarga expiran en 7 días.</p>
+        <p class="footer">This is an automated email from Ticket Platform. Download links expire in 7 days.</p>
     </div>
 </body>
 </html>
