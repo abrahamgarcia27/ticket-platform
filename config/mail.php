@@ -104,6 +104,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Reporte diario de eventos
+    |--------------------------------------------------------------------------
+    |
+    | Correo al que se envía el reporte diario de eventos finalizados (comando
+    | report:daily-events).
+    |
+    */
+
+    'report_daily_to' => env('MAIL_REPORT_DAILY_TO', 'arturoalvavi98@gmail.com'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Markdown Mail Settings
     |--------------------------------------------------------------------------
     |

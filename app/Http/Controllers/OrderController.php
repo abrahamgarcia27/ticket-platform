@@ -381,4 +381,15 @@ class OrderController extends Controller
 
         return back()->with('success', 'Email sent successfully.');
     }
+
+    /**
+     * Genera y descarga el PDF de órdenes por evento (usado por enlace firmado en reporte diario).
+     */
+    public function downloadEventOrdersPdf($id)
+    {
+        $event = Event::with(['orders.ticket'])->findOrFail($id);
+        $pdf = PDF::loadView('pages.orders.orders-by-event-pdf', compact('event'));
+        $filename = 'orders-' . \Illuminate\Support\Str::slug($event->title) . '-' . $event->id . '.pdf';
+        return $pdf->download($filename);
+    }
 }
