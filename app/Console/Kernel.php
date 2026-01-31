@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('report:daily-events')->dailyAt('09:00');
+        // Envía el reporte cuando el date_time_end de los tickets del evento ya pasó (cada 5 min)
+        $schedule->command('report:daily-events')->everyFiveMinutes();
     }
 
     /**

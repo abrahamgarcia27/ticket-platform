@@ -22,16 +22,37 @@ class SendDailyEventsReport extends Command
      *
      * @var string
      */
-    protected $description = 'Envía por email la lista de eventos que finalizaron el día anterior con enlaces para descargar el PDF de órdenes';
+    protected $description = 'Envía por email el reporte de eventos cuando el date_time_end de sus tickets ha sido alcanzado (se ejecuta cada 5 minutos vía cron)';
 
     /**
      * Execute the console command.
+     * Busca eventos cuyo último ticket ya pasó su date_time_end y aún no han recibido reporte.
      */
     public function handle(): int
     {
-        $yesterday = Carbon::yesterday();
+        $now = Carbon::now();
 
-        $events = Event::whereDate('date_time_end', $yesterday)->get();
+        // Eventos sin reporte enviado y con al menos un ticket cuyo date_time_end es hoy
+        $eventsPendingReport = Event::whereNull('report_sent_at')
+            ->whereHas('tickets', function ($query) {
+                $query->whereDate('date_time_end', Carbon::today());
+            })
+            ->get();
+
+        $eventIdsToReport = $eventsPendingReport->filter(function (Event $event) use ($now) {
+            $lastTicketEnd = $event->tickets()->max('date_time_end');
+            if ($lastTicketEnd === null) {
+                return false;
+            }
+            return Carbon::parse($lastTicketEnd)->lte($now);
+        })->pluck('id');
+
+        if ($eventIdsToReport->isEmpty()) {
+            $this->info('No hay eventos con tickets ya finalizados pendientes de reporte.');
+            return Command::SUCCESS;
+        }
+
+        $events = Event::whereIn('id', $eventIdsToReport)->get();
 
         $events->each(function (Event $event) {
             $event->pdf_url = URL::temporarySignedRoute(
@@ -41,14 +62,21 @@ class SendDailyEventsReport extends Command
             );
         });
 
-        $to = config('mail.report_daily_to');
+        $to = array_values(array_filter(array_map('trim', explode(',', config('mail.report_daily_to', '')))));
 
-        Mail::send('pages.email.daily-events-report', ['events' => $events], function ($message) use ($to) {
+        Mail::send('pages.email.daily-events-report', ['events' => $events], function ($message) use ($to, $events) {
             $message->to($to);
-            $message->subject('Daily report: Events that ended yesterday - ' . Carbon::yesterday()->format('m/d/Y'));
+            $message->subject(
+                'Reporte: Eventos finalizados - ' . $events->count() . ' evento(s) - ' . Carbon::now()->format('d/m/Y H:i')
+            );
         });
 
-        $this->info('Reporte enviado a ' . $to . ' con ' . $events->count() . ' evento(s).');
+        $events->each(function (Event $event) {
+            $event->offsetUnset('pdf_url');
+            $event->update(['report_sent_at' => Carbon::now()]);
+        });
+
+        $this->info('Reporte enviado a ' . implode(', ', $to) . ' con ' . $events->count() . ' evento(s).');
 
         return Command::SUCCESS;
     }
