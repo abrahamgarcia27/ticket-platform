@@ -32,6 +32,11 @@ class Event extends Model
         'meta_description',
         'link_external_sales',
         'google_event_id',
+        'report_sent_at',
+    ];
+
+    protected $casts = [
+        'report_sent_at' => 'datetime',
     ];
 
     public function user(): BelongsTo{
