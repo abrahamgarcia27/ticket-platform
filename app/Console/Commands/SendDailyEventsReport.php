@@ -67,7 +67,7 @@ class SendDailyEventsReport extends Command
         Mail::send('pages.email.daily-events-report', ['events' => $events], function ($message) use ($to, $events) {
             $message->to($to);
             $message->subject(
-                'Reporte: Eventos finalizados - ' . $events->count() . ' evento(s) - ' . Carbon::now()->format('d/m/Y H:i')
+                'Report: Events ended - ' . $events->count() . ' event(s) - ' . Carbon::now()->format('m/d/Y H:i')
             );
         });
 

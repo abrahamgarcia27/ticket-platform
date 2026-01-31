@@ -19,8 +19,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Daily report: Events that ended yesterday</h1>
-        <p>List of events that ended the previous day. You can download the orders PDF for each event using the link below.</p>
+        <h1>Report: Events with ticket sales ended</h1>
+        <p>List of events whose ticket sales have ended. You can download the orders PDF for each event using the link below.</p>
 
         @if(count($events) > 0)
             <ul>
@@ -32,7 +32,7 @@
                 @endforeach
             </ul>
         @else
-            <p class="no-events">There were no events that ended the previous day.</p>
+            <p class="no-events">There are no events in this report.</p>
         @endif
 
         <p class="footer">This is an automated email from Ticket Platform. Download links expire in 7 days.</p>
