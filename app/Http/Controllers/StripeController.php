@@ -224,7 +224,7 @@ class StripeController extends Controller
         ];
         
         Mail::send('pages.email.email', $emailData, function ($message) use ($emailData, $pdf) {
-            $message->from('admin@ticketsplatform.com', $emailData['user_name']);
+            $message->from(env('MAIL_FROM_ADDRESS'), $emailData['user_name']);
             $message->to($emailData['email'], $emailData['name']);
             $message->subject($emailData['subject']);
             $message->priority(3);
