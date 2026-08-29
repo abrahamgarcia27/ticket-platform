@@ -63,6 +63,7 @@ Route::get('/successpage/{codes}', [OrderController::class, 'successpage'])->nam
 Route::get('/test/verify-order-email/{orderId}', [OrderController::class, 'resendOrderEmail'])->name('resendOrderEmail');
 
 Route::get('/pdf/{code}', [OrderController::class, 'pdf'])->name('pdf');
+Route::get('/qr/{code}', [OrderController::class, 'generateQr'])->name('qr.generate');
 Route::get('/report/event/{id}/pdf', [OrderController::class, 'downloadEventOrdersPdf'])->name('report.event.pdf')->middleware('signed');
 
 Route::get('/sms', [SmsController::class, 'index'])->middleware('auth')->name('sms.index');
