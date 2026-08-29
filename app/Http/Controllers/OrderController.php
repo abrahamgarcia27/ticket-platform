@@ -86,7 +86,7 @@ class OrderController extends Controller
                     'email_buyer' => $request['email_buyer'],
                     'phone_buyer' => $request['phone_buyer'],
                     'ticket_id' => $ticketData['ticket_id'],
-                    'code' => Str::random(5),
+                    'code' => Str::random(10),
                 ];
 
                 $order = Order::create($orderDetails);
