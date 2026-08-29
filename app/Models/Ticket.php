@@ -16,6 +16,7 @@ class Ticket extends Model
         'quantity',
         'type',
         'price',
+        'fee',
         'date_time_start',
         'date_time_end',
         'event_id',
@@ -29,5 +30,15 @@ class Ticket extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'ticket_id', 'id');
+    }
+
+    public function getSoldTicketsAttribute()
+    {
+        return $this->orders()->count();
+    }
+
+    public function fees()
+    {
+        return $this->hasMany(FeeTicket::class);
     }
 }

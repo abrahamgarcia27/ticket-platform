@@ -54,6 +54,37 @@
                             <label for="price" class="form-control-label">Price</label>
                             <input class="form-control" type="text" name="price" id="price" placeholder="$" required>
                         </div>
+                        <div class="form-check form-switch" id="feeSwitchGroup" style="padding-bottom: 15px;">
+                            <input class="form-check-input" type="checkbox" role="switch" id="has_fee" name="has_fee">
+                            <label class="form-check-label" for="has_fee">Do you want to add fees?</label>
+                        </div>
+                        <div id="feesContainer" style="display: none;">
+                            <div class="fee-row mb-3">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <label class="form-control-label">Fee Name</label>
+                                        <input type="text" name="fees[0][name]" class="form-control fee-name" placeholder="Fee Name">
+                                    </div>
+                                    <div class="col-5">
+                                        <label class="form-control-label">Fee Amount</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" name="fees[0][amount]" class="form-control fee-amount" placeholder="0.00" step="0.01" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <button type="button" class="btn btn-danger btn-sm remove-fee" style="display: none; margin-bottom: 0px;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end mb-3">
+                                <button type="button" class="btn btn-primary btn-sm" id="addFee">
+                                    <i class="fas fa-plus"></i> Add Another Fee
+                                </button>
+                            </div>
+                        </div>
                         <div class="form-check form-switch" style="padding-bottom: 15px;">
                             <input class="form-check-input" type="checkbox" role="switch" id="available" name="available" checked>
                             <label class="form-check-label" for="available">Available</label>
@@ -83,21 +114,83 @@
     $("#free").on("change", function(){
         var checked = $(this).is(':checked');
         if(checked){
-            $("#price").prop("disabled", true);
+            $("#price").prop({
+                disabled: true,
+                required: false
+            });
+            $("#feeSwitchGroup, #feesContainer").hide();
+            $("#has_fee").prop('checked', false).trigger('change');
         }
-        else{
-            $("#price").prop("disabled", false);
-        }    
     }); 
+    
     $("#paid").on("change", function(){
         var checked = $(this).is(':checked');
         if(checked){
-            $("#price").prop("disabled", false);
+            $("#price").prop({
+                disabled: false,
+                required: true
+            });
+            $("#feeSwitchGroup").show();
         }
-        else{
-            $("#price").prop("disabled", true);
-        }    
-    }); 
+    });
+
+    let feeIndex = 1;
+
+    $("#has_fee").on("change", function(){
+        if($(this).is(':checked')) {
+            $("#feesContainer").show();
+        } else {
+            $("#feesContainer").hide();
+        }
+    });
+
+    $("#addFee").on('click', function() {
+        const newRow = `
+            <div class="fee-row mb-3">
+                <div class="row">
+                    <div class="col-5">
+                        <input type="text" name="fees[${feeIndex}][name]" class="form-control fee-name" placeholder="Fee Name" required>
+                    </div>
+                    <div class="col-5">
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" name="fees[${feeIndex}][amount]" class="form-control fee-amount" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                        <button type="button" class="btn btn-danger btn-sm remove-fee">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        
+        $(newRow).insertBefore($(this).parent());
+        feeIndex++;
+        
+        // Show remove buttons if there are multiple fee rows
+        if ($('.fee-row').length > 1) {
+            $('.remove-fee').show();
+        }
+    });
+    
+    // Remove fee row
+    $(document).on('click', '.remove-fee', function() {
+        $(this).closest('.fee-row').remove();
+        
+        // Hide remove buttons if only one fee row remains
+        if ($('.fee-row').length <= 1) {
+            $('.remove-fee').hide();
+        }
+        
+        // Rename remaining inputs to maintain proper array indexing
+        $('.fee-row').each(function(index) {
+            $(this).find('.fee-name').attr('name', `fees[${index}][name]`);
+            $(this).find('.fee-amount').attr('name', `fees[${index}][amount]`);
+        });
+        
+        feeIndex = $('.fee-row').length;
+    });
 </script>
 @endpush
 

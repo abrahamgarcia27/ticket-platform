@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Event;
 use App\Models\Ticket;
-
+use App\Models\FeeTicket;
 
 class TicketController extends Controller
 {
@@ -53,6 +53,14 @@ class TicketController extends Controller
             $all['price'] = 0;
         }
         $ticket = Ticket::create($all);
+        if($request->has_fee)
+        {
+            $fees = $request->fees;
+            foreach ($fees as $fee) {
+                $fee['ticket_id'] = $ticket->id;
+                FeeTicket::create($fee);
+            }
+        }
 
         return redirect()->route('ticket.index', [$id])->with('succes', 'Ticket created successfully!');
 
@@ -71,7 +79,7 @@ class TicketController extends Controller
      */
     public function edit(string $id)
     {
-        $ticket = Ticket::find($id);
+        $ticket = Ticket::with('fees')->findOrFail($id);
         return view('pages.tickets.edit', compact('ticket'));
 
     }
@@ -87,7 +95,7 @@ class TicketController extends Controller
         ]);
         
         $all = $request->except(['_token']);
-        // dd($request);
+       
         if ($all['type'] == 'free') {
             $all['price'] = 0;
         }
@@ -96,8 +104,22 @@ class TicketController extends Controller
         }else {
             $all['available'] = 0;
         }
+
         $ticket = Ticket::find($id);
         $ticket->update($all);
+        
+        $ticket->fees()->delete();
+
+        if($request->has_fee)
+        {
+            $fees = $request->fees;
+            foreach ($fees as $fee) {
+                $fee['ticket_id'] = $ticket->id;
+                FeeTicket::create($fee);
+            }
+        }
+        
+        
         
         return back()->with('succes', 'Ticket succesfully updated');
 

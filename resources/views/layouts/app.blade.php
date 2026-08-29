@@ -92,6 +92,23 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.0/css/responsive.dataTables.min.css">
     
     <style>
+        .sold-out-overlay {
+            position: absolute;
+            top: 50%;
+            left: 35%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            opacity: 0.8;
+            pointer-events: none;
+            width: auto;
+        }
+        .opacity-25 {
+            opacity: 0.25;
+        }
+        .img-fluid-sold-out {
+            width: 50%;
+            height: 50%;
+        }
         .bgcolor-dark {
             background-color: #0E1012 !important;
         }
@@ -163,7 +180,7 @@
         .card-no-border{
             border-radius: 0px !important;
         }
-        @media only screen and (max-width: 959px) {
+        @media only screen and (max-width: 991.98px) {
             .coverimg {
                 background-repeat: round !important;
             }
@@ -172,12 +189,12 @@
             }
             #getTicketsBottom {
                display: block;
-               height: 140px; 
+               height: 80px; 
                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.16);
             }
             #getTicketsBottom1{
                display: block;
-               height: 140px; 
+               height: 80px; 
                position: sticky !important;
                background-color: #ffff;
             }
@@ -233,10 +250,15 @@
         .list-event {
             width: 380px;
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            border-radius: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             .image-container {
                 position: relative;
-                border-radius: 25px;
+                border-radius: 25px 25px 0 0;
                 overflow: hidden;
             }
             .image-container::before {
@@ -246,48 +268,73 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0, 0, 0, 0.1); /* Fondo semitransparente */
+                background-color: rgba(0, 0, 0, 0.05); /* Ligero overlay */
+                z-index: 1;
             }   
             .card-img-top{
-                border-radius: 25px;
-                height: 380px;
+                border-radius: 25px 25px 0 0;
+                height: auto;
                 width: 100%;
-                object-fit: cover;
+                object-fit: contain;
+                max-height: 500px;
+                display: block;
             }
-            .event-title-container {
-                position: absolute;
-                bottom: 10px;
-                left: 10%;
-                transform: translateX(-10%);
+
+            /* New event info container below image */
+            .event-info-container {
                 display: flex;
                 align-items: center;
-                z-index: 1;
-                width: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                margin: 0px;
+                padding: 15px 20px;
+                background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+                border-radius: 0 0 25px 25px;
+                gap: 15px;
+                min-height: 80px;
             }
 
             .event-date-circle {
-                background-color: #D9BC73;
-                border: 1px solid #ffff;
+                background: linear-gradient(135deg, #D9BC73, #E8D399);
+                border: 2px solid #fff;
                 border-radius: 50%;
                 color: white;
                 text-align: center;
-                width: 80px;
-                height: 80px;
+                width: 70px;
+                height: 70px;
+                flex-shrink: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 4px 10px rgba(217, 188, 115, 0.3);
                 .event-date {
-                    margin:0px;
+                    margin: 0;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    line-height: 1;
                 }
             }
 
             .event-title {
-                color: white;
+                color: #2d3748;
                 font-size: 1rem;
-                margin-left: 10px;
-                width: 280px;
-                font-weight: bold;
+                font-weight: 600;
+                line-height: 1.3;
+                flex: 1;
+                text-align: left;
+                margin: 0;
             }
 
+            /* Hover effects */
+            &:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                .event-date-circle {
+                    transform: scale(1.05);
+                    box-shadow: 0 6px 15px rgba(217, 188, 115, 0.4);
+                }
+                .event-title {
+                    color: #D9BC73;
+                }
+            }
         }
         .events-container {
             padding: 0px !important;
@@ -299,18 +346,466 @@
         @media only screen and (max-width: 1400px) {
            .list-event {
             width: 300px;
+            margin-bottom: 25px;
             .card-img-top{
-                height: 300px;
+                height: auto;
+                max-height: 400px;
             }
             .event-date-circle {
                 width: 60px;
                 height: 60px;
                 .event-date {
-                    font-size: 12px;
+                    font-size: 0.65rem;
                 }
            }
            .event-title {
-                width: 200px;
+                font-size: 0.9rem;
+            }
+           .event-info-container {
+                padding: 12px 15px;
+                gap: 12px;
+                min-height: 70px;
+            }
+        }
+
+        /* Tablet Modal Fixes */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            /* Modal GetTickets - usar layout desktop pero más pequeño */
+            #getTickets .modal-dialog {
+                max-width: 95% !important;
+                margin: 1rem auto !important;
+            }
+            
+            #getTickets .modal-content {
+                max-height: 85vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Modal Checkout - usar layout desktop pero más pequeño */
+            #checkout .modal-dialog {
+                max-width: 95% !important;
+                margin: 1rem auto !important;
+            }
+            
+            #checkout .modal-content {
+                max-height: 85vh !important;
+                overflow-y: auto !important;
+            }
+            
+            /* Ocultar versiones móviles en tablets */
+            #getTicketsMobile {
+                display: none !important;
+            }
+            
+            #checkoutMobile {
+                display: none !important;
+            }
+        }
+
+        /* Mobile Navigation Top Bar */
+        @media (max-width: 991.98px) {
+            .mobile-top-nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: #fff;
+                border-bottom: 2px solid #D9BC73;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 1050;
+                padding: 8px 0;
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-top-nav .container-fluid {
+                padding: 0 15px;
+            }
+
+            .mobile-top-nav .nav-link {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 12px;
+                color: #6c757d;
+                text-decoration: none;
+                border-radius: 20px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                font-size: 0.8rem;
+                font-weight: 600;
+                background: transparent;
+                border: 2px solid transparent;
+                min-height: 40px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .mobile-top-nav .nav-link::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, #D9BC73, #E8D399);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                border-radius: 18px;
+                z-index: -1;
+            }
+
+            .mobile-top-nav .nav-link:hover::before,
+            .mobile-top-nav .nav-link.temp-active::before {
+                opacity: 1;
+            }
+
+            .mobile-top-nav .nav-link:hover,
+            .mobile-top-nav .nav-link.temp-active {
+                color: #fff;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(217, 188, 115, 0.4);
+            }
+
+            .mobile-top-nav .nav-link span {
+                z-index: 1;
+                position: relative;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Mobile Bottom Get Tickets Button */
+            .mobile-bottom-ticket {
+                position: fixed;
+                bottom: 0px; /* Lowered to extend more towards bottom */
+                left: 0;
+                right: 0;
+                background: #fff;
+                border-top: 2px solid #D9BC73;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+                z-index: 1050;
+                padding: 15px 15px 50px 15px; /* Extended bottom padding even more */
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-bottom-ticket .btn-yellow {
+                background: linear-gradient(135deg, #D9BC73, #E8D399);
+                border: none;
+                border-radius: 20px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(217, 188, 115, 0.3);
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .mobile-bottom-ticket .btn-yellow:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(217, 188, 115, 0.5);
+            }
+
+            /* Adjust main content padding for fixed navbars */
+            .main-content {
+                padding-top: 60px !important;
+                padding-bottom: 0 !important; /* Use margin-bottom on last element instead */
+            }
+
+            /* Hide original mobile nav */
+            #navPhone {
+                display: none !important;
+            }
+
+            /* Control exact scroll limit - account for increased height */
+            .main-content .row:last-of-type {
+                margin-bottom: 110px !important; /* Increased for even taller navbar */
+            }
+
+            /* Remove conflicting bottom margin */
+            .main-content {
+                margin-bottom: 0 !important; /* Remove extra margin, use precise control above */
+            }
+
+            /* Adjust the get tickets bottom bar position */
+            #getTicketsBottom1 {
+                bottom: 0px !important; /* Directly at bottom now */
+            }
+        }
+
+        /* Event Summary Styling */
+        .event-summary-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-left: 4px solid #D9BC73;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .event-summary-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #495057;
+            font-weight: 400;
+            text-align: left;
+            font-family: 'Open Sans', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        @media (max-width: 768px) {
+            .event-summary-container {
+                padding: 15px 20px;
+                margin: 8px 0;
+            }
+            
+            .event-summary-content {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+        }
+
+        /* Section Divider Styling */
+        .section-divider {
+            width: 90%;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.15);
+            margin: 30px auto 25px auto;
+            border-radius: 1px;
+        }
+
+        /* Mobile Footer Styling - DISABLED */
+        .mobile-footer {
+            display: none !important; /* Hidden on all devices now */
+        }
+
+        /* Mobile Ticket Selection Styling */
+        @media (max-width: 768px) {
+            .section-divider {
+                width: 90%;
+                margin: 20px auto 20px auto;
+            }
+
+            /* Improve mobile ticket selector visibility */
+            .ticket-select-mobile {
+                font-size: 1.1rem !important;
+                font-weight: 600 !important;
+                text-align: center !important;
+                min-width: 50px !important;
+                height: 40px !important;
+                border: none !important;
+                border-radius: 8px !important;
+                background-color: #fff !important;
+                color: #333 !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+            }
+
+            /* Modern ticket card design similar to reference image */
+            .ticket-card-mobile {
+                background-color: #fff !important;
+                border-radius: 12px !important;
+                padding: 0 !important;
+                margin-bottom: 16px !important;
+                border: 1px solid #e9ecef !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+                overflow: hidden !important;
+                transition: box-shadow 0.3s ease !important;
+            }
+
+            .ticket-card-mobile:hover {
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16) !important;
+            }
+
+            /* Top section - ticket type */
+            .ticket-type-section {
+                background-color: #f8f9fa !important;
+                padding: 12px 16px !important;
+                border-bottom: 1px solid #e9ecef !important;
+            }
+
+            /* Bottom section - event title and controls */
+            .ticket-controls-section {
+                background-color: #fff !important;
+                padding: 16px !important;
+            }
+
+            /* Ticket type styling */
+            .ticket-type-mobile {
+                font-size: 1rem !important;
+                font-weight: 600 !important;
+                color: #495057 !important;
+                margin: 0 !important;
+            }
+
+            /* Event title styling */
+            .event-title-mobile {
+                font-size: 0.9rem !important;
+                font-weight: 500 !important;
+                color: #6c757d !important;
+                margin-bottom: 12px !important;
+                line-height: 1.3 !important;
+                word-wrap: break-word !important;
+            }
+
+            /* Ticket price styling */
+            .ticket-price-mobile {
+                font-size: 1.2rem !important;
+                font-weight: 700 !important;
+                color: #343a40 !important;
+                margin-bottom: 2px !important;
+            }
+
+            .ticket-fee-mobile {
+                font-size: 0.8rem !important;
+                color: #6c757d !important;
+                margin-left: 4px !important;
+            }
+
+            /* Sales end date styling - moved down */
+            .ticket-sales-end {
+                font-size: 0.75rem !important;
+                color: #6c757d !important;
+                margin-top: 6px !important;
+                line-height: 1.2 !important;
+            }
+
+            /* Square buttons with proper colors */
+            .btn-ticket-minus {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 6px !important;
+                border: none !important;
+                background-color: #dee2e6 !important;
+                color: #6c757d !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease !important;
+                flex-shrink: 0 !important;
+            }
+
+            .btn-ticket-plus {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 6px !important;
+                border: none !important;
+                background-color: #343a40 !important;
+                color: #fff !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 0.9rem !important;
+                font-weight: 600 !important;
+                transition: all 0.2s ease !important;
+                flex-shrink: 0 !important;
+            }
+
+            .btn-ticket-minus:hover {
+                background-color: #ced4da !important;
+                color: #495057 !important;
+            }
+
+            .btn-ticket-plus:hover {
+                background-color: #495057 !important;
+                color: #fff !important;
+            }
+
+            .btn-ticket-minus:disabled,
+            .btn-ticket-plus:disabled {
+                background-color: #f8f9fa !important;
+                color: #adb5bd !important;
+                cursor: not-allowed !important;
+            }
+
+            /* Ticket controls container - better centered */
+            .ticket-controls-mobile {
+                display: flex !important;
+                align-items: flex-start !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+
+            .ticket-info-section {
+                flex: 1 !important;
+                min-width: 0 !important;
+                padding-right: 8px !important;
+            }
+
+            .ticket-quantity-controls {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                flex-shrink: 0 !important;
+                margin-left: auto !important;
+            }
+
+            /* Responsive adjustments for small phones */
+            @media (max-width: 360px) {
+                .ticket-controls-section {
+                    padding: 12px !important;
+                }
+                
+                .ticket-info-section {
+                    padding-right: 6px !important;
+                }
+                
+                .ticket-quantity-controls {
+                    gap: 8px !important;
+                }
+                
+                .btn-ticket-minus,
+                .btn-ticket-plus {
+                    width: 32px !important;
+                    height: 32px !important;
+                    font-size: 0.8rem !important;
+                }
+                
+                .ticket-select-mobile {
+                    min-width: 45px !important;
+                    height: 32px !important;
+                    font-size: 1rem !important;
+                }
+            }
+
+            /* Override old button styles for mobile tickets */
+            .btn.px-3 {
+                padding: 8px 12px !important;
+                font-size: 0.9rem !important;
+                min-width: 40px !important;
+                height: 40px !important;
+            }
+
+            /* Ensure proper spacing in ticket selection container */
+            .d-flex.align-items-center.justify-content-center {
+                gap: 8px !important;
+            }
+
+            /* Fix mobile modal bottom navigation positioning */
+            #getTicketsBottom {
+                bottom: 15px !important; /* Move up from bottom edge */
+                padding: 15px 0 !important; /* More internal padding */
+                height: auto !important; /* Auto height instead of fixed 80px */
+                min-height: 100px !important; /* Minimum height for content */
+                background-color: #fff !important;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+            }
+
+            /* Ensure buttons have proper spacing and visibility */
+            #getTicketsBottom .btn-lg {
+                padding: 12px 20px !important;
+                font-size: 1rem !important;
+                margin-bottom: 10px !important; /* Space from bottom */
+            }
+
+            /* Add padding to modal body to prevent content overlap with fixed bottom */
+            .modal-fullscreen .modal-body {
+                padding-bottom: 140px !important; /* Ensure content doesn't hide behind bottom nav */
+            }
+
+            /* Adjust total display spacing */
+            #getTicketsBottom .row {
+                margin-bottom: 10px !important;
+                padding: 0 5px !important;
             }
         }
     </style>

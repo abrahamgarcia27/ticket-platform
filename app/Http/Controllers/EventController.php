@@ -9,6 +9,7 @@ use App\Models\Ticket;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 Use \Carbon\Carbon;
 use Google\Client;
 use Google\Service\Calendar;
@@ -95,6 +96,7 @@ class EventController extends Controller
         $clonedEvent->created_by = Auth::id();
         $clonedEvent->date_time_start = Carbon::parse($originalEvent->date_time_start)->addWeek()->format('Y-m-d H:i');
         $clonedEvent->date_time_end = Carbon::parse($originalEvent->date_time_end)->addWeek()->format('Y-m-d H:i');
+        $clonedEvent->google_event_id = null;
         $clonedEvent->save();
 
         // Clonar los tickets del evento original
@@ -166,6 +168,11 @@ class EventController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'date_time_start' => 'required|date',
+            'date_time_end' => 'required|date|after:date_time_start'
+        ]);
+
         $all = $request->except(['_token', 'image']);
         $event = Event::find($id);
         if (!$request->has('external_sales')) {
@@ -199,7 +206,7 @@ class EventController extends Controller
     public function destroy(string $id)
     {
         $event = Event::find($id);
-        if (env('APP_ENV') == 'production') {
+        if (env('APP_ENV') == 'production' && $event->google_event_id !== null) {
             $this->deleteGooogleEvent($event);
         }
         $event->delete();
@@ -283,14 +290,32 @@ class EventController extends Controller
 
     public function deleteGooogleEvent($event)
     {
-        $client = new Client();
-        $client->setAuthConfig(config('google.service_account_key_path'));
-        $client->addScope(\Google_Service_Calendar::CALENDAR);
+        try {
+            $client = new Client();
+            $client->setAuthConfig(config('google.service_account_key_path'));
+            $client->addScope(\Google_Service_Calendar::CALENDAR);
 
-        $service = new Calendar($client);
-        $calendarId = env('GOOGLE_CALENDAR_ID');
+            $service = new Calendar($client);
+            $calendarId = env('GOOGLE_CALENDAR_ID');
 
-        $service->events->delete($calendarId, $event->google_event_id);
+            // Verificar si el evento existe antes de intentar eliminarlo
+            try {
+                $service->events->get($calendarId, $event->google_event_id);
+                // Si llegamos aquí, el evento existe, procedemos a eliminarlo
+                $service->events->delete($calendarId, $event->google_event_id);
+            } catch (\Google\Service\Exception $e) {
+                // Si el evento no existe (404) o ya fue eliminado, solo registramos el error
+                if ($e->getCode() == 404) {
+                    Log::info("Evento de Google Calendar no encontrado: {$event->google_event_id}. Puede que ya haya sido eliminado.");
+                } else {
+                    // Para otros errores, relanzamos la excepción
+                    throw $e;
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("Error al eliminar evento de Google Calendar: " . $e->getMessage());
+            // No lanzamos la excepción para que el proceso de eliminación local continúe
+        }
     }
     
 }
