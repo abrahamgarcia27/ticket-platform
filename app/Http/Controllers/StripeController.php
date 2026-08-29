@@ -37,7 +37,7 @@ class StripeController extends Controller
         foreach ($selectedTickets as $ticketData) {
             $ticket = Ticket::findOrFail($ticketData['ticket_id']);
             $quantity = $ticketData['quantity'];
-                
+
             // Validate quantity and availability
             if ($quantity <= 0 || $quantity > ($ticket->quantity - $ticket->count_orders)) {
                 return redirect()->back()->with('error', 'Invalid ticket quantity');
@@ -60,7 +60,7 @@ class StripeController extends Controller
                 'title' => $ticket->title,
                 'price' => $ticket->price
             ];
-            
+
             if ($ticket->fees) {
                 foreach ($ticket->fees as $fee) {
                     $lineItems[] = [
@@ -97,7 +97,7 @@ class StripeController extends Controller
             'success_url' => route('stripe.success') . "?session_id={CHECKOUT_SESSION_ID}",
             'cancel_url' => route('event.show', [$ticket->event->id]),
         ]);
-    
+
         return redirect()->away($session->url);
     }
 
@@ -116,14 +116,14 @@ class StripeController extends Controller
 
         $session = \Stripe\Checkout\Session::retrieve($session_id);
         $sessionData = json_encode($session->toArray());
-        
+
         $codes = [];
         $orders_data = [];
-        
+
         // Process each ticket type in the order
         foreach ($orderData['tickets'] as $ticketData) {
             $ticket = Ticket::findOrFail($ticketData['ticket_id']);
-            
+
             // Create orders for each ticket quantity
             for ($i = 0; $i < $ticketData['quantity']; $i++) {
                 $orderDetails = [
@@ -132,40 +132,29 @@ class StripeController extends Controller
                     'email_buyer' => $orderData['email_buyer'],
                     'phone_buyer' => $orderData['phone_buyer'],
                     'ticket_id' => $ticketData['ticket_id'],
-                    'code' => Str::random(5),
+                    'code' => Str::random(10),
                     'stripe_data' => $sessionData
                 ];
 
                 $order = Order::create($orderDetails);
-                
-                // Generate QR code
-                QrCode::format('png')
-                    ->size(200)
-                    ->style('round')
-                    ->backgroundColor(255, 255, 255)
-                    ->generate($orderDetails['code'], '../public/storage/uploads/'. $orderDetails['code'] .'.png');
-                
-                $order->update([
-                    'svg_qr' => 'uploads/' . $orderDetails['code'] . '.png'
-                ]);
-                
+
                 $codes[] = $order->code;
-                
+
                 $event = Event::where('id', $order->ticket->event_id)->first();
                 $created_at = Carbon::parse($order->created_at);
                 $fechaRestada = $created_at->subHours(6);
 
                 $order_data = [
-                    'event_title'     => $event->title,
+                    'event_title' => $event->title,
                     'event_ubication' => $event->ubication,
-                    'event_datetime'  => $event->date_time_start,
-                    'order'           => $order->id,
-                    'type_ticket'     => $order->ticket->type,
-                    'name_ticket'     => $order->ticket->title,
-                    'name_buyer'      => $order->name_buyer . ' ' . $order->last_name_buyer,
-                    'order_date'      => $fechaRestada,
-                    'qr'              => $order->svg_qr,
-                    'website'         => $event->user->web_url
+                    'event_datetime' => $event->date_time_start,
+                    'order' => $order->id,
+                    'type_ticket' => $order->ticket->type,
+                    'name_ticket' => $order->ticket->title,
+                    'name_buyer' => $order->name_buyer . ' ' . $order->last_name_buyer,
+                    'order_date' => $fechaRestada,
+                    'qr' => $order->code,
+                    'website' => $event->user->web_url
                 ];
                 $orders_data[] = $order_data;
             }
@@ -201,9 +190,9 @@ class StripeController extends Controller
 
         $title = $event . ' - ' . $startDate . ' ' . date('(h:s a)', strtotime($ticket->event->date_time_start));
         $clock = $startDate . ' ' . date(' h:s a', strtotime($ticket->event->date_time_start));
-        $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' . 
-                    $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' . 
-                    $ticket->event->postal_code . ', ' . $ticket->event->address_country;
+        $location = $ticket->event->ubication . ' ' . $ticket->event->street_address . ', ' .
+            $ticket->event->address_locality . ', ' . $ticket->event->address_region . ' ' .
+            $ticket->event->postal_code . ', ' . $ticket->event->address_country;
 
         $emailData = [
             'name' => $orderData['name_buyer'],
@@ -222,7 +211,7 @@ class StripeController extends Controller
             'event_location' => $ticket->event->maps_url,
             'tickets' => $orderData['tickets']
         ];
-        
+
         Mail::send('pages.email.email', $emailData, function ($message) use ($emailData, $pdf) {
             $message->from(env('MAIL_FROM_ADDRESS'), $emailData['user_name']);
             $message->to($emailData['email'], $emailData['name']);

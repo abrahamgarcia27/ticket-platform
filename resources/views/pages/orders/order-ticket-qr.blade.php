@@ -31,7 +31,7 @@
                 <img src="{{ asset('storage/' . $event_image) }}" class="card-img-top" alt="">
                 <div class="card-body ">
                   <h1 class="card-title " style="text-align: center;"><strong>{{ $name_ticket }}</strong></h1>
-                  <img src="{{ asset('storage/' . $qr) }}" style="padding-left: 125px" alt="">
+                  <img src="{{ route('qr.generate', ['code' => $qr]) }}" style="padding-left: 125px" alt="">
                 </div>
                 <div class="card-footer" style="text-align: center">
                     <p>Visit our website <strong>{{ $website }}</strong></p>

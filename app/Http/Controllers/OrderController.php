@@ -91,17 +91,6 @@ class OrderController extends Controller
 
                 $order = Order::create($orderDetails);
 
-                // Generate QR code
-                QrCode::format('png')
-                    ->size(200)
-                    ->style('round')
-                    ->backgroundColor(255, 255, 255)
-                    ->generate($orderDetails['code'], '../public/storage/uploads/' . $orderDetails['code'] . '.png');
-
-                $order->update([
-                    'svg_qr' => 'uploads/' . $orderDetails['code'] . '.png'
-                ]);
-
                 $codes[] = $order->code;
 
                 $event = Event::where('id', $order->ticket->event_id)->first();
@@ -117,7 +106,7 @@ class OrderController extends Controller
                     'name_ticket' => $order->ticket->title,
                     'name_buyer' => $order->name_buyer . ' ' . $order->last_name_buyer,
                     'order_date' => $fechaRestada,
-                    'qr' => $order->svg_qr,
+                    'qr' => $order->code,
                     'website' => $event->user->web_url
                 ];
                 $orders_data[] = $order_data;
@@ -308,7 +297,7 @@ class OrderController extends Controller
             'name_ticket' => $order->ticket->title,
             'name_buyer' => $order->name_buyer . ' ' . $order->last_name_buyer,
             'order_date' => $order->created_at,
-            'qr' => $order->svg_qr,
+            'qr' => $order->code,
             'website' => $event->user->web_url
         ]);
         return $pdf->download('sample.pdf');
@@ -338,7 +327,7 @@ class OrderController extends Controller
                 'name_ticket' => $order->ticket->title,
                 'name_buyer' => $order->name_buyer . ' ' . $order->last_name_buyer,
                 'order_date' => $fechaRestada,
-                'qr' => $order->svg_qr,
+                'qr' => $order->code,
                 'website' => $event->user->web_url
             ]
         ];
@@ -380,6 +369,17 @@ class OrderController extends Controller
         });
 
         return back()->with('success', 'Email sent successfully.');
+    }
+
+    public function generateQr($code)
+    {
+        $qr = QrCode::format('png')
+            ->size(200)
+            ->style('round')
+            ->backgroundColor(255, 255, 255)
+            ->generate($code);
+
+        return response($qr)->header('Content-Type', 'image/png');
     }
 
     /**

@@ -81,7 +81,7 @@
                                           {{ date('j F, Y h:s a', strtotime($order_data['order_date'])) }}</p>
                                         </td>
                                         <td style="line-height: 16px; font-size: 16px; width: 100%; height: 16px; margin: 0; padding-right: 15px; padding-bottom: 15px;" align="right" width="100%" height="16">
-                                          <img class="w-16" src="{{ asset('storage/' . $order_data['qr']) }}" style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 100px; border-style: none; border-width: 0;" width="64">
+                                          <img class="w-16" src="{{ route('qr.generate', ['code' => $order_data['qr']]) }}" style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 100px; border-style: none; border-width: 0;" width="64">
                                         </td>
                                       </tr>
                                   </tbody>
