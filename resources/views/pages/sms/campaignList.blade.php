@@ -76,7 +76,7 @@
                         <p class="text-sm text-secondary mb-2 mb-md-0">
                             Showing {{ $campaigns->firstItem() }} to {{ $campaigns->lastItem() }} of {{ $campaigns->total() }} campaigns
                         </p>
-                        {{ $campaigns->onEachSide(1)->links('pagination::bootstrap-5') }}
+                        {{ $campaigns->onEachSide(1)->links('pagination::bootstrap-4') }}
                     </div>
                 @endif
             </div>           

@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Http\Controllers\SmsController;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 /**
@@ -78,6 +81,7 @@ class SmsCampaignListTest extends TestCase
         $this->actingAs($user)->get(route('sms.index'))
             ->assertOk()
             ->assertSee('Showing 1 to 10 of 25 campaigns')
+            ->assertSee('page-link', false)
             ->assertSee('Campaign 10')
             ->assertDontSee('>Campaign 11<', false)
             ->assertDontSee('Direct message');
@@ -86,6 +90,92 @@ class SmsCampaignListTest extends TestCase
             ->assertOk()
             ->assertSee('Showing 21 to 25 of 25 campaigns')
             ->assertSee('Campaign 25');
+    }
+
+    public function test_showing_summary_appears_only_once(): void
+    {
+        $html = $this->actingAs($this->user())->get(route('sms.index', ['page' => 2]))->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, 'Showing'));
+        $this->assertStringNotContainsString(' results', $html);
+    }
+
+    public function test_out_of_range_page_redirects_to_last_page_keeping_search(): void
+    {
+        $user = $this->user();
+
+        $this->actingAs($user)->get(route('sms.index', ['page' => 99]))
+            ->assertRedirect(route('sms.index', ['page' => 3]));
+
+        // 13 VIP campaigns => 2 pages.
+        $this->actingAs($user)->get(route('sms.index', ['search' => 'vip', 'page' => 99]))
+            ->assertRedirect(route('sms.index', ['search' => 'vip', 'page' => 2]));
+
+        // Single page of results => no page param.
+        $this->actingAs($user)->get(route('sms.index', ['search' => 'ANIVERSARIO', 'page' => 5]))
+            ->assertRedirect(route('sms.index', ['search' => 'ANIVERSARIO']));
+
+        // No results at all => clean empty state, no redirect loop.
+        $this->actingAs($user)->get(route('sms.index', ['search' => 'nothing-matches', 'page' => 4]))
+            ->assertRedirect(route('sms.index', ['search' => 'nothing-matches']));
+        $this->actingAs($user)->get(route('sms.index', ['search' => 'nothing-matches']))
+            ->assertOk()
+            ->assertSee('No campaigns match your search.')
+            ->assertDontSee('Showing');
+    }
+
+    public function test_pagination_does_not_follow_next_page_url_on_other_hosts(): void
+    {
+        Http::swap(new HttpFactory());
+        Http::fake([
+            'shortysms.com/api/campaigns' => Http::response([
+                'data' => [$this->campaign(1, 'Only page', 'First page', 'VIP list')],
+                'next_page_url' => 'https://evil.example.com/api/campaigns?page=2',
+            ]),
+            '*' => Http::response(['data' => [$this->campaign(2, 'Leaked', 'Should not be fetched', 'VIP list')]]),
+        ]);
+        Log::spy();
+
+        $this->actingAs($this->user())->get(route('sms.index'))
+            ->assertOk()
+            ->assertSee('Only page')
+            ->assertDontSee('Leaked');
+
+        Http::assertSentCount(1);
+        Http::assertNotSent(fn ($request) => str_contains($request->url(), 'evil.example.com'));
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    public function test_pagination_does_not_follow_next_page_url_over_http(): void
+    {
+        Http::swap(new HttpFactory());
+        Http::fake([
+            'shortysms.com/api/campaigns' => Http::response([
+                'data' => [$this->campaign(1, 'Only page', 'First page', 'VIP list')],
+                'next_page_url' => 'http://shortysms.com/api/campaigns?page=2',
+            ]),
+            '*' => Http::response(['data' => []]),
+        ]);
+        Log::spy();
+
+        $this->actingAs($this->user())->get(route('sms.index'))->assertOk();
+
+        Http::assertSentCount(1);
+        Log::shouldHaveReceived('warning')->once();
+    }
+
+    public function test_strip_emoji_keeps_accents(): void
+    {
+        $method = new \ReflectionMethod(SmsController::class, 'stripEmoji');
+        $method->setAccessible(true);
+        $controller = app(SmsController::class);
+
+        $this->assertSame(
+            'Tributo a Jarabe de Palo & Juanes ¡Ven! Música, señor, Café',
+            $method->invoke($controller, "🎶🎸 Tributo a Jarabe de Palo & Juanes 🇲🇽 ¡Ven! 👍🏽 Música, señor, Café ❤️ 👨‍👩‍👧")
+        );
+        $this->assertSame("Line one\nLine two", $method->invoke($controller, "🔥 Line one ✨\n🎉 Line two"));
+        $this->assertSame('1 - 2', $method->invoke($controller, '1️⃣ - 2'));
     }
 
     public function test_search_filters_and_pagination_keeps_query(): void

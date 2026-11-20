@@ -11,10 +11,13 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class SmsController extends Controller
 {
     private const CAMPAIGNS_PER_PAGE = 10;
+
+    private const SHORTYSMS_API_BASE = 'https://shortysms.com/api';
 
     public function index(Request $request)
     {
@@ -22,6 +25,15 @@ class SmsController extends Controller
         $campaigns = $this->filterCampaigns($this->fetchCampaigns(), $search);
 
         $page = LengthAwarePaginator::resolveCurrentPage();
+        $lastPage = max(1, (int) ceil($campaigns->count() / self::CAMPAIGNS_PER_PAGE));
+        if ($page > $lastPage) {
+            // Out of range page: go to the last page, keeping the search.
+            return redirect()->route('sms.index', array_filter([
+                'search' => $search,
+                'page' => $lastPage > 1 ? $lastPage : null,
+            ]));
+        }
+
         $campaigns = new LengthAwarePaginator(
             $campaigns->forPage($page, self::CAMPAIGNS_PER_PAGE)->values(),
             $campaigns->count(),
@@ -56,10 +68,14 @@ class SmsController extends Controller
     {
         $search = trim((string) $request->query('search', ''));
         $rows = $this->campaignExportRows($this->filterCampaigns($this->fetchCampaigns(), $search));
+        // DejaVu Sans has no emoji glyphs (they render as empty boxes), so strip them from the PDF only.
+        $rows = array_map(function ($row) {
+            return array_map([$this, 'stripEmoji'], $row);
+        }, $rows);
 
         $pdf = Pdf::loadView('pages.sms.campaignListPdf', [
             'rows' => $rows,
-            'search' => $search,
+            'search' => $this->stripEmoji($search),
             'generatedAt' => now()->format('Y-m-d H:i:s'),
         ])->setPaper('a4', 'landscape');
 
@@ -73,7 +89,7 @@ class SmsController extends Controller
     {
         $access_token = env('SHORTYSMS_TOKEN');
         $campaigns = collect();
-        $url = 'https://shortysms.com/api/campaigns';
+        $url = self::SHORTYSMS_API_BASE . '/campaigns';
         $requests = 0;
 
         while ($url && $requests < 50) {
@@ -89,6 +105,11 @@ class SmsController extends Controller
             }
             $campaigns = $campaigns->merge($response['data']);
             $url = $response['next_page_url'] ?? null;
+            if ($url && !$this->isShortySmsApiUrl($url)) {
+                // Never send the bearer token to a host we don't trust.
+                Log::warning('ShortySMS next_page_url points to an unexpected host, pagination stopped.', ['url' => $url]);
+                $url = null;
+            }
         }
 
         return $campaigns->filter(function ($campaign) {
@@ -138,6 +159,45 @@ class SmsController extends Controller
                 $this->campaignContactLists($campaign),
             ];
         })->all();
+    }
+
+    /**
+     * True only when the URL has the same scheme and host as the ShortySMS API base.
+     */
+    private function isShortySmsApiUrl($url): bool
+    {
+        if (!is_string($url)) {
+            return false;
+        }
+        $base = parse_url(self::SHORTYSMS_API_BASE);
+        $next = parse_url($url);
+
+        return is_array($next)
+            && isset($next['scheme'], $next['host'])
+            && strtolower($next['scheme']) === strtolower($base['scheme'])
+            && strtolower($next['host']) === strtolower($base['host'])
+            && ($next['port'] ?? null) === ($base['port'] ?? null)
+            && !isset($next['user']);
+    }
+
+    /**
+     * Remove emoji (pictographs, symbols, flags, skin tones, variation selectors, ZWJ, keycaps, tags)
+     * while keeping accents, ñ and the rest of the text.
+     */
+    private function stripEmoji($value): string
+    {
+        $value = (string) $value;
+        $value = preg_replace(
+            '/[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{2300}-\x{23FF}\x{2B00}-\x{2BFF}\x{FE00}-\x{FE0F}\x{200D}\x{20E3}\x{E0020}-\x{E007F}\x{3030}\x{303D}\x{3297}\x{3299}]/u',
+            '',
+            $value
+        ) ?? $value;
+
+        // Collapse the spaces left behind (keeping line breaks).
+        $value = preg_replace('/[ \t]{2,}/u', ' ', $value) ?? $value;
+        $value = preg_replace('/^[ \t]+|[ \t]+$/mu', '', $value) ?? $value;
+
+        return trim($value);
     }
 
     /**
