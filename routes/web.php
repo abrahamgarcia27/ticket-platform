@@ -28,6 +28,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventPurchaseEmailController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SmsController;
@@ -45,6 +46,8 @@ Route::post('/event-store', [EventController::class, 'store'])->middleware('auth
 Route::delete('/event-delete/{id}', [EventController::class, 'destroy'])->middleware('auth')->name('event.destroy');
 Route::get('/create-event', [EventController::class, 'createGoogleEvent']);
 Route::get('/event-clone/{id}', [EventController::class, 'clonar'])->name('event.clonar');
+Route::get('/event/{id}/resend-emails', [EventPurchaseEmailController::class, 'show'])->middleware('auth')->name('event.resend-emails');
+Route::post('/event/{id}/resend-emails', [EventPurchaseEmailController::class, 'send'])->middleware('auth')->name('event.resend-emails.send');
 
 
 Route::get('/tickets/{id}', [TicketController::class, 'index'])->middleware('auth')->name('ticket.index');
