@@ -67,6 +67,8 @@ Route::get('/qr/{code}', [OrderController::class, 'generateQr'])->name('qr.gener
 Route::get('/report/event/{id}/pdf', [OrderController::class, 'downloadEventOrdersPdf'])->name('report.event.pdf')->middleware('signed');
 
 Route::get('/sms', [SmsController::class, 'index'])->middleware('auth')->name('sms.index');
+Route::get('/sms/export/csv', [SmsController::class, 'exportCsv'])->middleware('auth')->name('sms.export.csv');
+Route::get('/sms/export/pdf', [SmsController::class, 'exportPdf'])->middleware('auth')->name('sms.export.pdf');
 Route::get('/contact-list', [SmsController::class, 'indexContactList'])->middleware('auth')->name('contactlist.index');
 Route::get('/sms-create', [SmsController::class, 'create'])->middleware('auth')->name('sms.create');
 Route::post('/add-campaign', [SmsController::class, 'addCampaingStore'])->middleware('auth')->name('addcampaign.store');

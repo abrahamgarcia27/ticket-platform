@@ -8,30 +8,150 @@ use App\Models\Ticket;
 use App\Models\Event;
 use App\Models\Order;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class SmsController extends Controller
 {
-    public function index() 
+    private const CAMPAIGNS_PER_PAGE = 10;
+
+    public function index(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+        $campaigns = $this->filterCampaigns($this->fetchCampaigns(), $search);
+
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $campaigns = new LengthAwarePaginator(
+            $campaigns->forPage($page, self::CAMPAIGNS_PER_PAGE)->values(),
+            $campaigns->count(),
+            self::CAMPAIGNS_PER_PAGE,
+            $page,
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'pageName' => 'page']
+        );
+        $campaigns->withQueryString();
+
+        return view('pages.sms.campaignList', compact('campaigns', 'search'));
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+        $rows = $this->campaignExportRows($this->filterCampaigns($this->fetchCampaigns(), $search));
+        $filename = 'sms-campaigns-' . now()->format('Ymd-His') . '.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            // UTF-8 BOM so Excel shows accents correctly.
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['ID', 'Title', 'Content', 'Sent At', 'Contact List']);
+            foreach ($rows as $row) {
+                fputcsv($out, array_map([$this, 'escapeCsvCell'], $row));
+            }
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+        $rows = $this->campaignExportRows($this->filterCampaigns($this->fetchCampaigns(), $search));
+
+        $pdf = Pdf::loadView('pages.sms.campaignListPdf', [
+            'rows' => $rows,
+            'search' => $search,
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('sms-campaigns-' . now()->format('Ymd-His') . '.pdf');
+    }
+
+    /**
+     * All campaigns from ShortySMS (follows the API pagination), only real campaigns.
+     */
+    private function fetchCampaigns(): Collection
     {
         $access_token = env('SHORTYSMS_TOKEN');
-        
-        $response = Http::withToken($access_token)->withHeaders([
-            'Content-Type' => 'application/json'
-        ])
-        ->get('https://shortysms.com/api/campaigns');
-        $response = $response->collect();
-        $response = $response->toArray();
-        if (array_key_exists('data', $response)) {
-            $campaigns = $response['data'];
-            $campaigns = array_filter($campaigns, function ($campaign) {
-                return $campaign['is_campaign'] === true;
-            });
-        } else {
-            $campaigns = [];
+        $campaigns = collect();
+        $url = 'https://shortysms.com/api/campaigns';
+        $requests = 0;
+
+        while ($url && $requests < 50) {
+            $requests++;
+            $response = Http::withToken($access_token)->withHeaders([
+                'Content-Type' => 'application/json'
+            ])
+            ->get($url);
+            $response = $response->collect()->toArray();
+
+            if (!array_key_exists('data', $response) || !is_array($response['data'])) {
+                break;
+            }
+            $campaigns = $campaigns->merge($response['data']);
+            $url = $response['next_page_url'] ?? null;
         }
-        // dd($campaigns);
-        return view('pages.sms.campaignList', compact('campaigns'));
+
+        return $campaigns->filter(function ($campaign) {
+            return ($campaign['is_campaign'] ?? false) === true;
+        })->values();
     }
+
+    /**
+     * Case-insensitive search by id, title, content and contact list name.
+     */
+    private function filterCampaigns(Collection $campaigns, string $search): Collection
+    {
+        if ($search === '') {
+            return $campaigns;
+        }
+        $needle = mb_strtolower($search);
+
+        return $campaigns->filter(function ($campaign) use ($needle) {
+            $haystack = [
+                (string) ($campaign['id'] ?? ''),
+                $campaign['title'] ?? '',
+                $campaign['content'] ?? '',
+                $this->campaignContactLists($campaign),
+            ];
+            foreach ($haystack as $value) {
+                if (str_contains(mb_strtolower((string) $value), $needle)) {
+                    return true;
+                }
+            }
+            return false;
+        })->values();
+    }
+
+    private function campaignContactLists(array $campaign): string
+    {
+        return collect($campaign['contact_lists'] ?? [])->pluck('name')->filter()->implode(', ');
+    }
+
+    private function campaignExportRows(Collection $campaigns): array
+    {
+        return $campaigns->map(function ($campaign) {
+            return [
+                $campaign['id'] ?? '',
+                $campaign['title'] ?? '',
+                $campaign['content'] ?? '',
+                !empty($campaign['sent_at']) ? date('Y-m-d H:i:s', strtotime($campaign['sent_at'])) : '',
+                $this->campaignContactLists($campaign),
+            ];
+        })->all();
+    }
+
+    /**
+     * Avoid CSV formula injection when the file is opened in Excel.
+     */
+    private function escapeCsvCell($value): string
+    {
+        $value = (string) $value;
+        if ($value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+            return "'" . $value;
+        }
+        return $value;
+    }
+
     public function create() 
     {
         $access_token = env('SHORTYSMS_TOKEN');
