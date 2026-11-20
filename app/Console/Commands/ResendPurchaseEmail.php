@@ -8,8 +8,7 @@ use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use PDF;
+use App\Services\PurchaseEmailService;
 
 class ResendPurchaseEmail extends Command
 {
@@ -130,28 +129,11 @@ class ResendPurchaseEmail extends Command
             ]
         );
 
-        $orders_data = [];
-        foreach ($batchOrders as $order) {
-            $created_at = Carbon::parse($order->created_at);
-            $fechaRestada = $created_at->subHours(6);
-
-            $orders_data[] = [
-                'event_title' => $event->title,
-                'event_ubication' => $event->ubication,
-                'event_datetime' => $event->date_time_start,
-                'order' => $order->id,
-                'type_ticket' => $order->ticket->type,
-                'name_ticket' => $order->ticket->title,
-                'name_buyer' => $order->name_buyer . ' ' . $order->last_name_buyer,
-                'order_date' => $fechaRestada,
-                'qr' => $order->code,
-                'website' => $event->user->web_url ?? ''
-            ];
-        }
+        $purchaseEmail = app(PurchaseEmailService::class);
+        $orders_data = $purchaseEmail->buildOrdersData($event, $batchOrders);
 
         $this->info('Renderizando PDF con los ' . count($orders_data) . ' tickets...');
-        $pdf = PDF::loadView('pages.orders.pdf', ['orders_data' => $orders_data]);
-        $pdfContent = $pdf->output();
+        $pdfContent = $purchaseEmail->renderPdf($orders_data);
         $pdfSizeKb = round(strlen($pdfContent) / 1024, 2);
 
         $this->info("PDF generado exitosamente ({$pdfSizeKb} KB, {$totalTickets} tickets/páginas).");
@@ -162,49 +144,9 @@ class ResendPurchaseEmail extends Command
             $this->info("Copia del PDF guardada en: {$savePath}");
         }
 
-        // Construir datos del email idénticos a StripeController
-        Carbon::setLocale('es');
-        $startDate = Carbon::parse($event->date_time_start)->isoFormat('D [de] MMMM, YYYY');
-        $startDate = ucwords($startDate);
-
-        $title = $event->title . ' - ' . $startDate . ' ' . date('(h:s a)', strtotime($event->date_time_start));
-        $clock = $startDate . ' ' . date(' h:s a', strtotime($event->date_time_start));
-        $location = $event->ubication . ' ' . $event->street_address . ', ' .
-            $event->address_locality . ', ' . $event->address_region . ' ' .
-            $event->postal_code . ', ' . $event->address_country;
-
-        $created_at = Carbon::parse($firstOrder->created_at);
-        $fechaRestada = $created_at->subHours(6);
-
-        $ticketsSummary = [
-            [
-                'ticket_id' => $ticket->id,
-                'quantity' => $totalTickets,
-                'title' => $ticket->title,
-                'price' => $ticket->price,
-            ]
-        ];
-
         $targetEmail = $this->option('to') ?: $firstOrder->email_buyer;
-        $buyerName = $firstOrder->name_buyer;
-
-        $emailData = [
-            'name' => $buyerName,
-            'email' => $targetEmail,
-            'subject' => $event->title,
-            'title' => $title,
-            'clock' => $clock,
-            'location' => $location,
-            'order_id' => $lastOrder->id,
-            'order_date' => $fechaRestada,
-            'order_quantity' => $totalTickets,
-            'user_name' => $event->user->username ?? config('mail.from.name', 'Tickets Platform'),
-            'user_email' => $event->user->email ?? config('mail.from.address'),
-            'event_image' => $event->image,
-            'organizer_image' => $event->user->image ?? '',
-            'event_location' => $event->maps_url,
-            'tickets' => $ticketsSummary
-        ];
+        // Datos del email idénticos a StripeController (ver PurchaseEmailService)
+        $emailData = $purchaseEmail->buildEmailData($event, collect($batchOrders), $targetEmail);
 
         if ($this->option('dry-run')) {
             $this->warn("MODO SIMULACIÓN (--dry-run): El correo NO fue enviado.");
@@ -217,18 +159,7 @@ class ResendPurchaseEmail extends Command
         $this->info("Enviando correo a: {$targetEmail}...");
 
         try {
-            Mail::send('pages.email.email', $emailData, function ($message) use ($emailData, $pdfContent) {
-                $fromAddress = config('mail.from.address') ?: env('MAIL_FROM_ADDRESS');
-                $fromName = $emailData['user_name'];
-
-                $message->from($fromAddress, $fromName);
-                $message->to($emailData['email'], $emailData['name']);
-                $message->subject($emailData['subject']);
-                $message->priority(3);
-                $message->attachData($pdfContent, 'Order.pdf', [
-                    'mime' => 'application/pdf',
-                ]);
-            });
+            $purchaseEmail->send($emailData, $pdfContent);
 
             $this->info("¡Correo reenviado exitosamente a {$targetEmail} con el PDF de {$totalTickets} tickets adjunto!");
 
