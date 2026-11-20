@@ -114,7 +114,7 @@ class EventResendPurchaseEmailsTest extends TestCase
         $this->actingAs($this->user)->get(route('event.index'))
             ->assertOk()
             ->assertSee(route('event.resend-emails', $this->event->id), false)
-            ->assertSee('Reenviar emails de compra');
+            ->assertSee('Resend purchase emails');
     }
 
     public function test_view_lists_only_this_event_orders_with_checkboxes(): void
@@ -132,7 +132,7 @@ class EventResendPurchaseEmailsTest extends TestCase
             ->assertSee('ana@example.com')
             ->assertSee('Beto Pérez')
             ->assertSee('#' . $a->id)
-            ->assertSee('Gratis')
+            ->assertSee('Free')
             ->assertSee('name="_token"', false)
             ->assertDontSee('otro@example.com')
             ->assertDontSee('value="' . $foreign->id . '"', false);
@@ -147,17 +147,17 @@ class EventResendPurchaseEmailsTest extends TestCase
 
         $html = $this->actingAs($this->user)->get(route('event.resend-emails', $this->event->id))
             ->assertOk()
-            ->assertSee('Mostrando 1 a 100 de 106 órdenes')
+            ->assertSee('Showing 1 to 100 of 106 orders')
             ->getContent();
         $this->assertSame(100, substr_count($html, 'name="order_ids[]"'));
 
         $this->actingAs($this->user)->get(route('event.resend-emails', [$this->event->id, 'page' => 2]))
             ->assertOk()
-            ->assertSee('Mostrando 101 a 106 de 106 órdenes');
+            ->assertSee('Showing 101 to 106 of 106 orders');
 
         $html = $this->actingAs($this->user)->get(route('event.resend-emails', [$this->event->id, 'search' => 'BUSCAME']))
             ->assertOk()
-            ->assertSee('Mostrando 1 a 1 de 1 órdenes')
+            ->assertSee('Showing 1 to 1 of 1 orders')
             ->getContent();
         $this->assertSame(1, substr_count($html, 'name="order_ids[]"'));
         $this->assertStringContainsString('value="' . $target->id . '"', $html);
@@ -244,7 +244,7 @@ class EventResendPurchaseEmailsTest extends TestCase
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => [$ana1->id, $ana2->id, $beto->id]])
             ->assertRedirect(route('event.resend-emails', $this->event->id))
-            ->assertSessionHas('succes', 'Correos reenviados: 2 (3 órdenes). Fallidos: 0.');
+            ->assertSessionHas('succes', 'Resent emails: 2 (3 orders). Failed: 0.');
 
         $messages = $this->sentMessages();
         $this->assertCount(2, $messages);
@@ -259,6 +259,41 @@ class EventResendPurchaseEmailsTest extends TestCase
         $this->assertStringContainsString('1 x General', $html);
         $this->assertStringContainsString('1 x VIP', $html);
         $this->assertStringNotContainsString('carla@example.com', implode(',', $recipients));
+    }
+
+    public function test_sends_to_custom_override_email_when_provided(): void
+    {
+        $ana = $this->makeOrder($this->general, 'ana@example.com', 'Ana');
+        $beto = $this->makeOrder($this->vip, 'beto@example.com', 'Beto');
+
+        $this->actingAs($this->user)
+            ->post(route('event.resend-emails.send', $this->event->id), [
+                'order_ids' => [$ana->id, $beto->id],
+                'custom_email' => 'qa-test@example.com',
+            ])
+            ->assertRedirect(route('event.resend-emails', $this->event->id))
+            ->assertSessionHas('succes', 'Resent emails to qa-test@example.com: 2 (2 orders). Failed: 0.');
+
+        $messages = $this->sentMessages();
+        $this->assertCount(2, $messages);
+
+        foreach ($messages as $m) {
+            $this->assertSame('qa-test@example.com', strtolower($m->getOriginalMessage()->getTo()[0]->getAddress()));
+        }
+    }
+
+    public function test_rejects_invalid_custom_email(): void
+    {
+        $ana = $this->makeOrder($this->general, 'ana@example.com', 'Ana');
+
+        $this->actingAs($this->user)
+            ->post(route('event.resend-emails.send', $this->event->id), [
+                'order_ids' => [$ana->id],
+                'custom_email' => 'correo-invalido',
+            ])
+            ->assertSessionHasErrors(['custom_email' => 'The alternative email entered has an invalid format.']);
+
+        $this->assertCount(0, $this->sentMessages());
     }
 
     public function test_rejects_orders_from_other_events_and_sends_nothing(): void
@@ -287,15 +322,15 @@ class EventResendPurchaseEmailsTest extends TestCase
 
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => ['abc']])
-            ->assertSessionHasErrors(['order_ids.0' => 'El folio de orden seleccionado no es válido.']);
+            ->assertSessionHasErrors(['order_ids.0' => 'The selected order folio is invalid.']);
 
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => [5, 5]])
-            ->assertSessionHasErrors(['order_ids.0' => 'Una orden se seleccionó más de una vez.']);
+            ->assertSessionHasErrors(['order_ids.0' => 'An order was selected more than once.']);
 
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => 'abc'])
-            ->assertSessionHasErrors(['order_ids' => 'La selección de órdenes no es válida.']);
+            ->assertSessionHasErrors(['order_ids' => 'The order selection is invalid.']);
 
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => range(1, 101)])
@@ -320,7 +355,7 @@ class EventResendPurchaseEmailsTest extends TestCase
 
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => [$ok->id, $bad->id]])
-            ->assertSessionHas('error', fn ($msg) => str_contains($msg, 'Correos reenviados: 1 (1 órdenes). Fallidos: 1.') && str_contains($msg, 'falla@example.com'));
+            ->assertSessionHas('error', fn ($msg) => str_contains($msg, 'Resent emails: 1 (1 orders). Failed: 1.') && str_contains($msg, 'falla@example.com'));
     }
 
     public function test_resend_command_still_works_with_shared_service(): void

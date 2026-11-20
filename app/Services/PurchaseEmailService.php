@@ -109,19 +109,26 @@ class PurchaseEmailService
     /**
      * Resend the purchase email for the given orders of an event.
      * Orders are grouped by buyer email, so each buyer gets one email with all of their selected tickets.
+     * If $overrideEmail is provided, all groups are delivered to that single email address instead.
      *
      * @return array{sent: int, failed: int, sent_orders: int, failed_emails: array<int, string>}
      */
-    public function resendForOrders(Event $event, Collection $orders): array
+    public function resendForOrders(Event $event, Collection $orders, ?string $overrideEmail = null): array
     {
         $result = ['sent' => 0, 'failed' => 0, 'sent_orders' => 0, 'failed_emails' => []];
+
+        $overrideEmail = is_string($overrideEmail) ? trim($overrideEmail) : null;
+        if ($overrideEmail === '') {
+            $overrideEmail = null;
+        }
 
         $groups = $orders->groupBy(fn (Order $order) => mb_strtolower(trim((string) $order->email_buyer)));
 
         foreach ($groups as $email => $buyerOrders) {
+            $recipient = $overrideEmail ?? trim((string) $buyerOrders->first()->email_buyer);
             try {
                 $pdfContent = $this->renderPdf($this->buildOrdersData($event, $buyerOrders->sortBy('id')));
-                $emailData = $this->buildEmailData($event, $buyerOrders, trim((string) $buyerOrders->first()->email_buyer));
+                $emailData = $this->buildEmailData($event, $buyerOrders, $recipient);
                 $this->send($emailData, $pdfContent);
 
                 $result['sent']++;
@@ -129,15 +136,19 @@ class PurchaseEmailService
                 Log::info('[resend-purchase-view] Correo reenviado', [
                     'event_id' => $event->id,
                     'recipient' => $emailData['email'],
+                    'original_buyer_email' => $email,
+                    'override_email' => $overrideEmail,
                     'order_ids' => $buyerOrders->pluck('id')->all(),
                     'user_id' => auth()->id(),
                 ]);
             } catch (\Throwable $e) {
                 $result['failed']++;
-                $result['failed_emails'][] = (string) $email;
+                $result['failed_emails'][] = (string) $recipient;
                 Log::error('[resend-purchase-view] Error al reenviar correo: ' . $e->getMessage(), [
                     'event_id' => $event->id,
-                    'recipient' => $email,
+                    'recipient' => $recipient,
+                    'original_buyer_email' => $email,
+                    'override_email' => $overrideEmail,
                     'order_ids' => $buyerOrders->pluck('id')->all(),
                     'exception' => $e,
                 ]);

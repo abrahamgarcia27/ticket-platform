@@ -23,33 +23,43 @@
             min-width: 190px;
         }
     </style>
-    @include('layouts.navbars.auth.topnav', ['title' => 'Reenviar emails de compra'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Resend purchase emails'])
     <div class="card shadow-lg mx-4 card-profile-bottom">
         <div id="alert">
             @include('components.alert')
         </div>
         <div class="card-body p-3">
             <div class="card-header pb-0">
-                <div class="d-flex align-items-center flex-wrap">
+                <div class="d-flex align-items-center flex-wrap gap-2">
                     <div>
-                        <h4 class="mb-0">Reenviar emails de compra</h4>
+                        <h4 class="mb-0">Resend purchase emails</h4>
                         <p class="text-sm mb-0">{{ $event->title }} &middot; {{ $event->date_time_start }}</p>
                     </div>
-                    <a href="{{ route('event.index') }}" class="btn btn-outline-secondary btn-sm ms-auto mb-0 me-2">Volver a eventos</a>
-                    <button type="submit" form="frmResendEmails" class="btn btn-primary btn-sm mb-0" id="btnResend" disabled>
-                        Reenviar a seleccionadas (<span id="selectedCount">0</span>)
-                    </button>
+                    <div class="ms-auto d-flex align-items-center flex-wrap gap-2">
+                        <div class="input-group input-group-sm" style="width: 280px;">
+                            <span class="input-group-text bg-white"><i class="fas fa-at text-xs"></i></span>
+                            <input type="email" name="custom_email" form="frmResendEmails" id="customEmailInput"
+                                class="form-control form-control-sm"
+                                placeholder="Send to another email (optional)"
+                                title="If left empty, it will be sent to the buyer's original email"
+                                value="{{ old('custom_email') }}">
+                        </div>
+                        <a href="{{ route('event.index') }}" class="btn btn-outline-secondary btn-sm mb-0">Back to events</a>
+                        <button type="submit" form="frmResendEmails" class="btn btn-primary btn-sm mb-0" id="btnResend" disabled>
+                            Resend to selected (<span id="selectedCount">0</span>)
+                        </button>
+                    </div>
                 </div>
                 <p class="text-xs text-secondary mt-2 mb-0">
-                    Se envía el mismo correo de compra con el PDF de los tickets. Si un comprador tiene varias órdenes seleccionadas, recibe un solo correo con todos sus tickets.
-                    La selección aplica a las órdenes de esta página (máximo {{ $orders->perPage() }}).
+                    Sends the purchase email with the tickets PDF attached. If you enter an alternative email above, the selected orders will be sent to that address instead of the original buyer's email. If left blank, it will be sent to the original buyer.
+                    Selection applies to orders on this page (maximum {{ $orders->perPage() }}).
                 </p>
                 <form method="GET" action="{{ route('event.resend-emails', $event->id) }}" class="d-flex align-items-center mt-3" role="search" style="max-width: 520px;">
                     <input type="search" name="search" class="form-control form-control-sm me-2" maxlength="100" value="{{ $search }}"
-                        placeholder="Buscar por folio, código, comprador o email" aria-label="Buscar órdenes">
-                    <button type="submit" class="btn btn-dark btn-sm mb-0 me-2">Buscar</button>
+                        placeholder="Search by order #, code, buyer or email" aria-label="Search orders">
+                    <button type="submit" class="btn btn-dark btn-sm mb-0 me-2">Search</button>
                     @if ($search !== '')
-                        <a href="{{ route('event.resend-emails', $event->id) }}" class="btn btn-outline-secondary btn-sm mb-0">Limpiar</a>
+                        <a href="{{ route('event.resend-emails', $event->id) }}" class="btn btn-outline-secondary btn-sm mb-0">Clear</a>
                     @endif
                 </form>
             </div>
@@ -61,13 +71,13 @@
                             <thead>
                                 <tr>
                                     <th style="padding-left: 24px; width: 40px;">
-                                        <input class="form-check-input" type="checkbox" id="selectAll" title="Seleccionar todas las visibles" aria-label="Seleccionar todas las órdenes visibles" @disabled($orders->isEmpty())>
+                                        <input class="form-check-input" type="checkbox" id="selectAll" title="Select all visible" aria-label="Select all visible orders" @disabled($orders->isEmpty())>
                                     </th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Folio</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Comprador</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Order #</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Buyer</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Email</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Ticket</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" style="min-width: 190px;">Estado</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" style="min-width: 190px;">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,7 +85,7 @@
                                     <tr>
                                         <td style="padding-left: 24px">
                                             <input class="form-check-input order-checkbox" type="checkbox" name="order_ids[]" value="{{ $order->id }}" id="order-{{ $order->id }}"
-                                                aria-label="Seleccionar orden {{ $order->id }}" @checked(in_array((string) $order->id, array_map('strval', (array) old('order_ids', [])), true))>
+                                                aria-label="Select order {{ $order->id }}" @checked(in_array((string) $order->id, array_map('strval', (array) old('order_ids', [])), true))>
                                         </td>
                                         <td>
                                             <label for="order-{{ $order->id }}" class="text-sm font-weight-bold mb-0">#{{ $order->id }}</label>
@@ -92,15 +102,15 @@
                                         </td>
                                         <td class="estado-cell">
                                             <div class="d-flex flex-wrap gap-1">
-                                                <span class="badge badge-sm {{ $order->stripe_data ? 'bg-gradient-success' : 'bg-gradient-info' }}">{{ $order->stripe_data ? 'Pagada' : 'Gratis' }}</span>
-                                                <span class="badge badge-sm {{ $order->assist ? 'bg-gradient-dark' : 'bg-gradient-secondary' }}">{{ $order->assist ? 'Asistió' : 'Sin asistencia' }}</span>
+                                                <span class="badge badge-sm {{ $order->stripe_data ? 'bg-gradient-success' : 'bg-gradient-info' }}">{{ $order->stripe_data ? 'Paid' : 'Free' }}</span>
+                                                <span class="badge badge-sm {{ $order->assist ? 'bg-gradient-dark' : 'bg-gradient-secondary' }}">{{ $order->assist ? 'Attended' : 'Not attended' }}</span>
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="6" class="text-center py-4">
-                                            <p class="text-sm mb-0">{{ $search !== '' ? 'Ninguna orden coincide con la búsqueda.' : 'Este evento no tiene órdenes.' }}</p>
+                                            <p class="text-sm mb-0">{{ $search !== '' ? 'No orders match the search criteria.' : 'This event has no orders.' }}</p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -111,7 +121,7 @@
                 @if ($orders->total() > 0)
                     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between px-4 pt-3">
                         <p class="text-sm text-secondary mb-2 mb-md-0">
-                            Mostrando {{ $orders->firstItem() }} a {{ $orders->lastItem() }} de {{ $orders->total() }} órdenes
+                            Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }} orders
                         </p>
                         {{ $orders->onEachSide(1)->links('pagination::bootstrap-4') }}
                     </div>
@@ -127,6 +137,7 @@
         const selectAll = document.getElementById('selectAll');
         const button = document.getElementById('btnResend');
         const counter = document.getElementById('selectedCount');
+        const customEmailInput = document.getElementById('customEmailInput');
         const checkboxes = Array.from(document.querySelectorAll('.order-checkbox'));
 
         if (!form || !selectAll || !button || !counter) {
@@ -150,7 +161,17 @@
 
         form.addEventListener('submit', function (e) {
             const selected = checkboxes.filter(cb => cb.checked).length;
-            if (selected === 0 || !confirm('Se reenviará el correo de compra de ' + selected + ' orden(es) a sus compradores. ¿Continuar?')) {
+            if (selected === 0) {
+                e.preventDefault();
+                return;
+            }
+
+            const targetEmail = customEmailInput ? customEmailInput.value.trim() : '';
+            const confirmMsg = targetEmail !== ''
+                ? 'The purchase email for ' + selected + ' order(s) will be resent to: ' + targetEmail + '. Continue?'
+                : 'The purchase email for ' + selected + ' order(s) will be resent to their original buyers. Continue?';
+
+            if (!confirm(confirmMsg)) {
                 e.preventDefault();
                 return;
             }

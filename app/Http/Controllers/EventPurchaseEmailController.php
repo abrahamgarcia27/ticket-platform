@@ -66,33 +66,38 @@ class EventPurchaseEmailController extends Controller
         $validated = $request->validate([
             'order_ids' => ['required', 'array', 'min:1', 'max:' . self::MAX_ORDERS_PER_REQUEST],
             'order_ids.*' => ['required', 'integer', 'distinct'],
+            'custom_email' => ['nullable', 'email', 'max:255'],
         ], [
-            'order_ids.required' => 'Selecciona al menos una orden.',
-            'order_ids.min' => 'Selecciona al menos una orden.',
-            'order_ids.array' => 'La selección de órdenes no es válida.',
-            'order_ids.max' => 'Puedes reenviar como máximo ' . self::MAX_ORDERS_PER_REQUEST . ' órdenes a la vez.',
-            'order_ids.*.required' => 'La selección de órdenes no es válida.',
-            'order_ids.*.integer' => 'El folio de orden seleccionado no es válido.',
-            'order_ids.*.distinct' => 'Una orden se seleccionó más de una vez.',
+            'order_ids.required' => 'Please select at least one order.',
+            'order_ids.min' => 'Please select at least one order.',
+            'order_ids.array' => 'The order selection is invalid.',
+            'order_ids.max' => 'You can resend at most ' . self::MAX_ORDERS_PER_REQUEST . ' orders at once.',
+            'order_ids.*.required' => 'The order selection is invalid.',
+            'order_ids.*.integer' => 'The selected order folio is invalid.',
+            'order_ids.*.distinct' => 'An order was selected more than once.',
+            'custom_email.email' => 'The alternative email entered has an invalid format.',
+            'custom_email.max' => 'The alternative email may not be greater than 255 characters.',
         ]);
 
         $orderIds = array_map('intval', $validated['order_ids']);
+        $customEmail = !empty($validated['custom_email']) ? trim($validated['custom_email']) : null;
 
         // Only orders that belong to this event (orders -> tickets -> event).
         $orders = $event->orders()->with('ticket')->whereIn('orders.id', $orderIds)->get();
         if ($orders->count() !== count($orderIds)) {
             return redirect()->back(302, [], route('event.resend-emails', $event->id))
-                ->with('error', 'Algunas órdenes seleccionadas no pertenecen a este evento. No se envió ningún correo.');
+                ->with('error', 'Some selected orders do not belong to this event. No emails were sent.');
         }
 
         @set_time_limit(300);
-        $result = $purchaseEmail->resendForOrders($event, $orders);
+        $result = $purchaseEmail->resendForOrders($event, $orders, $customEmail);
 
-        $message = "Correos reenviados: {$result['sent']} ({$result['sent_orders']} órdenes). Fallidos: {$result['failed']}.";
+        $targetText = $customEmail ? " to {$customEmail}" : '';
+        $message = "Resent emails{$targetText}: {$result['sent']} ({$result['sent_orders']} orders). Failed: {$result['failed']}.";
         $redirect = redirect()->back(302, [], route('event.resend-emails', $event->id));
 
         if ($result['failed'] > 0) {
-            return $redirect->with('error', $message . ' No se pudo enviar a: ' . implode(', ', $result['failed_emails']));
+            return $redirect->with('error', $message . ' Could not send to: ' . implode(', ', $result['failed_emails']));
         }
 
         return $redirect->with('succes', $message);
