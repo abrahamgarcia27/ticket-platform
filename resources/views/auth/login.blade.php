@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+    {{-- #118: fondo negro sólido solo en la pantalla de login --}}
+    <style>
+        body,
+        .login-bg-black {
+            background-color: #000000 !important;
+            background-image: none !important;
+        }
+    </style>
     <div class="container position-sticky z-index-sticky top-0">
         <div class="row">
             <div class="col-12">
@@ -8,13 +16,13 @@
             </div>
         </div>
     </div>
-    <main class="main-content  mt-0">
+    <main class="main-content mt-0 login-bg-black">
         <section>
             <div class="page-header min-vh-100">
                 <div class="container">
                     <div class="row">
                         <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
-                            <div class="card card-plain">
+                            <div class="card bg-white">
                                 <div class="card-header pb-0 text-start">
                                     <h4 class="font-weight-bolder">Sign In</h4>
                                     <p class="mb-0">Enter your email and password to sign in</p>
