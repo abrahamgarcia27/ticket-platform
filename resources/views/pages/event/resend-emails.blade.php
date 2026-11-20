@@ -1,6 +1,28 @@
 @extends('layouts.app', ['class' => 'g-sidenav-show bg-gray-100'])
 
 @section('content')
+    <style>
+        /* The checkboxes are not wrapped in .form-check, where Argon draws their border and tick. */
+        #resendOrders .form-check-input[type=checkbox] {
+            border: 1px solid #cbd3da;
+            cursor: pointer;
+        }
+        #resendOrders .form-check-input[type=checkbox]:checked {
+            border-color: transparent;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M5 10.5l3.5 3.5 6.5-7'/%3e%3c/svg%3e"), linear-gradient(310deg, #fb6340 0%, #f56036 100%);
+            background-size: 100% 100%, 100% 100%;
+        }
+        #resendOrders .form-check-input[type=checkbox]:indeterminate {
+            border-color: #fb6340;
+        }
+        #resendOrders .form-check-input[type=checkbox]:focus-visible {
+            box-shadow: 0 0 0 2px rgba(251, 99, 64, 0.35);
+        }
+        #resendOrders td.estado-cell {
+            white-space: normal;
+            min-width: 190px;
+        }
+    </style>
     @include('layouts.navbars.auth.topnav', ['title' => 'Reenviar emails de compra'])
     <div class="card shadow-lg mx-4 card-profile-bottom">
         <div id="alert">
@@ -45,7 +67,7 @@
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Comprador</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Email</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Ticket</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Estado</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2" style="min-width: 190px;">Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,9 +90,11 @@
                                         <td>
                                             <p class="text-sm font-weight-bold mb-0">{{ $order->ticket->title ?? '' }}</p>
                                         </td>
-                                        <td>
-                                            <span class="badge badge-sm {{ $order->stripe_data ? 'bg-gradient-success' : 'bg-gradient-info' }}">{{ $order->stripe_data ? 'Pagada' : 'Gratis' }}</span>
-                                            <span class="badge badge-sm {{ $order->assist ? 'bg-gradient-dark' : 'bg-gradient-secondary' }}">{{ $order->assist ? 'Asistió' : 'Sin asistencia' }}</span>
+                                        <td class="estado-cell">
+                                            <div class="d-flex flex-wrap gap-1">
+                                                <span class="badge badge-sm {{ $order->stripe_data ? 'bg-gradient-success' : 'bg-gradient-info' }}">{{ $order->stripe_data ? 'Pagada' : 'Gratis' }}</span>
+                                                <span class="badge badge-sm {{ $order->assist ? 'bg-gradient-dark' : 'bg-gradient-secondary' }}">{{ $order->assist ? 'Asistió' : 'Sin asistencia' }}</span>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

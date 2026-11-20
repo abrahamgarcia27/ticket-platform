@@ -19,19 +19,30 @@ class EventPurchaseEmailController extends Controller
     public function show(Request $request, $id)
     {
         $event = Event::findOrFail($id);
-        $search = trim((string) $request->query('search', ''));
+        // Only a plain string is accepted (?search[]=x is ignored instead of failing).
+        $rawSearch = $request->query('search');
+        $search = is_string($rawSearch) ? mb_substr(trim($rawSearch), 0, 100) : '';
 
         $query = $event->orders()->with('ticket')->orderBy('orders.id');
         if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $like = '%' . $search . '%';
-                if (ctype_digit(ltrim($search, '#'))) {
-                    $q->orWhere('orders.id', (int) ltrim($search, '#'));
+            $words = preg_split('/\s+/u', $search, -1, PREG_SPLIT_NO_EMPTY);
+
+            $query->where(function ($q) use ($search, $words) {
+                $folio = ltrim($search, '#');
+                if ($folio !== '' && ctype_digit($folio)) {
+                    $q->orWhere('orders.id', (int) $folio);
                 }
-                $q->orWhere('orders.code', 'like', $like)
-                    ->orWhere('orders.email_buyer', 'like', $like)
-                    ->orWhere('orders.name_buyer', 'like', $like)
-                    ->orWhere('orders.last_name_buyer', 'like', $like);
+                // Every word must match some field, so "Ana Pérez" matches name + last name.
+                $q->orWhere(function ($all) use ($words) {
+                    foreach ($words as $word) {
+                        $like = $this->likePattern($word);
+                        $all->where(function ($any) use ($like) {
+                            foreach (['orders.code', 'orders.email_buyer', 'orders.name_buyer', 'orders.last_name_buyer'] as $column) {
+                                $any->orWhereRaw($column . " LIKE ? ESCAPE '!'", [$like]);
+                            }
+                        });
+                    }
+                });
             });
         }
 
@@ -58,7 +69,11 @@ class EventPurchaseEmailController extends Controller
         ], [
             'order_ids.required' => 'Selecciona al menos una orden.',
             'order_ids.min' => 'Selecciona al menos una orden.',
+            'order_ids.array' => 'La selección de órdenes no es válida.',
             'order_ids.max' => 'Puedes reenviar como máximo ' . self::MAX_ORDERS_PER_REQUEST . ' órdenes a la vez.',
+            'order_ids.*.required' => 'La selección de órdenes no es válida.',
+            'order_ids.*.integer' => 'El folio de orden seleccionado no es válido.',
+            'order_ids.*.distinct' => 'Una orden se seleccionó más de una vez.',
         ]);
 
         $orderIds = array_map('intval', $validated['order_ids']);
@@ -81,5 +96,14 @@ class EventPurchaseEmailController extends Controller
         }
 
         return $redirect->with('succes', $message);
+    }
+
+    /**
+     * "%term%" for LIKE ... ESCAPE '!': %, _ and ! are matched literally (same on MySQL and SQLite;
+     * a backslash is a normal character because the escape character is '!').
+     */
+    private function likePattern(string $term): string
+    {
+        return '%' . str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term) . '%';
     }
 }

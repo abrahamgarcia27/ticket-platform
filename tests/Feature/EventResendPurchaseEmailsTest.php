@@ -170,6 +170,65 @@ class EventResendPurchaseEmailsTest extends TestCase
             ->assertRedirect(route('event.resend-emails', [$this->event->id, 'page' => 2]));
     }
 
+    private function searchIds(string $query): array
+    {
+        $html = $this->actingAs($this->user)
+            ->get(route('event.resend-emails', $this->event->id) . '?' . $query)
+            ->assertOk()
+            ->getContent();
+        preg_match_all('/name="order_ids\[\]" value="(\d+)"/', $html, $m);
+
+        return array_map('intval', $m[1]);
+    }
+
+    public function test_search_matches_full_name_across_first_and_last_name(): void
+    {
+        $ana = $this->makeOrder($this->general, 'ana@example.com', 'Ana');            // Ana Pérez
+        $anaMaria = $this->makeOrder($this->general, 'am@example.com', 'Ana María');  // Ana María Pérez
+        $other = Order::create([
+            'name_buyer' => 'Ana', 'last_name_buyer' => 'López', 'email_buyer' => 'lopez@example.com',
+            'phone_buyer' => '1', 'code' => 'CODE1', 'ticket_id' => $this->general->id,
+        ]);
+
+        $this->assertSame([$ana->id, $anaMaria->id], $this->searchIds('search=' . urlencode('Ana Pérez')));
+        $this->assertSame([$anaMaria->id], $this->searchIds('search=' . urlencode('  ana   maría  pérez ')));
+        $this->assertSame([$other->id], $this->searchIds('search=' . urlencode('Ana López')));
+        $this->assertSame([$ana->id], $this->searchIds('search=' . urlencode('#' . $ana->id)));
+    }
+
+    public function test_search_escapes_like_wildcards(): void
+    {
+        $percent = Order::create([
+            'name_buyer' => 'Promo 100%', 'last_name_buyer' => 'X', 'email_buyer' => 'p@example.com',
+            'phone_buyer' => '1', 'code' => 'AB_CD', 'ticket_id' => $this->general->id,
+        ]);
+        $plain = Order::create([
+            'name_buyer' => 'Promo 1000', 'last_name_buyer' => 'X', 'email_buyer' => 'q@example.com',
+            'phone_buyer' => '1', 'code' => 'ABXCD', 'ticket_id' => $this->general->id,
+        ]);
+        $slash = Order::create([
+            'name_buyer' => 'Back\\slash', 'last_name_buyer' => 'X', 'email_buyer' => 'r@example.com',
+            'phone_buyer' => '1', 'code' => 'BANG!1', 'ticket_id' => $this->general->id,
+        ]);
+
+        // Without escaping, "%" / "_" would be wildcards and match every row.
+        $this->assertSame([$percent->id], $this->searchIds('search=' . urlencode('%')));
+        $this->assertSame([$percent->id], $this->searchIds('search=' . urlencode('100%')));
+        $this->assertSame([$percent->id], $this->searchIds('search=' . urlencode('AB_CD')));
+        $this->assertSame([$slash->id], $this->searchIds('search=' . urlencode('\\')));
+        $this->assertSame([$slash->id], $this->searchIds('search=' . urlencode('G!1')));
+        $this->assertSame([$percent->id, $plain->id], $this->searchIds('search=Promo'));
+    }
+
+    public function test_array_search_parameter_is_ignored(): void
+    {
+        $a = $this->makeOrder($this->general, 'ana@example.com');
+        $b = $this->makeOrder($this->vip, 'beto@example.com');
+
+        $this->assertSame([$a->id, $b->id], $this->searchIds('search[]=ana'));
+        $this->assertSame([$a->id, $b->id], $this->searchIds('search[x][y]=1'));
+    }
+
     public function test_unknown_event_returns_404(): void
     {
         $this->actingAs($this->user)->get(route('event.resend-emails', 999999))->assertNotFound();
@@ -228,7 +287,15 @@ class EventResendPurchaseEmailsTest extends TestCase
 
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => ['abc']])
-            ->assertSessionHasErrors('order_ids.0');
+            ->assertSessionHasErrors(['order_ids.0' => 'El folio de orden seleccionado no es válido.']);
+
+        $this->actingAs($this->user)
+            ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => [5, 5]])
+            ->assertSessionHasErrors(['order_ids.0' => 'Una orden se seleccionó más de una vez.']);
+
+        $this->actingAs($this->user)
+            ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => 'abc'])
+            ->assertSessionHasErrors(['order_ids' => 'La selección de órdenes no es válida.']);
 
         $this->actingAs($this->user)
             ->post(route('event.resend-emails.send', $this->event->id), ['order_ids' => range(1, 101)])
