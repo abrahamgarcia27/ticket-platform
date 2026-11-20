@@ -141,7 +141,47 @@
                     </form>
                 </div>
             </div>
-            
+            <div class="col-md-12 mt-4" id="bank-account">
+                <div class="card">
+                    <form role="form" method="POST" action="{{ route('profile.bank-account.update') }}">
+                        @csrf
+                        <div class="card-header pb-0">
+                            <div class="d-flex align-items-center">
+                                <p class="mb-0">Bank Account</p>
+                                <button type="submit" class="btn btn-primary btn-sm ms-auto">Save bank account</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-uppercase text-sm">Bank Information</p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="bank_name" class="form-control-label">Bank</label>
+                                        <input class="form-control @error('bank_name') is-invalid @enderror" type="text" name="bank_name" id="bank_name"
+                                            maxlength="100" required value="{{ old('bank_name', $bankAccount->bank_name ?? '') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="account_holder" class="form-control-label">Account holder</label>
+                                        <input class="form-control @error('account_holder') is-invalid @enderror" type="text" name="account_holder" id="account_holder"
+                                            maxlength="150" required value="{{ old('account_holder', $bankAccount->account_holder ?? '') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="account_number" class="form-control-label">Account number / CLABE</label>
+                                        <input class="form-control @error('account_number') is-invalid @enderror" type="text" name="account_number" id="account_number"
+                                            inputmode="numeric" autocomplete="off" maxlength="18" required
+                                            value="{{ old('account_number', $bankAccount->account_number ?? '') }}">
+                                        <small class="text-muted">10-11 digit account number or 18 digit CLABE.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         @include('layouts.footers.auth.footer')
     </div>

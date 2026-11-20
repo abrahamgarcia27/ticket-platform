@@ -11,7 +11,9 @@ class UserProfileController extends Controller
 {
     public function show()
     {
-        return view('pages.user-profile');
+        return view('pages.user-profile', [
+            'bankAccount' => auth()->user()->bankAccount,
+        ]);
     }
 
     public function update(Request $request)
