@@ -2,6 +2,81 @@
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Dashboard'])
+    <div class="container-fluid py-4" id="weekly-sales">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header pb-0">
+                        <div class="d-flex flex-wrap align-items-start gap-2">
+                            <div class="me-auto">
+                                <h5 class="mb-0">Ventas por evento de la semana</h5>
+                                <p class="text-sm text-dark mb-0" id="weeklySalesRange">
+                                    Semana del {{ $sales['range_label'] }} (lunes a domingo)
+                                    @if ($sales['is_current'])
+                                        <span class="badge bg-gradient-primary ms-1">Semana actual</span>
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <a href="{{ route('home', ['week' => $sales['prev_week']]) }}" class="btn btn-outline-dark btn-sm mb-0" id="btnPrevWeek" aria-label="Semana anterior">
+                                    <i class="fas fa-chevron-left me-1"></i> Anterior
+                                </a>
+                                @unless ($sales['is_current'])
+                                    <a href="{{ route('home') }}" class="btn btn-outline-dark btn-sm mb-0">Semana actual</a>
+                                @endunless
+                                <a href="{{ route('home', ['week' => $sales['next_week']]) }}" class="btn btn-outline-dark btn-sm mb-0" id="btnNextWeek" aria-label="Semana siguiente">
+                                    Siguiente <i class="fas fa-chevron-right ms-1"></i>
+                                </a>
+                                <form method="GET" action="{{ route('home') }}" class="d-flex align-items-center gap-2 mb-0">
+                                    <label for="weekDate" class="text-sm text-dark mb-0 text-nowrap">Ir a la semana del</label>
+                                    <input type="date" id="weekDate" name="date" class="form-control form-control-sm" style="width: 150px;"
+                                        value="{{ $sales['start']->format('Y-m-d') }}" required>
+                                    <button type="submit" class="btn btn-dark btn-sm mb-0">Ver</button>
+                                </form>
+                                <button type="button" class="btn btn-primary btn-sm mb-0" id="btnDownloadChart" @disabled(empty($sales['rows']))>
+                                    <i class="fas fa-download me-1"></i> Descargar PNG
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mt-3 text-center">
+                            <div class="col-6 col-md-3 mb-2">
+                                <p class="text-xs text-uppercase text-secondary font-weight-bold mb-0">Ingresos</p>
+                                <h6 class="mb-0" id="weeklySalesRevenue">${{ number_format($sales['totals']['revenue'], 2) }} USD</h6>
+                            </div>
+                            <div class="col-6 col-md-3 mb-2">
+                                <p class="text-xs text-uppercase text-secondary font-weight-bold mb-0">Boletos pagados</p>
+                                <h6 class="mb-0">{{ number_format($sales['totals']['paid_tickets']) }}</h6>
+                            </div>
+                            <div class="col-6 col-md-3 mb-2">
+                                <p class="text-xs text-uppercase text-secondary font-weight-bold mb-0">Boletos gratis</p>
+                                <h6 class="mb-0">{{ number_format($sales['totals']['free_tickets']) }}</h6>
+                            </div>
+                            <div class="col-6 col-md-3 mb-2">
+                                <p class="text-xs text-uppercase text-secondary font-weight-bold mb-0">Eventos</p>
+                                <h6 class="mb-0">{{ $sales['totals']['events'] }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        @if (empty($sales['rows']))
+                            <div class="text-center py-5" id="weeklySalesEmpty">
+                                <i class="fas fa-chart-bar fa-2x text-secondary mb-2"></i>
+                                <p class="text-sm text-dark mb-0">No hay eventos con fecha en esta semana.</p>
+                                <p class="text-xs text-secondary mb-0">Usa los botones Anterior / Siguiente o elige otra fecha.</p>
+                            </div>
+                        @else
+                            <div class="chart" style="position: relative; height: 380px;">
+                                <canvas id="weeklySalesChart" role="img" aria-label="Gráfica de ingresos y boletos por evento de la semana del {{ $sales['range_label'] }}"></canvas>
+                            </div>
+                            <p class="text-xs text-secondary mt-2 mb-0">
+                                Eventos cuya fecha de inicio cae en la semana. Ingresos = precio del boleto de las órdenes pagadas con Stripe (sin cargos/fees). Boletos gratis = órdenes sin pago.
+                            </p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- <div class="container-fluid py-4">
         <div class="row">
             <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
@@ -395,88 +470,168 @@
 @endsection
 
 @push('js')
-    <script src="./assets/js/plugins/chartjs.min.js"></script>
+    @if (!empty($sales['rows']))
+    <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}"></script>
     <script>
-        var ctx1 = document.getElementById("chart-line").getContext("2d");
+        document.addEventListener('DOMContentLoaded', function () {
+            const canvas = document.getElementById('weeklySalesChart');
+            if (!canvas || typeof Chart === 'undefined') {
+                return;
+            }
 
-        var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+            const rows = @json($sales['rows']);
+            const rangeLabel = @json('Ventas por evento · ' . $sales['range_label']);
+            const fileName = @json('ventas-semana-' . $sales['week'] . '.png');
+            const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+            const integer = new Intl.NumberFormat('en-US');
 
-        gradientStroke1.addColorStop(1, 'rgba(251, 99, 64, 0.2)');
-        gradientStroke1.addColorStop(0.2, 'rgba(251, 99, 64, 0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(251, 99, 64, 0)');
-        new Chart(ctx1, {
-            type: "line",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile apps",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#fb6340",
-                    backgroundColor: gradientStroke1,
-                    borderWidth: 3,
-                    fill: true,
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                    maxBarThickness: 6
-
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
+            const splitTitle = function (text, max) {
+                const words = String(text).split(/\s+/);
+                const lines = [];
+                let line = '';
+                words.forEach(function (word) {
+                    if ((line + ' ' + word).trim().length > max && line !== '') {
+                        lines.push(line);
+                        line = word;
+                    } else {
+                        line = (line + ' ' + word).trim();
                     }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: true,
-                            drawOnChartArea: true,
-                            drawTicks: false,
-                            borderDash: [5, 5]
+                });
+                if (line !== '') {
+                    lines.push(line);
+                }
+                return lines.slice(0, 2).map(function (l, i, all) {
+                    return i === 1 && lines.length > 2 ? l + '…' : l;
+                });
+            };
+
+            const textColor = '#344767';
+            const gridColor = 'rgba(52, 71, 103, 0.12)';
+            const font = { family: 'Open Sans', size: 12 };
+
+            const chart = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: rows.map(function (r) { return splitTitle(r.title, 22).concat([r.date_label]); }),
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Ingresos (USD)',
+                            data: rows.map(function (r) { return r.revenue; }),
+                            backgroundColor: 'rgba(251, 99, 64, 0.85)',
+                            borderColor: '#fb6340',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            maxBarThickness: 48,
+                            yAxisID: 'y',
+                            order: 2
                         },
-                        ticks: {
+                        {
+                            type: 'line',
+                            label: 'Boletos pagados',
+                            data: rows.map(function (r) { return r.paid_tickets; }),
+                            borderColor: '#1171ef',
+                            backgroundColor: '#1171ef',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            tension: 0.3,
+                            yAxisID: 'y1',
+                            order: 1
+                        },
+                        {
+                            type: 'line',
+                            label: 'Boletos gratis',
+                            data: rows.map(function (r) { return r.free_tickets; }),
+                            borderColor: '#2dce89',
+                            backgroundColor: '#2dce89',
+                            borderWidth: 2,
+                            borderDash: [6, 4],
+                            pointRadius: 4,
+                            tension: 0.3,
+                            yAxisID: 'y1',
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        title: {
                             display: true,
+                            text: rangeLabel,
+                            color: textColor,
+                            font: { family: 'Open Sans', size: 15, weight: 'bold' },
+                            padding: { bottom: 12 }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: { color: textColor, font: font, usePointStyle: true, padding: 16 }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(33, 37, 41, 0.92)',
+                            titleFont: { family: 'Open Sans', size: 13, weight: 'bold' },
+                            bodyFont: font,
                             padding: 10,
-                            color: '#fbfbfb',
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
+                            callbacks: {
+                                title: function (items) {
+                                    const r = rows[items[0].dataIndex];
+                                    return [r.title, r.date_label];
+                                },
+                                label: function (item) {
+                                    const value = item.parsed.y;
+                                    return ' ' + item.dataset.label + ': ' + (item.dataset.yAxisID === 'y' ? money.format(value) : integer.format(value));
+                                }
+                            }
                         }
                     },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                            borderDash: [5, 5]
+                    scales: {
+                        x: {
+                            ticks: { color: textColor, font: font, autoSkip: false, maxRotation: 0 },
+                            grid: { display: false }
                         },
-                        ticks: {
-                            display: true,
-                            color: '#ccc',
-                            padding: 20,
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
+                        y: {
+                            beginAtZero: true,
+                            position: 'left',
+                            title: { display: true, text: 'Ingresos (USD)', color: textColor, font: { family: 'Open Sans', size: 12, weight: 'bold' } },
+                            ticks: { color: textColor, font: font, callback: function (value) { return money.format(value); } },
+                            grid: { color: gridColor }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            title: { display: true, text: 'Boletos', color: textColor, font: { family: 'Open Sans', size: 12, weight: 'bold' } },
+                            ticks: { color: textColor, font: font, precision: 0, callback: function (value) { return Number.isInteger(value) ? integer.format(value) : ''; } },
+                            grid: { drawOnChartArea: false }
                         }
-                    },
-                },
-            },
+                    }
+                }
+            });
+
+            const button = document.getElementById('btnDownloadChart');
+            if (button) {
+                button.addEventListener('click', function () {
+                    // Copy onto a white canvas so the PNG is not transparent.
+                    const source = chart.canvas;
+                    const out = document.createElement('canvas');
+                    out.width = source.width;
+                    out.height = source.height;
+                    const ctx = out.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, out.width, out.height);
+                    ctx.drawImage(source, 0, 0);
+
+                    const link = document.createElement('a');
+                    link.href = out.toDataURL('image/png');
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                });
+            }
         });
     </script>
+    @endif
 @endpush
