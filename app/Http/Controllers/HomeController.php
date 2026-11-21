@@ -36,7 +36,7 @@ class HomeController extends Controller
             'start' => $weekStart,
             'end' => $weekEnd,
             'range_label' => $this->rangeLabel($weekStart, $weekEnd),
-            'is_current' => $weekStart->equalTo(CarbonImmutable::now()->startOfWeek(Carbon::MONDAY)),
+            'is_current' => $weekStart->equalTo($this->now()->startOfWeek(Carbon::MONDAY)),
             'prev_week' => $weekStart->subWeek()->format('o-\WW'),
             'next_week' => $weekStart->addWeek()->format('o-\WW'),
             'rows' => $rows,
@@ -52,19 +52,28 @@ class HomeController extends Controller
     }
 
     /**
+     * Single source of "now" (app timezone). Carbon and CarbonImmutable keep separate test clocks in
+     * Carbon 2, so everything goes through Carbon::now() (frozen with Carbon::setTestNow()).
+     */
+    private function now(): CarbonImmutable
+    {
+        return Carbon::now()->toImmutable();
+    }
+
+    /**
      * Monday 00:00 (app timezone) of the requested week.
      * Accepts ?week=YYYY-Www (ISO week) or ?date=YYYY-MM-DD; anything invalid falls back to the current week.
      */
     private function resolveWeekStart(Request $request): CarbonImmutable
     {
-        $current = CarbonImmutable::now()->startOfWeek(Carbon::MONDAY);
+        $current = $this->now()->startOfWeek(Carbon::MONDAY);
 
         $week = $request->query('week');
         if (is_string($week) && preg_match('/^(\d{4})-W(\d{1,2})$/', trim($week), $m)) {
             $year = (int) $m[1];
             $number = (int) $m[2];
             if ($year >= 2000 && $year <= 2100 && $number >= 1) {
-                $candidate = CarbonImmutable::now()->setISODate($year, $number)->startOfWeek(Carbon::MONDAY);
+                $candidate = $this->now()->setISODate($year, $number)->startOfWeek(Carbon::MONDAY);
                 // setISODate rolls week 53 over to the next year when that year has only 52 weeks.
                 if ((int) $candidate->format('o') === $year && (int) $candidate->format('W') === $number) {
                     return $candidate;

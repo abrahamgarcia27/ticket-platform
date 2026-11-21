@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Ticket;
 use App\Models\User;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -33,7 +34,7 @@ class DashboardWeeklySalesTest extends TestCase
 
         config(['logging.default' => 'null']);
         // Wednesday 18 Nov 2026 => week 2026-W47 (Mon 16 - Sun 22 Nov).
-        Carbon::setTestNow(Carbon::parse('2026-11-18 12:00:00', config('app.timezone')));
+        $this->freezeClock('2026-11-18 12:00:00');
 
         $this->user = User::create(['username' => 'admin', 'email' => 'admin@example.com', 'password' => 'secret123']);
     }
@@ -41,7 +42,18 @@ class DashboardWeeklySalesTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
         parent::tearDown();
+    }
+
+    /**
+     * Freeze both Carbon and CarbonImmutable (in Carbon 2 they keep separate test clocks).
+     */
+    private function freezeClock(string $datetime): void
+    {
+        $now = Carbon::parse($datetime, config('app.timezone'));
+        Carbon::setTestNow($now);
+        CarbonImmutable::setTestNow($now->toImmutable());
     }
 
     private function event(string $title, string $start): Event
@@ -168,6 +180,29 @@ class DashboardWeeklySalesTest extends TestCase
                 ->assertOk()
                 ->assertSee('Semana del 16 al 22 de noviembre de 2026');
         }
+    }
+
+    public function test_current_week_follows_the_frozen_clock_not_the_real_date(): void
+    {
+        // A week far from the real date: Wednesday 10 March 2027 => 2027-W10 (Mon 8 - Sun 14 March).
+        $this->freezeClock('2027-03-10 09:30:00');
+        $this->event('Evento de marzo', '2027-03-12 21:00');
+
+        $html = $this->actingAs($this->user)->get(route('home'))
+            ->assertOk()
+            ->assertSee('Semana del 8 al 14 de marzo de 2027')
+            ->assertSee('badge bg-gradient-primary ms-1">Semana actual', false)
+            ->assertSee(route('home', ['week' => '2027-W09']), false)
+            ->assertSee(route('home', ['week' => '2027-W11']), false)
+            ->getContent();
+        $this->assertSame(['Evento de marzo'], array_column($this->chartRows($html), 'title'));
+
+        // Invalid input falls back to the frozen current week, not today's.
+        $this->get('/dashboard?week=abc')->assertOk()->assertSee('Semana del 8 al 14 de marzo de 2027');
+
+        // Only Carbon frozen (CarbonImmutable left on another date) must still be honored.
+        CarbonImmutable::setTestNow(CarbonImmutable::parse('2030-01-01 00:00:00', config('app.timezone')));
+        $this->get(route('home'))->assertOk()->assertSee('Semana del 8 al 14 de marzo de 2027');
     }
 
     public function test_week_without_events_shows_empty_state(): void

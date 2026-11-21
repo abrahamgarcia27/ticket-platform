@@ -532,9 +532,10 @@
                             data: rows.map(function (r) { return r.paid_tickets; }),
                             borderColor: '#1171ef',
                             backgroundColor: '#1171ef',
-                            borderWidth: 2,
-                            pointRadius: 4,
-                            tension: 0.3,
+                            showLine: false,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            pointStyle: 'circle',
                             yAxisID: 'y1',
                             order: 1
                         },
@@ -544,10 +545,10 @@
                             data: rows.map(function (r) { return r.free_tickets; }),
                             borderColor: '#2dce89',
                             backgroundColor: '#2dce89',
-                            borderWidth: 2,
-                            borderDash: [6, 4],
-                            pointRadius: 4,
-                            tension: 0.3,
+                            showLine: false,
+                            pointRadius: 6,
+                            pointHoverRadius: 8,
+                            pointStyle: 'rectRot',
                             yAxisID: 'y1',
                             order: 1
                         }
@@ -568,7 +569,14 @@
                         legend: {
                             display: true,
                             position: 'bottom',
-                            labels: { color: textColor, font: font, usePointStyle: true, padding: 16 }
+                            // Chart.js sorts the legend by draw "order"; keep dataset order (Ingresos first).
+                            labels: {
+                                color: textColor,
+                                font: font,
+                                usePointStyle: true,
+                                padding: 16,
+                                sort: function (a, b) { return a.datasetIndex - b.datasetIndex; }
+                            }
                         },
                         tooltip: {
                             backgroundColor: 'rgba(33, 37, 41, 0.92)',
