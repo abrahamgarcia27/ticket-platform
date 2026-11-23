@@ -155,6 +155,68 @@
         background-color: #0E1012;
     }
 
+    /* Hero Text Overlay (Bottom-Left inside video/image, text in white) */
+    .fever-hero-caption-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 50px 80px 24px 24px;
+        background: linear-gradient(to top, rgba(14, 16, 18, 0.92) 0%, rgba(14, 16, 18, 0.6) 55%, transparent 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        pointer-events: none;
+        z-index: 20;
+    }
+
+    .fever-hero-caption-overlay > * {
+        pointer-events: auto;
+    }
+
+    .fever-hero-caption-overlay .fever-badge-category {
+        background-color: rgba(217, 188, 115, 0.2);
+        color: #f7e7be;
+        border: 1px solid var(--fever-gold);
+        margin-bottom: 8px;
+    }
+
+    .fever-hero-caption-overlay .fever-title {
+        color: #ffffff;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .fever-hero-caption-overlay .fever-key-points {
+        color: rgba(255, 255, 255, 0.9);
+        gap: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .fever-hero-caption-overlay .fever-key-points i {
+        color: var(--fever-gold);
+    }
+
+    @media (max-width: 576px) {
+        .fever-hero-caption-overlay {
+            padding: 35px 60px 14px 14px;
+        }
+        .fever-hero-caption-overlay .fever-title {
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+        }
+        .fever-hero-caption-overlay .fever-key-points {
+            font-size: 0.78rem;
+            gap: 6px 12px;
+        }
+        .fever-hero-caption-overlay .fever-badge-category {
+            font-size: 0.68rem;
+            padding: 2px 8px;
+            margin-bottom: 4px;
+        }
+    }
+
     /* Event Title Header & Key Metadata */
     .fever-event-header-container {
         width: 100%;
@@ -651,7 +713,7 @@
         @include('components.alert')
     </div>
 
-    {{-- Top of the Event: Single Video or Single Image (No carousel) --}}
+    {{-- Top of the Event: Single Video or Single Image (No carousel) with bottom-left text overlay --}}
     <div class="fever-hero-media-wrapper">
         <div class="fever-hero-media-content">
             @if($event->cover_video)
@@ -671,40 +733,40 @@
             @elseif($event->image)
                 <img src="{{ asset('storage/' . $event->image) }}" class="fever-hero-image" alt="{{ $event->title }}">
             @endif
-        </div>
-    </div>
 
-    {{-- Event Header Details (White Background) --}}
-    <div class="fever-event-header-container">
-        <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
-        <h1 class="fever-title">{{ $event->title }}</h1>
-        
-        <div class="fever-key-points">
-            <div class="fever-key-item">
-                <i class="far fa-calendar-alt"></i>
-                <span>{{ date('F j, Y', strtotime($event->date_time_start)) }}</span>
-            </div>
-            <div class="fever-key-item">
-                <i class="far fa-clock"></i>
-                <span>{{ date('g:i A', strtotime($event->date_time_start)) }} - {{ date('g:i A', strtotime($event->date_time_end)) }}</span>
-            </div>
-            <div class="fever-key-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>{{ $event->ubication }} ({{ $event->address_locality }}, {{ $event->address_region }})</span>
-            </div>
-            @php
-                $minPrice = $tickets->where('type', 'paid')->min('price');
-                $hasFree = $tickets->where('type', 'free')->isNotEmpty();
-            @endphp
-            <div class="fever-key-item">
-                <i class="fas fa-ticket-alt"></i>
-                @if($hasFree && !$minPrice)
-                    <span>Free Admission</span>
-                @elseif($minPrice)
-                    <span>Tickets from ${{ number_format($minPrice, 2) }}</span>
-                @else
-                    <span>Available Tickets</span>
-                @endif
+            {{-- Text overlay at bottom-left of video/hero --}}
+            <div class="fever-hero-caption-overlay">
+                <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
+                <h1 class="fever-title">{{ $event->title }}</h1>
+                
+                <div class="fever-key-points">
+                    <div class="fever-key-item">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>{{ date('F j, Y', strtotime($event->date_time_start)) }}</span>
+                    </div>
+                    <div class="fever-key-item">
+                        <i class="far fa-clock"></i>
+                        <span>{{ date('g:i A', strtotime($event->date_time_start)) }} - {{ date('g:i A', strtotime($event->date_time_end)) }}</span>
+                    </div>
+                    <div class="fever-key-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ $event->ubication }} ({{ $event->address_locality }}, {{ $event->address_region }})</span>
+                    </div>
+                    @php
+                        $minPrice = $tickets->where('type', 'paid')->min('price');
+                        $hasFree = $tickets->where('type', 'free')->isNotEmpty();
+                    @endphp
+                    <div class="fever-key-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        @if($hasFree && !$minPrice)
+                            <span>Free Admission</span>
+                        @elseif($minPrice)
+                            <span>Tickets from ${{ number_format($minPrice, 2) }}</span>
+                        @else
+                            <span>Available Tickets</span>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>
