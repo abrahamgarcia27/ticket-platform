@@ -199,6 +199,18 @@
         flex-direction: column;
         align-items: flex-start;
         text-align: left;
+        cursor: pointer;
+        pointer-events: auto;
+        user-select: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .fever-hero-caption-inner:hover {
+        opacity: 0.95;
+    }
+
+    .fever-hero-caption-inner:active {
+        transform: translateY(1px);
     }
 
     @media (min-width: 992px) {
@@ -869,7 +881,7 @@
 
             {{-- Text overlay at bottom-left of video/hero --}}
             <div class="fever-hero-caption-overlay">
-                <div class="fever-hero-caption-inner">
+                <div class="fever-hero-caption-inner" onclick="window.scrollToTicketsSection(event)" role="button" tabindex="0" title="Ver tickets">
                     <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
                     <h1 class="fever-title">{{ $event->title }}</h1>
 
@@ -2020,6 +2032,36 @@
 
 
 <script>
+    // Smooth scroll from video hero caption down to tickets section
+    window.scrollToTicketsSection = function(e) {
+        if (e) {
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        }
+        
+        // Find target: purchase box on desktop, or sticky tabs / overview
+        const purchaseBox = document.querySelector('.fever-purchase-box');
+        const targetSection = document.getElementById('tab-overview') || document.querySelector('.fever-sticky-tabs') || document.getElementById('overview');
+        
+        if (window.innerWidth >= 992 && purchaseBox) {
+            // In desktop, align so the purchase box and tabs are in perfect view
+            const boxRect = purchaseBox.getBoundingClientRect();
+            const offsetPosition = window.pageYOffset + boxRect.top - 100;
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        } else if (targetSection) {
+            // In mobile, scroll directly to overview / tabs
+            const tabsRect = targetSection.getBoundingClientRect();
+            const offsetPosition = window.pageYOffset + tabsRect.top - 60;
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     // Fever Hero Video Mute/Unmute toggle (Exposed globally)
     window.toggleHeroVideoAudio = function(e) {
         if (e) {
