@@ -70,9 +70,9 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="rating" class="form-control-label">Calificación del Evento (1.0 a 5.0 con decimales)</label>
-                            <input class="form-control @error('rating') is-invalid @enderror" type="number" step="0.1" min="1.0" max="5.0" name="rating" id="rating" placeholder="Ej. 4.8" value="{{ old('rating') }}">
-                            <small class="form-text text-muted">Puntuación del evento que se mostrará en estrellas (ej. 4.5, 4.8, 5.0).</small>
+                            <label for="rating" class="form-control-label">Event Rating (1.0 to 5.0 with decimals)</label>
+                            <input class="form-control @error('rating') is-invalid @enderror" type="number" step="0.1" min="1.0" max="5.0" name="rating" id="rating" placeholder="e.g. 4.8" value="{{ old('rating') }}">
+                            <small class="form-text text-muted">Event score displayed in stars on the event page (e.g. 4.5, 4.8, 5.0).</small>
                             @error('rating')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
