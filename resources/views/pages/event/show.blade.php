@@ -661,14 +661,11 @@
                 </video>
 
                 {{-- Fever floating controls: Mute/Unmute audio toggle --}}
-                <div class="fever-hero-video-controls" style="z-index: 999999 !important; pointer-events: auto !important;">
-                    <button type="button" class="fever-hero-control-btn" id="feverAudioToggleBtn" onclick="window.toggleHeroVideoAudio(event)" title="Activar/Silenciar sonido" style="cursor: pointer; position: relative; z-index: 999999 !important;">
+                <div class="fever-hero-video-controls">
+                    <button type="button" class="fever-hero-control-btn" id="feverAudioToggleBtn" onclick="window.toggleHeroVideoAudio(event)" title="Activar/Silenciar sonido">
                         <i class="fas fa-volume-mute" id="feverAudioIcon" style="pointer-events: none;"></i>
                     </button>
                 </div>
-                <script>
-                    console.log("[INLINE HERO VIDEO] Video and audio button rendered in DOM. Video element:", document.getElementById("feverHeroVideo"), "Button element:", document.getElementById("feverAudioToggleBtn"));
-                </script>
             @elseif($event->coverimage)
                 <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-hero-image" alt="{{ $event->title }}">
             @elseif($event->image)
@@ -1756,48 +1753,36 @@
 
 <script>
     // Fever Hero Video Mute/Unmute toggle (Exposed globally)
-    console.log("[AUDIO SETUP] Registering window.toggleHeroVideoAudio");
     window.toggleHeroVideoAudio = function(e) {
         if (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
         }
-        console.log("[toggleHeroVideoAudio] Button clicked!");
         var video = document.getElementById('feverHeroVideo');
         var icon = document.getElementById('feverAudioIcon');
-        console.log("[toggleHeroVideoAudio] Video found:", !!video, "Current muted:", video ? video.muted : "N/A", "Current volume:", video ? video.volume : "N/A");
+        if (!video) return;
 
-        if (!video) {
-            console.error('[feverHeroVideo] Video element #feverHeroVideo NOT found in DOM!');
-            alert("Error: Video element not found");
-            return;
-        }
-
-        // Toggle state
-        if (video.muted || video.volume === 0) {
-            console.log("[toggleHeroVideoAudio] Unmuting video...");
+        if (video.muted) {
             video.muted = false;
             video.defaultMuted = false;
             video.volume = 1.0;
             var p = video.play();
             if (p !== undefined) {
-                p.then(function() {
-                    console.log("[toggleHeroVideoAudio] Playback resumed with unmuted audio successfully!");
-                }).catch(function(err) {
-                    console.warn('[toggleHeroVideoAudio] Autoplay unmuted audio play warning:', err);
+                p.catch(function(err) {
+                    console.log("Audio play error:", err);
                 });
             }
             if (icon) {
                 icon.className = "fas fa-volume-up";
             }
+            console.log("[Audio] UNMUTED - sound is ON");
         } else {
-            console.log("[toggleHeroVideoAudio] Muting video...");
             video.muted = true;
             if (icon) {
                 icon.className = "fas fa-volume-mute";
             }
+            console.log("[Audio] MUTED - sound is OFF");
         }
-        console.log("[toggleHeroVideoAudio] New muted state:", video.muted, "New volume:", video.volume, "Icon class:", icon ? icon.className : "N/A");
     };
 
     // Compact Fever-style Gallery Scroll & Lightbox
@@ -1835,14 +1820,7 @@
             });
         }
 
-        const audioBtn = document.getElementById('feverAudioToggleBtn');
-        if (audioBtn) {
-            audioBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                window.toggleHeroVideoAudio();
-            });
-        }
+
     });
 </script>
 
