@@ -40,28 +40,21 @@
         overflow-x: hidden;
     }
 
-    /* Top navigation header */
+    /* Top navigation header (floating transparent header over hero media) */
     .fever-nav-header {
-        background-color: #0E1012;
-        padding: 12px 16px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
         width: 100%;
+        padding: 16px 20px;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 65%, transparent 100%);
         z-index: 100;
     }
 
     @media (min-width: 992px) {
         .fever-nav-header {
-            padding: 12px 20px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .fever-nav-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
-            z-index: 100;
+            padding: 20px 24px;
         }
     }
 
@@ -79,7 +72,7 @@
         width: auto;
     }
 
-    /* Top Hero Multimedia (Single Video OR Single Image) */
+    /* Top Hero Multimedia (Single Video OR Single Image - Full Width & Immersive Height) */
     .fever-hero-media-wrapper {
         background-color: #0E1012;
         width: 100%;
@@ -88,13 +81,14 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        min-height: 220px;
-        max-height: 520px;
+        height: 78vh;
+        min-height: 540px;
+        max-height: 820px;
     }
 
     .fever-hero-media-content {
         width: 100%;
-        max-width: 1200px;
+        height: 100%;
         margin: 0 auto;
         position: relative;
         display: flex;
@@ -102,10 +96,16 @@
         justify-content: center;
     }
 
-    .fever-hero-video {
-        width: 100%;
-        max-height: 500px;
-        object-fit: contain;
+    .fever-hero-video,
+    .fever-hero-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        object-fit: cover !important;
+        object-position: center center !important;
         background-color: #0E1012;
         display: block;
         pointer-events: none; /* Disables right click context / pause on click */
@@ -119,25 +119,13 @@
             min-height: 100dvh;
             max-height: none;
         }
-        .fever-hero-media-content {
-            height: 100%;
-            width: 100%;
-        }
-        .fever-hero-video,
-        .fever-hero-image {
-            width: 100% !important;
-            height: 100% !important;
-            max-height: none !important;
-            object-fit: cover !important;
-            object-position: center center !important;
-        }
     }
 
     /* Fever floating action buttons on video */
     .fever-hero-video-controls {
         position: absolute;
-        bottom: 20px;
-        right: 20px;
+        bottom: 32px;
+        right: 32px;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -187,12 +175,7 @@
         }
     }
 
-    .fever-hero-image {
-        width: 100%;
-        max-height: 500px;
-        object-fit: contain;
-        background-color: #0E1012;
-    }
+    
 
     /* Hero Text Overlay (Bottom-Left inside video/image, text in white) */
     .fever-hero-caption-overlay {
@@ -200,19 +183,39 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: 60px 70px 20px 16px;
-        background: linear-gradient(to top, rgba(14, 16, 18, 0.92) 0%, rgba(14, 16, 18, 0.6) 55%, transparent 100%);
+        padding: 100px 20px 32px 20px;
+        background: linear-gradient(to top, rgba(14, 16, 18, 0.95) 0%, rgba(14, 16, 18, 0.65) 50%, rgba(14, 16, 18, 0.2) 75%, transparent 100%);
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
+        justify-content: center;
         pointer-events: none;
         z-index: 20;
     }
 
+    .fever-hero-caption-inner {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        cursor: pointer;
+        pointer-events: auto;
+        user-select: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .fever-hero-caption-inner:hover {
+        opacity: 0.95;
+    }
+
+    .fever-hero-caption-inner:active {
+        transform: translateY(1px);
+    }
+
     @media (min-width: 992px) {
-        .fever-hero-caption-overlay {
-            padding: 70px 80px 24px 20px;
+        .fever-hero-caption-inner {
+            padding: 0 20px;
         }
     }
 
@@ -878,8 +881,9 @@
 
             {{-- Text overlay at bottom-left of video/hero --}}
             <div class="fever-hero-caption-overlay">
-                <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
-                <h1 class="fever-title">{{ $event->title }}</h1>
+                <div class="fever-hero-caption-inner" onclick="window.scrollToTicketsSection(event)" role="button" tabindex="0" title="Ver tickets">
+                    <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
+                    <h1 class="fever-title">{{ $event->title }}</h1>
 
                 <div class="fever-key-points">
                     <div class="fever-key-item">
@@ -942,6 +946,7 @@
                         <span class="fever-rating-scale">/ 5.0</span>
                     </div>
                 @endif
+                </div>
             </div>
         </div>
     </div>
@@ -2027,6 +2032,36 @@
 
 
 <script>
+    // Smooth scroll from video hero caption down to tickets section
+    window.scrollToTicketsSection = function(e) {
+        if (e) {
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        }
+        
+        // Find target: purchase box on desktop, or sticky tabs / overview
+        const purchaseBox = document.querySelector('.fever-purchase-box');
+        const targetSection = document.getElementById('tab-overview') || document.querySelector('.fever-sticky-tabs') || document.getElementById('overview');
+        
+        if (window.innerWidth >= 992 && purchaseBox) {
+            // In desktop, align so the purchase box and tabs are in perfect view
+            const boxRect = purchaseBox.getBoundingClientRect();
+            const offsetPosition = window.pageYOffset + boxRect.top - 100;
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        } else if (targetSection) {
+            // In mobile, scroll directly to overview / tabs
+            const tabsRect = targetSection.getBoundingClientRect();
+            const offsetPosition = window.pageYOffset + tabsRect.top - 60;
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     // Fever Hero Video Mute/Unmute toggle (Exposed globally)
     window.toggleHeroVideoAudio = function(e) {
         if (e) {
