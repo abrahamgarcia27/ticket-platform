@@ -79,6 +79,7 @@
         width: 100%;
         max-width: 1100px;
         margin: 0 auto;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -101,7 +102,8 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        z-index: 10;
+        z-index: 999;
+        pointer-events: auto;
     }
 
     .fever-hero-control-btn {
@@ -660,8 +662,8 @@
 
                 {{-- Fever floating controls: Mute/Unmute audio toggle --}}
                 <div class="fever-hero-video-controls">
-                    <button type="button" class="fever-hero-control-btn" id="feverAudioToggleBtn" onclick="toggleHeroVideoAudio()" title="Activar/Silenciar sonido">
-                        <i class="fas fa-volume-mute" id="feverAudioIcon"></i>
+                    <button type="button" class="fever-hero-control-btn" id="feverAudioToggleBtn" onclick="window.toggleHeroVideoAudio()" title="Activar/Silenciar sonido">
+                        <i class="fas fa-volume-mute" id="feverAudioIcon" style="pointer-events: none;"></i>
                     </button>
                 </div>
             @elseif($event->coverimage)
@@ -1752,21 +1754,26 @@
 <script>
     // Fever Hero Video Mute/Unmute toggle (Exposed globally)
     window.toggleHeroVideoAudio = function() {
-        const video = document.getElementById('feverHeroVideo');
-        const icon = document.getElementById('feverAudioIcon');
-        if (!video) return;
+        var video = document.getElementById('feverHeroVideo');
+        var icon = document.getElementById('feverAudioIcon');
+        if (!video) {
+            console.warn('[feverHeroVideo] No video element found');
+            return;
+        }
 
-        if (video.muted) {
+        // Toggle state
+        if (video.muted || video.volume === 0) {
             video.muted = false;
+            video.defaultMuted = false;
             video.volume = 1.0;
-            var playPromise = video.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(function(e) {
-                    console.log('Video play audio catch:', e);
+            var p = video.play();
+            if (p !== undefined) {
+                p.catch(function(err) {
+                    console.log('Autoplay unmuted audio play error:', err);
                 });
             }
             if (icon) {
-                icon.classList.remove('fa-volume-mute');
+                icon.classList.remove('fa-volume-mute', 'fa-volume-off');
                 icon.classList.add('fa-volume-up');
             }
         } else {
