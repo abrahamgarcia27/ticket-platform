@@ -1750,48 +1750,36 @@
 
 
 <script>
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.fever-carousel-slide');
-    const dots = document.querySelectorAll('.fever-dot');
-
-    function showSlide(index) {
-        if (!slides.length) return;
-        if (index >= slides.length) currentSlide = 0;
-        else if (index < 0) currentSlide = slides.length - 1;
-        else currentSlide = index;
-
-        slides.forEach((s, i) => {
-            s.classList.toggle('active', i === currentSlide);
-        });
-        dots.forEach((d, i) => {
-            d.classList.toggle('active', i === currentSlide);
-        });
-    }
-
-    function nextSlide() { showSlide(currentSlide + 1); }
-    function prevSlide() { showSlide(currentSlide - 1); }
-    function goToSlide(i) { showSlide(i); }
-
-<script>
-    // Fever Hero Video Mute/Unmute toggle
-    function toggleHeroVideoAudio() {
+    // Fever Hero Video Mute/Unmute toggle (Exposed globally)
+    window.toggleHeroVideoAudio = function() {
         const video = document.getElementById('feverHeroVideo');
         const icon = document.getElementById('feverAudioIcon');
-        if (!video || !icon) return;
+        if (!video) return;
 
         if (video.muted) {
             video.muted = false;
-            icon.classList.remove('fa-volume-mute');
-            icon.classList.add('fa-volume-up');
+            video.volume = 1.0;
+            var playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(function(e) {
+                    console.log('Video play audio catch:', e);
+                });
+            }
+            if (icon) {
+                icon.classList.remove('fa-volume-mute');
+                icon.classList.add('fa-volume-up');
+            }
         } else {
             video.muted = true;
-            icon.classList.remove('fa-volume-up');
-            icon.classList.add('fa-volume-mute');
+            if (icon) {
+                icon.classList.remove('fa-volume-up');
+                icon.classList.add('fa-volume-mute');
+            }
         }
-    }
+    };
 
     // Compact Fever-style Gallery Scroll & Lightbox
-    function scrollGallery(direction) {
+    window.scrollGallery = function(direction) {
         const track = document.getElementById('galleryTrack');
         if (!track) return;
         const scrollAmount = track.clientWidth * 0.75;
@@ -1799,29 +1787,23 @@
             left: direction * scrollAmount,
             behavior: 'smooth'
         });
-    }
+    };
 
-    function openLightbox(mediaUrl, isVideo) {
+    window.openLightbox = function(mediaUrl, isVideo) {
         const container = document.getElementById('lightboxMediaContainer');
         if (!container) return;
 
         if (isVideo) {
-            container.innerHTML = `
-                <video class="fever-lightbox-media" controls autoplay playsinline style="width: 100%; max-height: 80vh;">
-                    <source src="${mediaUrl}">
-                </video>
-            `;
+            container.innerHTML = '<video class="fever-lightbox-media" controls autoplay playsinline style="width: 100%; max-height: 80vh;"><source src="' + mediaUrl + '"></video>';
         } else {
-            container.innerHTML = `
-                <img src="${mediaUrl}" class="fever-lightbox-media" alt="Enlarged view">
-            `;
+            container.innerHTML = '<img src="' + mediaUrl + '" class="fever-lightbox-media" alt="Enlarged view">';
         }
 
         const modal = new bootstrap.Modal(document.getElementById('galleryLightboxModal'));
         modal.show();
-    }
+    };
 
-    // Stop video playback when lightbox closes
+    // Stop video playback when lightbox closes & attach click handlers
     document.addEventListener('DOMContentLoaded', function() {
         const lightboxEl = document.getElementById('galleryLightboxModal');
         if (lightboxEl) {
@@ -1830,30 +1812,15 @@
                 if (container) container.innerHTML = '';
             });
         }
-    });
 
-    // Smooth tab scrolling and active state
-    document.querySelectorAll('.fever-tab-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) {
-                const offset = 80;
-                const bodyRect = document.body.getBoundingClientRect().top;
-                const elementRect = targetEl.getBoundingClientRect().top;
-                const elementPosition = elementRect - bodyRect;
-                const offsetPosition = elementPosition - offset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-
-                document.querySelectorAll('.fever-tab-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            }
-        });
+        const audioBtn = document.getElementById('feverAudioToggleBtn');
+        if (audioBtn) {
+            audioBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.toggleHeroVideoAudio();
+            });
+        }
     });
 </script>
 
