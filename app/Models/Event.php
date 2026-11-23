@@ -25,7 +25,9 @@ class Event extends Model
         'date_time_start',
         'date_time_end',
         'coverimage',
+        'cover_video',
         'image',
+        'gallery',
         'summary',
         'created_by',
         'meta_title',
@@ -37,6 +39,7 @@ class Event extends Model
 
     protected $casts = [
         'report_sent_at' => 'datetime',
+        'gallery' => 'array',
     ];
 
     public function user(): BelongsTo{

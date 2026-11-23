@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-    /* Estilos Fever-like en tema claro y elegante (fondo blanco con acentos dorados y oscuros) */
+    /* Estilos Fever-like en tema claro y elegante */
     :root {
         --fever-gold: #D9BC73;
         --fever-gold-dark: #b89849;
@@ -38,107 +38,43 @@
         max-height: 40px;
     }
 
-    /* Hero multimedia carousel */
-    .fever-hero-section {
+    /* Top Hero Multimedia (Single Video OR Single Image) */
+    .fever-hero-media-wrapper {
         background-color: #0E1012;
         width: 100%;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         overflow: hidden;
+        min-height: 340px;
+        max-height: 520px;
     }
 
-    .fever-carousel-container {
-        position: relative;
+    .fever-hero-media-content {
         width: 100%;
         max-width: 1100px;
         margin: 0 auto;
-        height: 480px;
-        background-color: #0E1012;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    @media (max-width: 768px) {
-        .fever-carousel-container {
-            height: 320px;
-        }
-    }
-
-    .fever-carousel-slide {
-        display: none;
+    .fever-hero-video {
         width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        opacity: 0;
-        transition: opacity 0.4s ease-in-out;
-        text-align: center;
-    }
-
-    .fever-carousel-slide.active {
-        display: block;
-        opacity: 1;
-    }
-
-    .fever-carousel-img {
-        width: 100%;
-        height: 100%;
+        max-height: 500px;
         object-fit: contain;
         background-color: #0E1012;
     }
 
-    .fever-carousel-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.65);
-        color: #ffffff;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 5;
-        transition: all 0.2s;
+    .fever-hero-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        background-color: #0E1012;
     }
 
-    .fever-carousel-btn:hover {
-        background: var(--fever-gold);
-        color: #0E1012;
-    }
-
-    .fever-carousel-prev { left: 20px; }
-    .fever-carousel-next { right: 20px; }
-
-    .fever-carousel-dots {
-        position: absolute;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 8px;
-        z-index: 5;
-    }
-
-    .fever-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .fever-dot.active {
-        background: var(--fever-gold);
-        transform: scale(1.25);
-    }
-
-    /* Event Title Header & Key Metadata (White Background) */
+    /* Event Title Header & Key Metadata */
     .fever-event-header-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -195,7 +131,7 @@
         font-size: 1.05rem;
     }
 
-    /* Sticky Navigation Tabs (Clean Light Theme) */
+    /* Sticky Navigation Tabs */
     .fever-sticky-tabs {
         position: sticky;
         top: 0;
@@ -252,7 +188,7 @@
         }
     }
 
-    /* Section Cards (Clean white card with subtle border) */
+    /* Section Cards */
     .fever-section {
         background: #ffffff;
         border: 1px solid var(--fever-gray-200);
@@ -276,7 +212,96 @@
         color: var(--fever-gold-dark);
     }
 
-    /* Sticky Sidebar Purchase Box (Fever Style in Light Mode) */
+    /* Gallery Carousel */
+    .fever-gallery-carousel {
+        position: relative;
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #000;
+        height: 420px;
+    }
+
+    @media (max-width: 768px) {
+        .fever-gallery-carousel {
+            height: 280px;
+        }
+    }
+
+    .fever-gallery-slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+    }
+
+    .fever-gallery-slide.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .fever-gallery-item {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background-color: #0E1012;
+    }
+
+    .fever-gallery-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.65);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        transition: all 0.2s;
+    }
+
+    .fever-gallery-btn:hover {
+        background: var(--fever-gold);
+        color: #0E1012;
+    }
+
+    .fever-gallery-prev { left: 16px; }
+    .fever-gallery-next { right: 16px; }
+
+    .fever-gallery-dots {
+        position: absolute;
+        bottom: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 5;
+    }
+
+    .fever-gdot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .fever-gdot.active {
+        background: var(--fever-gold);
+        transform: scale(1.3);
+    }
+
+    /* Sticky Sidebar Purchase Box */
     .fever-purchase-box {
         position: sticky;
         top: 80px;
@@ -351,19 +376,6 @@
         margin-top: 15px;
     }
 
-    /* Ticket Card */
-    .fever-ticket-card {
-        background: var(--fever-gray-100);
-        border: 1px solid var(--fever-gray-200);
-        border-radius: 10px;
-        padding: 18px;
-        margin-bottom: 14px;
-        transition: border-color 0.2s;
-    }
-    .fever-ticket-card:hover {
-        border-color: var(--fever-gold);
-    }
-
     /* Mobile Sticky Action Bar */
     .fever-mobile-sticky-action {
         display: none;
@@ -402,36 +414,19 @@
         @include('components.alert')
     </div>
 
-    {{-- Hero multimedia carousel section --}}
-    <div class="fever-hero-section">
-        <div class="fever-carousel-container" id="eventHeroCarousel">
-            @if($event->coverimage)
-                <div class="fever-carousel-slide active">
-                    <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-carousel-img" alt="{{ $event->title }}">
-                </div>
+    {{-- Top of the Event: Single Video or Single Image (No carousel) --}}
+    <div class="fever-hero-media-wrapper">
+        <div class="fever-hero-media-content">
+            @if($event->cover_video)
+                <video class="fever-hero-video" controls autoplay muted loop playsinline>
+                    <source src="{{ asset('storage/' . $event->cover_video) }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            @elseif($event->coverimage)
+                <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-hero-image" alt="{{ $event->title }}">
+            @elseif($event->image)
+                <img src="{{ asset('storage/' . $event->image) }}" class="fever-hero-image" alt="{{ $event->title }}">
             @endif
-
-            @if($event->image)
-                <div class="fever-carousel-slide {{ !$event->coverimage ? 'active' : '' }}">
-                    <img src="{{ asset('storage/' . $event->image) }}" class="fever-carousel-img" alt="{{ $event->title }}">
-                </div>
-            @endif
-
-            <button class="fever-carousel-btn fever-carousel-prev" onclick="prevSlide()">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="fever-carousel-btn fever-carousel-next" onclick="nextSlide()">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-
-            <div class="fever-carousel-dots" id="carouselDots">
-                @if($event->coverimage)
-                    <div class="fever-dot active" onclick="goToSlide(0)"></div>
-                @endif
-                @if($event->image)
-                    <div class="fever-dot {{ !$event->coverimage ? 'active' : '' }}" onclick="goToSlide(1)"></div>
-                @endif
-            </div>
         </div>
     </div>
 
@@ -470,11 +465,11 @@
         </div>
     </div>
 
-    {{-- Sticky Tabs --}}
+    {{-- Sticky Tabs (Overview, Gallery, Location, Organizer) --}}
     <nav class="fever-sticky-tabs">
         <div class="fever-tabs-wrapper">
             <a href="#overview" class="fever-tab-link active" id="tab-overview">Overview</a>
-            <a href="#tickets-section" class="fever-tab-link" id="tab-tickets">Tickets</a>
+            <a href="#gallery-section" class="fever-tab-link" id="tab-gallery">Gallery</a>
             <a href="#location" class="fever-tab-link" id="tab-location">Location</a>
             <a href="#organizer" class="fever-tab-link" id="tab-organizer">Organizer</a>
         </div>
@@ -502,51 +497,50 @@
                 @endif
             </section>
 
-            {{-- Tickets Section --}}
-            <section class="fever-section" id="tickets-section">
-                <h3 class="fever-section-title"><i class="fas fa-ticket-alt"></i> Tickets</h3>
+            {{-- Gallery Carousel Section (Images or Videos) --}}
+            @php
+                $galleryItems = [];
+                if (!empty($event->gallery) && is_array($event->gallery)) {
+                    $galleryItems = $event->gallery;
+                } else {
+                    if ($event->image) $galleryItems[] = $event->image;
+                    if ($event->coverimage) $galleryItems[] = $event->coverimage;
+                }
+            @endphp
+            <section class="fever-section" id="gallery-section">
+                <h3 class="fever-section-title"><i class="fas fa-images"></i> Gallery</h3>
                 
-                @if ($tickets->isNotEmpty())
-                    <div class="tickets-list">
-                        @foreach($tickets as $t)
-                            <div class="fever-ticket-card">
-                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <div>
-                                        <h5 class="mb-1 font-weight-bold" style="color: #111827;">{{ $t->title }}</h5>
-                                        <span class="badge bg-secondary text-capitalize">{{ $t->type }}</span>
-                                        <div class="text-xs text-muted mt-1">
-                                            Sales end: {{ date('F j, Y (g:i A)', strtotime($t->date_time_end)) }}
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <div class="h4 mb-2 font-weight-bold" style="color: var(--fever-gold-dark);">
-                                            @if ($t->type == 'free')
-                                                Free
-                                            @else
-                                                ${{ number_format($t->price, 2) }}
-                                            @endif
-                                        </div>
-                                        @if($t->orders_count >= $t->quantity)
-                                            <span class="badge bg-danger">Sold Out</span>
-                                        @else
-                                            <button type="button" class="btn btn-sm btn-yellow mb-0" data-bs-toggle="modal" data-bs-target="#getTickets">
-                                                Select Tickets
-                                            </button>
-                                        @endif
-                                    </div>
-                                </div>
+                @if(!empty($galleryItems))
+                    <div class="fever-gallery-carousel" id="eventGalleryCarousel">
+                        @foreach($galleryItems as $index => $item)
+                            <div class="fever-gallery-slide {{ $index === 0 ? 'active' : '' }}">
+                                @if(preg_match('/\.(mp4|webm|ogg|mov)$/i', $item))
+                                    <video class="fever-gallery-item" controls playsinline>
+                                        <source src="{{ asset('storage/' . $item) }}">
+                                    </video>
+                                @else
+                                    <img src="{{ asset('storage/' . $item) }}" class="fever-gallery-item" alt="Gallery item {{ $index + 1 }}">
+                                @endif
                             </div>
                         @endforeach
-                    </div>
-                @elseif($event->link_external_sales)
-                    <div class="alert alert-light border text-dark" role="alert">
-                        Tickets for this event are handled via an external partner.
-                        <div class="mt-3">
-                            <a href="{{ $event->link_external_sales }}" target="_blank" class="btn btn-yellow">Get Tickets Externally</a>
-                        </div>
+
+                        @if(count($galleryItems) > 1)
+                            <button class="fever-gallery-btn fever-gallery-prev" onclick="prevGallerySlide()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="fever-gallery-btn fever-gallery-next" onclick="nextGallerySlide()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+
+                            <div class="fever-gallery-dots">
+                                @foreach($galleryItems as $index => $item)
+                                    <div class="fever-gdot {{ $index === 0 ? 'active' : '' }}" onclick="goToGallerySlide({{ $index }})"></div>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
                 @else
-                    <p class="text-muted">No tickets currently available for online purchase.</p>
+                    <p class="text-muted">No gallery items available yet.</p>
                 @endif
             </section>
 
@@ -1627,6 +1621,55 @@
     if (slides.length > 1) {
         setInterval(nextSlide, 5000);
     }
+
+    // Smooth tab scrolling and active state
+    document.querySelectorAll('.fever-tab-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                const offset = 80;
+                const bodyRect = document.body.getBoundingClientRect().top;
+                const elementRect = targetEl.getBoundingClientRect().top;
+                const elementPosition = elementRect - bodyRect;
+                const offsetPosition = elementPosition - offset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                document.querySelectorAll('.fever-tab-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+</script>
+
+
+<script>
+    let currentGallerySlide = 0;
+    const gSlides = document.querySelectorAll('.fever-gallery-slide');
+    const gDots = document.querySelectorAll('.fever-gdot');
+
+    function showGallerySlide(index) {
+        if (!gSlides.length) return;
+        if (index >= gSlides.length) currentGallerySlide = 0;
+        else if (index < 0) currentGallerySlide = gSlides.length - 1;
+        else currentGallerySlide = index;
+
+        gSlides.forEach((s, i) => {
+            s.classList.toggle('active', i === currentGallerySlide);
+        });
+        gDots.forEach((d, i) => {
+            d.classList.toggle('active', i === currentGallerySlide);
+        });
+    }
+
+    function nextGallerySlide() { showGallerySlide(currentGallerySlide + 1); }
+    function prevGallerySlide() { showGallerySlide(currentGallerySlide - 1); }
+    function goToGallerySlide(i) { showGallerySlide(i); }
 
     // Smooth tab scrolling and active state
     document.querySelectorAll('.fever-tab-link').forEach(link => {

@@ -67,18 +67,49 @@
                             <input class="form-control" type="text" name="date_time_end" id="dateTime" value="{{ $event->date_time_end }}" required>
                         </div>
                         <div class="form-group">
-                            <label for="image" class="form-control-label">Cover Event Image</label>
+                            <label for="coverimage" class="form-control-label">Cover Event Image</label>
                             <input class="form-control" type="file" name="coverimage" id="coverimage">
                         </div>
-                        <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg"
-                            style="background-image: url('{{ asset('storage/' .  $event->coverimage) }}'); background-position: top;">
+                        @if ($event->coverimage)
+                        <div class="page-header align-items-start min-vh-25 pt-4 pb-4 m-2 border-radius-lg"
+                            style="background-image: url('{{ asset('storage/' .  $event->coverimage) }}'); background-position: center; background-size: cover; height: 180px;">
+                        </div>
+                        @endif
+                        <div class="form-group">
+                            <label for="cover_video" class="form-control-label">Cover Event Video (opcional - MP4 / WebM)</label>
+                            <input class="form-control" type="file" name="cover_video" id="cover_video" accept="video/*">
+                            @if ($event->cover_video)
+                                <div class="mt-2">
+                                    <video src="{{ asset('storage/' . $event->cover_video) }}" controls style="max-width: 100%; max-height: 200px; border-radius: 8px;"></video>
+                                </div>
+                            @endif
                         </div>
                         <div class="form-group">
                             <label for="image" class="form-control-label">Main Event Image</label>
                             <input class="form-control" type="file" name="image" id="image">
                         </div>
-                        <div class="page-header align-items-start min-vh-50 pt-5 pb-11 m-3 border-radius-lg"
-                            style="background-image: url('{{ asset('storage/' .  $event->image) }}'); background-position: top;">
+                        @if ($event->image)
+                        <div class="page-header align-items-start min-vh-25 pt-4 pb-4 m-2 border-radius-lg"
+                            style="background-image: url('{{ asset('storage/' .  $event->image) }}'); background-position: center; background-size: cover; height: 180px;">
+                        </div>
+                        @endif
+                        <div class="form-group">
+                            <label for="gallery" class="form-control-label">Event Gallery (Imágenes o Videos para carrusel)</label>
+                            <input class="form-control" type="file" name="gallery[]" id="gallery" multiple accept="image/*,video/*">
+                            <small class="form-text text-muted">Puedes subir múltiples imágenes o videos para la galería del evento.</small>
+                            @if ($event->gallery && is_array($event->gallery))
+                                <div class="row mt-2 g-2">
+                                    @foreach($event->gallery as $item)
+                                        <div class="col-3">
+                                            @if(preg_match('/\.(mp4|webm|ogg|mov)$/i', $item))
+                                                <video src="{{ asset('storage/' . $item) }}" controls style="width: 100%; height: 80px; object-fit: cover; border-radius: 6px;"></video>
+                                            @else
+                                                <img src="{{ asset('storage/' . $item) }}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 6px;">
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                         <div class="form-group">
                             <label for="about" class="form-control-label">About Event</label>

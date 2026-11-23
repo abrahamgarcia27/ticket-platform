@@ -71,6 +71,22 @@ class EventController extends Controller
                 'coverimage' => $image         
             ]);
         }
+        if ($request->hasFile('cover_video')) {
+            $video = $request->file('cover_video')->store('uploads/videos','public');
+            Event::find($event->id)->update([
+                'cover_video' => $video         
+            ]);
+        }
+        if ($request->hasFile('gallery')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery') as $file) {
+                $path = $file->store('uploads/gallery', 'public');
+                $galleryPaths[] = $path;
+            }
+            Event::find($event->id)->update([
+                'gallery' => $galleryPaths
+            ]);
+        }
         $id = $event->id; 
 
         if (env('APP_ENV') == 'production') {
@@ -191,6 +207,25 @@ class EventController extends Controller
             $image = $request->file('coverimage')->store('uploads','public');
             Event::find($event->id)->update([
                 'coverimage' => $image         
+            ]);
+        }
+        if ($request->hasFile('cover_video')) {
+            if ($event->cover_video) {
+                Storage::delete('public/'.$event->cover_video);
+            }
+            $video = $request->file('cover_video')->store('uploads/videos','public');
+            Event::find($event->id)->update([
+                'cover_video' => $video         
+            ]);
+        }
+        if ($request->hasFile('gallery')) {
+            $currentGallery = is_array($event->gallery) ? $event->gallery : [];
+            foreach ($request->file('gallery') as $file) {
+                $path = $file->store('uploads/gallery', 'public');
+                $currentGallery[] = $path;
+            }
+            Event::find($event->id)->update([
+                'gallery' => $currentGallery
             ]);
         }
         if (env('APP_ENV') == 'production' && $event->google_event_id !== null) {
