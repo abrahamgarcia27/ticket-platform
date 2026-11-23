@@ -322,25 +322,26 @@
         border-top: 1px solid var(--fever-gray-200);
         border-bottom: 1px solid var(--fever-gray-200);
         z-index: 100;
-        padding: 0 16px;
+        padding: 0;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         width: 100%;
-    }
-
-    @media (min-width: 992px) {
-        .fever-sticky-tabs {
-            padding: 0 20px;
-        }
     }
 
     .fever-tabs-wrapper {
         max-width: 1200px;
         margin: 0 auto;
+        padding: 0 16px;
         display: flex;
         gap: 20px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
+    }
+
+    @media (min-width: 992px) {
+        .fever-tabs-wrapper {
+            padding: 0 20px;
+        }
     }
 
     @media (min-width: 768px) {
