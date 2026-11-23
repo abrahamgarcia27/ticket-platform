@@ -1,263 +1,627 @@
 @extends('layouts.app')
 
 @section('content')
-    <main class="main-content mt-0">
-        <!-- Mobile Top Navigation (only visible on mobile) -->
-        <nav class="mobile-top-nav d-lg-none">
-            <div class="container-fluid">
-                <ul class="nav justify-content-around">
-                    <li class="nav-item">
-                        <a class="nav-link" id="aMobileInfo" href="#whenandwhere">
-                            <span>Info</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="aMobileDetails" href="#about">
-                            <span>Details</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="aMobileOrganizer" href="#organizer">
-                            <span>Organizer</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        
-        <div class="header">
-            <a href="/list-events">
-                <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo">
-            </a>
-        </div>
-        <div id="alert">
-            @include('components.alert')
-        </div>
-        <div class="card-transparent shadow-lg mt-0">
-            <div class="card-body p-3">
-                <div class="card-header pb-0">
-                    <div class="d-flex align-items-center">
-                        <h5 class="mb-0">{{ date('F j, Y', strtotime($event->date_time_start)) }}</h5>
-                    </div>
-                    <div class="d-flex align-items-center" style="padding-top: 15px;">
-                        <h3 class="mb-0" style="text-align: left;">{{ $event->title }}</h3>
-                    </div>
-                    <div class="event-summary-container" style="padding-top: 25px;">
-                        <div class="event-summary-content">
-                            {{ $event->summary }}
-                        </div>
-                    </div>
-                </div> 
-                <div class="card-body pb-0">                 
-                    <nav class="navbar sticky-top navbar-dark nav-event">
-                        <div class="col-12" id="navDesktop">
-                            <ul class="nav justify-content-around" id="mi-ul">
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aInfo" href="#whenandwhere">Info</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aDetails" href="#about">Details</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aOrganizer" href="#organizer">Organizer</a>
-                                </li>
-                            </ul>  
-                        </div>
-                        <div class="col-12" id="navPhone" style="display: none;">
-                            <ul class="nav justify-content-around">
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aInfo2" href="#whenandwhere">Info</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aDetails2" href="#about">Details</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aOrganizer2" href="#organizer">Organizer</a>
-                                </li>
-                            </ul>  
-                        </div>
-                    </nav>
-                    <!-- Section divider -->
-                    <div class="section-divider"></div>
-                    <div class="row" id="whenandwhere">
-                        <div class="col-6" id="whDesktop">
-                            <div class="row">
-                                <h4 style="padding-bottom: 20px">When and where</h4>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Date</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="fas fa-door-open" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Doors</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('h:s a', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <a class="" href="{{ $event->maps_url }}" target="_blank"><i class="fas fa-map-pin" style="padding-right: 10px"></i></a>
-                                            <a href="{{ $event->maps_url }}" target="_blank"><h6 class="mb-0">Location</h6></a>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ $location  }}</p>
-                                        </div>
-                                    </div>
-                                </div>  
-                            </div>
-                        </div>
-                        <div class="col-12" id="whPhone">
-                            <div class="row">
-                                <h4 style="padding-bottom: 20px">When and where</h4>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Date</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 locationDiv">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="fas fa-door-open" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Doors</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('h:s a', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 locationDiv">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <a class="" href="{{ $event->maps_url }}" target="_blank"><i class="fas fa-map-pin" style="padding-right: 10px"></i></a>
-                                            <a href="{{ $event->maps_url }}" target="_blank"><h6 class="mb-0">Location</h6></a>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ $location }}</p>
-                                        </div>
-                                    </div>
-                                </div>  
-                            </div>
-                        </div>
-                        <div class="col-6 d-flex align-items-center justify-content-end" id="cardGetTickets">
-                            @if ($tickets->isNotEmpty())    
-                            <div class="card-transpatent" style="width: 20rem;">
-                                @php
-                                    $hasAvailableTickets = $tickets->some(function($ticket) use ($today) {
-                                        return $today < $ticket->date_time_end && $ticket->orders_count < $ticket->quantity;
-                                    });
-                                    
-                                    $lowestPaidPrice = $tickets->where('type', 'paid')
-                                        ->where('date_time_end', '>', $today)
-                                        ->min('price');
-                                    
-                                    $hasFreeTickets = $tickets->where('type', 'free')
-                                        ->where('date_time_end', '>', $today)
-                                        ->isNotEmpty();
-                                @endphp
+<style>
+    :root {
+        --fever-gold: #D9BC73;
+        --fever-gold-hover: #c4a75e;
+        --fever-dark-bg: #0E1012;
+        --fever-card-bg: rgba(255, 255, 255, 0.04);
+        --fever-border: rgba(255, 255, 255, 0.1);
+        --fever-text-muted: #8898aa;
+    }
 
-                                @if ($hasAvailableTickets)
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
-                                                <h4>Free</h4>
-                                            @elseif ($lowestPaidPrice)
-                                                <h4></h4>
+    body {
+        background-color: var(--fever-dark-bg);
+        color: #f6f9fc;
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    .fever-event-page {
+        padding-bottom: 90px;
+    }
+
+    .fever-hero-section {
+        position: relative;
+        width: 100%;
+        background-color: #000;
+        overflow: hidden;
+    }
+
+    .fever-carousel-container {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        height: 480px;
+    }
+
+    @media (max-width: 768px) {
+        .fever-carousel-container {
+            height: 300px;
+        }
+    }
+
+    .fever-carousel-slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .fever-carousel-slide.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .fever-carousel-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .fever-carousel-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60%;
+        background: linear-gradient(to top, rgba(14, 16, 18, 1) 0%, rgba(14, 16, 18, 0.6) 50%, transparent 100%);
+        pointer-events: none;
+    }
+
+    .fever-carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        transition: all 0.2s;
+    }
+
+    .fever-carousel-btn:hover {
+        background: var(--fever-gold);
+        color: #000;
+    }
+
+    .fever-carousel-prev { left: 20px; }
+    .fever-carousel-next { right: 20px; }
+
+    .fever-carousel-dots {
+        position: absolute;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 5;
+    }
+
+    .fever-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .fever-dot.active {
+        background: var(--fever-gold);
+        transform: scale(1.2);
+    }
+
+    .fever-hero-content {
+        max-width: 1200px;
+        margin: -60px auto 0 auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 6;
+    }
+
+    .fever-badge-category {
+        display: inline-block;
+        background: rgba(217, 188, 115, 0.15);
+        color: var(--fever-gold);
+        border: 1px solid var(--fever-gold);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+    }
+
+    .fever-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 15px;
+        line-height: 1.2;
+    }
+
+    @media (max-width: 768px) {
+        .fever-title {
+            font-size: 1.75rem;
+        }
+    }
+
+    .fever-key-points {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        color: #ced4da;
+        font-size: 0.95rem;
+        margin-bottom: 25px;
+    }
+
+    .fever-key-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .fever-key-item i {
+        color: var(--fever-gold);
+    }
+
+    .fever-sticky-tabs {
+        position: sticky;
+        top: 0;
+        background: rgba(14, 16, 18, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--fever-border);
+        z-index: 100;
+        padding: 0 20px;
+    }
+
+    .fever-tabs-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        gap: 30px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .fever-tabs-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fever-tab-link {
+        color: var(--fever-text-muted);
+        text-decoration: none;
+        padding: 16px 0;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .fever-tab-link:hover, .fever-tab-link.active {
+        color: var(--fever-gold);
+        border-bottom-color: var(--fever-gold);
+    }
+
+    .fever-content-grid {
+        max-width: 1200px;
+        margin: 30px auto 0 auto;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 40px;
+    }
+
+    @media (max-width: 991px) {
+        .fever-content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .fever-section {
+        background: var(--fever-card-bg);
+        border: 1px solid var(--fever-border);
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 30px;
+    }
+
+    .fever-section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .fever-section-title i {
+        color: var(--fever-gold);
+    }
+
+    .fever-purchase-box {
+        position: sticky;
+        top: 80px;
+        background: rgba(22, 25, 29, 0.95);
+        border: 1px solid var(--fever-border);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .fever-price-from {
+        font-size: 0.85rem;
+        color: var(--fever-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .fever-price-val {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--fever-gold);
+    }
+
+    .fever-btn-buy {
+        background: var(--fever-gold);
+        color: #000;
+        font-weight: 700;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 20px;
+        width: 100%;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.2s;
+        margin-top: 15px;
+    }
+
+    .fever-btn-buy:hover {
+        background: var(--fever-gold-hover);
+        color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(217, 188, 115, 0.3);
+    }
+
+    .fever-info-pill {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--fever-border);
+    }
+    .fever-info-pill:last-child {
+        border-bottom: none;
+    }
+    .fever-info-pill i {
+        font-size: 1.1rem;
+        color: var(--fever-gold);
+        width: 24px;
+        text-align: center;
+    }
+
+    .fever-map-container {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--fever-border);
+        height: 280px;
+        margin-top: 15px;
+    }
+
+    .fever-mobile-sticky-action {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(14, 16, 18, 0.98);
+        border-top: 1px solid var(--fever-border);
+        padding: 12px 20px;
+        z-index: 1050;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
+    }
+
+    @media (max-width: 991px) {
+        .fever-mobile-sticky-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+</style>
+
+<div class="fever-event-page">
+    <div class="header d-flex align-items-center justify-content-between px-4 py-3" style="background: rgba(0,0,0,0.6);">
+        <a href="/list-events">
+            <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo" style="max-height: 40px;">
+        </a>
+        <a href="/list-events" class="btn btn-sm btn-outline-light mb-0">
+            <i class="fas fa-arrow-left me-1"></i> All Events
+        </a>
+    </div>
+
+    <div id="alert">
+        @include('components.alert')
+    </div>
+
+    <div class="fever-hero-section">
+        <div class="fever-carousel-container" id="eventHeroCarousel">
+            @if($event->coverimage)
+                <div class="fever-carousel-slide active">
+                    <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-carousel-img" alt="{{ $event->title }}">
+                    <div class="fever-carousel-overlay"></div>
+                </div>
+            @endif
+
+            @if($event->image)
+                <div class="fever-carousel-slide {{ !$event->coverimage ? 'active' : '' }}">
+                    <img src="{{ asset('storage/' . $event->image) }}" class="fever-carousel-img" alt="{{ $event->title }}">
+                    <div class="fever-carousel-overlay"></div>
+                </div>
+            @endif
+
+            <button class="fever-carousel-btn fever-carousel-prev" onclick="prevSlide()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="fever-carousel-btn fever-carousel-next" onclick="nextSlide()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="fever-carousel-dots" id="carouselDots">
+                @if($event->coverimage)
+                    <div class="fever-dot active" onclick="goToSlide(0)"></div>
+                @endif
+                @if($event->image)
+                    <div class="fever-dot {{ !$event->coverimage ? 'active' : '' }}" onclick="goToSlide(1)"></div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="fever-hero-content">
+        <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
+        <h1 class="fever-title">{{ $event->title }}</h1>
+        
+        <div class="fever-key-points">
+            <div class="fever-key-item">
+                <i class="far fa-calendar-alt"></i>
+                <span>{{ date('F j, Y', strtotime($event->date_time_start)) }}</span>
+            </div>
+            <div class="fever-key-item">
+                <i class="far fa-clock"></i>
+                <span>{{ date('g:i A', strtotime($event->date_time_start)) }} - {{ date('g:i A', strtotime($event->date_time_end)) }}</span>
+            </div>
+            <div class="fever-key-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ $event->ubication }} ({{ $event->address_locality }}, {{ $event->address_region }})</span>
+            </div>
+            @php
+                $minPrice = $tickets->where('type', 'paid')->min('price');
+                $hasFree = $tickets->where('type', 'free')->isNotEmpty();
+            @endphp
+            <div class="fever-key-item">
+                <i class="fas fa-ticket-alt"></i>
+                @if($hasFree && !$minPrice)
+                    <span>Free Admission</span>
+                @elseif($minPrice)
+                    <span>Tickets from ${{ number_format($minPrice, 2) }}</span>
+                @else
+                    <span>Available Tickets</span>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <nav class="fever-sticky-tabs">
+        <div class="fever-tabs-wrapper">
+            <a href="#overview" class="fever-tab-link active" id="tab-overview">Overview</a>
+            <a href="#tickets-section" class="fever-tab-link" id="tab-tickets">Tickets</a>
+            <a href="#location" class="fever-tab-link" id="tab-location">Location</a>
+            <a href="#organizer" class="fever-tab-link" id="tab-organizer">Organizer</a>
+        </div>
+    </nav>
+
+    <div class="fever-content-grid">
+        <div class="fever-main-column">
+            <section class="fever-section" id="overview">
+                <h3 class="fever-section-title"><i class="fas fa-info-circle"></i> About this event</h3>
+                
+                @if($event->summary)
+                    <p class="lead text-light mb-4" style="font-size: 1.1rem; line-height: 1.6;">
+                        {{ $event->summary }}
+                    </p>
+                @endif
+
+                @if($event->about)
+                    <div class="about-html text-secondary">
+                        {!! $event->about !!}
+                    </div>
+                @else
+                    <p class="text-secondary">Join us for an unforgettable experience at {{ $event->ubication }}. Enjoy live music, curated atmosphere, and premium service.</p>
+                @endif
+            </section>
+
+            <section class="fever-section" id="tickets-section">
+                <h3 class="fever-section-title"><i class="fas fa-ticket-alt"></i> Tickets</h3>
+                
+                @if ($tickets->isNotEmpty())
+                    <div class="tickets-list">
+                        @foreach($tickets as $t)
+                            <div class="p-3 mb-3 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--fever-border);">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <h5 class="mb-1 text-white">{{ $t->title }}</h5>
+                                        <span class="badge bg-gradient-dark text-capitalize">{{ $t->type }}</span>
+                                        <div class="text-xs text-muted mt-1">
+                                            Sales end: {{ date('F j, Y (g:i A)', strtotime($t->date_time_end)) }}
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="h4 mb-2 text-warning font-weight-bold">
+                                            @if ($t->type == 'free')
+                                                Free
+                                            @else
+                                                ${{ number_format($t->price, 2) }}
                                             @endif
                                         </div>
-                                        <div class="d-grid gap-2" style="padding-top: 10px">
-                                            <button type="button" class="btn btn-yellow" data-bs-toggle="modal" data-bs-target="#getTickets">
-                                                Get Tickets
+                                        @if($t->orders_count >= $t->quantity)
+                                            <span class="badge bg-danger">Sold Out</span>
+                                        @else
+                                            <button type="button" class="btn btn-sm btn-yellow mb-0" data-bs-toggle="modal" data-bs-target="#getTickets">
+                                                Select Tickets
                                             </button>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <h4>Sales Ended</h4>
-                                        </div>
-                                        <div class="d-grid gap-2" style="padding-top: 10px">
-                                            <button type="button" class="btn btn-yellow" data-bs-toggle="modal" data-bs-target="#">
-                                                Get Details
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-                        @else
-                            <div class="card-transpatent" style="width: 20rem;">
-                                <div class="card-body">
-                                    <div class="d-grid gap-2" style="padding-top: 10px">
-                                        <a type="button" class="btn btn-yellow" href="{{ $event->link_external_sales }}" target="_blank">
-                                            Get Tickets
-                                        </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                        @endif
-                        </div>
-                        
+                        @endforeach
                     </div>
-                    <div class="row" style="padding-top: 40px" id="about">
-                        <div class="card-transparent" style="width: 40rem">
-                            <h4 style="padding-bottom: 20px">About this event</h4>  
-                            <img src="{{ asset('storage/' .  $event->image) }}" class="card-img-bottom" alt="">
-                            <div class="about-html">{!! $event->about !!}</div>
+                @elseif($event->link_external_sales)
+                    <div class="alert alert-dark text-white" role="alert">
+                        Tickets for this event are handled via an external partner.
+                        <div class="mt-3">
+                            <a href="{{ $event->link_external_sales }}" target="_blank" class="btn btn-yellow">Get Tickets Externally</a>
                         </div>
                     </div>
-                    <div class="row" style="padding-top: 40px" id="organizer">
-                        <div class="card-transparent" style="width: 40rem">                          
-                            <h4 style="padding-bottom: 20px">Organizer</h4>                           
-                            <div class="card-body" >
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <div class="avatar avatar-xl">
-                                        <img src="{{ asset('storage/' .  $event->user->image) }}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 20px">
-                                <p class="mb-0" style="font-size: 0.80rem">Organized by</p>  
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center">
-                                <h6>{{ $event->user->username }}</h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 40px">
-                                <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                    Contact
-                                </button>
-                                </div>
-                            </div>
-                        </div>
+                @else
+                    <p class="text-muted">No tickets currently available for online purchase.</p>
+                @endif
+            </section>
+
+            <section class="fever-section" id="location">
+                <h3 class="fever-section-title"><i class="fas fa-map-marked-alt"></i> Location</h3>
+                <div class="fever-info-pill">
+                    <i class="fas fa-building"></i>
+                    <div>
+                        <strong>{{ $event->ubication }}</strong>
+                        <div class="text-sm text-muted">{{ $location }}</div>
                     </div>
-                    <div class="row" style="padding-top: 40px" id="organizer">
-                        <div class="card-transparent" style="width: 40rem">                          
-                            <h4 style="padding-bottom: 20px">Other events you may like</h4>                           
-                            <div class="card-body d-flex flex-column" style="min-height: 10vh; justify-content: space-between;">
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 10px; padding-bottom: 5px;">
-                                    <a href="/list-events" class="btn btn-dark">View Events</a>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+
+                <div class="fever-map-container">
+                    <iframe
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        style="border:0; filter: invert(90%) hue-rotate(180deg);"
+                        src="https://maps.google.com/maps?q={{ urlencode($location) }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+
+                <div class="mt-3 text-end">
+                    <a href="{{ $event->maps_url ?: 'https://maps.google.com/?q=' . urlencode($location) }}" target="_blank" class="btn btn-sm btn-outline-warning mb-0">
+                        <i class="fas fa-directions me-1"></i> Open in Google Maps
+                    </a>
+                </div>
+            </section>
+
+            <section class="fever-section" id="organizer">
+                <h3 class="fever-section-title"><i class="fas fa-user-tie"></i> Organizer</h3>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar avatar-lg">
+                        <img src="{{ $event->user && $event->user->image ? asset('storage/' . $event->user->image) : asset('img/logos/logo.png') }}" alt="organizer" class="border-radius-lg shadow-sm w-100">
                     </div>
-                </div>   
+                    <div>
+                        <h5 class="text-white mb-0">{{ $event->user ? $event->user->username : 'Event Organizer' }}</h5>
+                        <p class="text-sm text-muted mb-0">Event Host</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        <i class="far fa-envelope me-1"></i> Contact Organizer
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div class="fever-sidebar-column d-none d-lg-block">
+            <div class="fever-purchase-box">
+                <div class="fever-price-from">Tickets starting from</div>
+                <div class="fever-price-val">
+                    @if($hasFree && !$minPrice)
+                        Free
+                    @elseif($minPrice)
+                        ${{ number_format($minPrice, 2) }}
+                    @else
+                        --
+                    @endif
+                </div>
+
+                <div class="my-3">
+                    <div class="fever-info-pill">
+                        <i class="far fa-calendar"></i>
+                        <span class="text-sm">{{ date('M j, Y', strtotime($event->date_time_start)) }}</span>
+                    </div>
+                    <div class="fever-info-pill">
+                        <i class="far fa-clock"></i>
+                        <span class="text-sm">{{ date('g:i A', strtotime($event->date_time_start)) }}</span>
+                    </div>
+                    <div class="fever-info-pill">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="text-sm text-truncate" style="max-width: 250px;">{{ $event->ubication }}</span>
+                    </div>
+                </div>
+
+                @if ($tickets->isNotEmpty())
+                    <button type="button" class="fever-btn-buy" data-bs-toggle="modal" data-bs-target="#getTickets">
+                        Get Tickets
+                    </button>
+                @elseif($event->link_external_sales)
+                    <a href="{{ $event->link_external_sales }}" target="_blank" class="fever-btn-buy text-center d-block text-decoration-none">
+                        Get Tickets
+                    </a>
+                @endif
             </div>
-            <!-- Modal Contact -->
+        </div>
+    </div>
+
+    <div class="fever-mobile-sticky-action">
+        <div>
+            <div class="text-xs text-muted">From</div>
+            <div class="h5 mb-0 text-warning font-weight-bold">
+                @if($hasFree && !$minPrice)
+                    Free
+                @elseif($minPrice)
+                    ${{ number_format($minPrice, 2) }}
+                @else
+                    --
+                @endif
+            </div>
+        </div>
+        <div>
+            @if ($tickets->isNotEmpty())
+                <button type="button" class="btn btn-yellow mb-0" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
+                    Get Tickets
+                </button>
+            @elseif($event->link_external_sales)
+                <a href="{{ $event->link_external_sales }}" target="_blank" class="btn btn-yellow mb-0">
+                    Get Tickets
+                </a>
+            @endif
+        </div>
+    </div>
+</div>
+
+<!-- Modal Contact -->
             <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content modal-border">
@@ -1134,4 +1498,57 @@
     });
 </script>
 @endif
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.fever-carousel-slide');
+    const dots = document.querySelectorAll('.fever-dot');
+
+    function showSlide(index) {
+        if (!slides.length) return;
+        if (index >= slides.length) currentSlide = 0;
+        else if (index < 0) currentSlide = slides.length - 1;
+        else currentSlide = index;
+
+        slides.forEach((s, i) => {
+            s.classList.toggle('active', i === currentSlide);
+        });
+        dots.forEach((d, i) => {
+            d.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function nextSlide() { showSlide(currentSlide + 1); }
+    function prevSlide() { showSlide(currentSlide - 1); }
+    function goToSlide(i) { showSlide(i); }
+
+    if (slides.length > 1) {
+        setInterval(nextSlide, 5000);
+    }
+
+    // Smooth tab scrolling and active state
+    document.querySelectorAll('.fever-tab-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                const offset = 80;
+                const bodyRect = document.body.getBoundingClientRect().top;
+                const elementRect = targetEl.getBoundingClientRect().top;
+                const elementPosition = elementRect - bodyRect;
+                const offsetPosition = elementPosition - offset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                document.querySelectorAll('.fever-tab-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+</script>
+
 @endpush
