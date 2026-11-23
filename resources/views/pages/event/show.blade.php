@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.app', ['class' => 'fever-event-body'])
 
 @section('content')
 <style>
-    /* Estilos Fever-like en tema claro y elegante */
+    /* Estilos Fever-like en tema claro y elegante - Ultra responsivo (320px+) */
     :root {
         --fever-gold: #D9BC73;
         --fever-gold-dark: #b89849;
@@ -14,28 +14,45 @@
         --fever-gray-100: #f9fafb;
     }
 
+    /* Reset preventivo contra desbordamiento */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        max-width: 100vw;
+        overflow-x: hidden !important;
+    }
+
     body {
         background-color: #ffffff !important;
         color: #1f2937 !important;
         font-family: 'Open Sans', sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
     .fever-event-page {
         background-color: #ffffff;
         padding-bottom: 90px;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
     }
 
     /* Top navigation header */
     .fever-nav-header {
         background-color: #0E1012;
-        padding: 12px 24px;
+        padding: 12px 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        width: 100%;
     }
 
     .fever-nav-header .logo {
-        max-height: 40px;
+        max-height: 36px;
+        width: auto;
     }
 
     /* Top Hero Multimedia (Single Video OR Single Image) */
@@ -47,8 +64,15 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        min-height: 340px;
+        min-height: 220px;
         max-height: 520px;
+    }
+
+    @media (max-width: 576px) {
+        .fever-hero-media-wrapper {
+            min-height: 180px;
+            max-height: 300px;
+        }
     }
 
     .fever-hero-media-content {
@@ -76,10 +100,17 @@
 
     /* Event Title Header & Key Metadata */
     .fever-event-header-container {
+        width: 100%;
         max-width: 1200px;
         margin: 0 auto;
-        padding: 32px 20px 20px 20px;
+        padding: 24px 16px 16px 16px;
         background-color: #ffffff;
+    }
+
+    @media (min-width: 768px) {
+        .fever-event-header-container {
+            padding: 32px 20px 20px 20px;
+        }
     }
 
     .fever-badge-category {
@@ -87,51 +118,60 @@
         background-color: #fef9ed;
         color: var(--fever-gold-dark);
         border: 1px solid var(--fever-gold);
-        padding: 5px 14px;
+        padding: 4px 12px;
         border-radius: 20px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
 
     .fever-title {
-        font-size: 2.5rem;
+        font-size: 1.5rem;
         font-weight: 800;
         color: var(--fever-dark);
-        margin-bottom: 16px;
-        line-height: 1.2;
+        margin-bottom: 12px;
+        line-height: 1.25;
+        word-break: break-word;
     }
 
-    @media (max-width: 768px) {
+    @media (min-width: 768px) {
         .fever-title {
-            font-size: 1.85rem;
+            font-size: 2.2rem;
+            margin-bottom: 16px;
         }
     }
 
     .fever-key-points {
         display: flex;
         flex-wrap: wrap;
-        gap: 24px;
+        gap: 12px 18px;
         color: var(--fever-gray-600);
-        font-size: 0.95rem;
-        padding-bottom: 8px;
+        font-size: 0.88rem;
+        padding-bottom: 6px;
+    }
+
+    @media (min-width: 768px) {
+        .fever-key-points {
+            gap: 20px 24px;
+            font-size: 0.95rem;
+        }
     }
 
     .fever-key-item {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         font-weight: 500;
     }
 
     .fever-key-item i {
         color: var(--fever-gold-dark);
-        font-size: 1.05rem;
+        font-size: 0.95rem;
     }
 
-    /* Sticky Navigation Tabs */
+    /* Sticky Navigation Tabs (Responsive & Touch-friendly) */
     .fever-sticky-tabs {
         position: sticky;
         top: 0;
@@ -140,18 +180,27 @@
         border-top: 1px solid var(--fever-gray-200);
         border-bottom: 1px solid var(--fever-gray-200);
         z-index: 100;
-        padding: 0 20px;
+        padding: 0 16px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        width: 100%;
     }
 
     .fever-tabs-wrapper {
         max-width: 1200px;
         margin: 0 auto;
         display: flex;
-        gap: 32px;
+        gap: 20px;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
+
+    @media (min-width: 768px) {
+        .fever-tabs-wrapper {
+            gap: 32px;
+        }
+    }
+
     .fever-tabs-wrapper::-webkit-scrollbar {
         display: none;
     }
@@ -159,12 +208,20 @@
     .fever-tab-link {
         color: var(--fever-gray-500);
         text-decoration: none;
-        padding: 16px 0;
+        padding: 12px 0;
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 0.88rem;
         border-bottom: 3px solid transparent;
         transition: all 0.2s;
         white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    @media (min-width: 768px) {
+        .fever-tab-link {
+            padding: 16px 0;
+            font-size: 0.95rem;
+        }
     }
 
     .fever-tab-link:hover, .fever-tab-link.active {
@@ -174,18 +231,27 @@
 
     /* Content Grid Layout */
     .fever-content-grid {
+        width: 100%;
         max-width: 1200px;
-        margin: 32px auto 0 auto;
-        padding: 0 20px;
+        margin: 20px auto 0 auto;
+        padding: 0 16px;
         display: grid;
-        grid-template-columns: 1fr 380px;
-        gap: 40px;
+        grid-template-columns: 100%;
+        gap: 24px;
     }
 
-    @media (max-width: 991px) {
+    @media (min-width: 992px) {
         .fever-content-grid {
-            grid-template-columns: 1fr;
+            margin-top: 32px;
+            padding: 0 20px;
+            grid-template-columns: 1fr 380px;
+            gap: 40px;
         }
+    }
+
+    .fever-main-column {
+        min-width: 0; /* Prevents flex/grid blowouts */
+        width: 100%;
     }
 
     /* Section Cards */
@@ -193,19 +259,37 @@
         background: #ffffff;
         border: 1px solid var(--fever-gray-200);
         border-radius: 14px;
-        padding: 28px;
-        margin-bottom: 28px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        padding: 18px 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+        .fever-section {
+            padding: 28px;
+            margin-bottom: 28px;
+        }
     }
 
     .fever-section-title {
-        font-size: 1.35rem;
+        font-size: 1.2rem;
         font-weight: 700;
         color: var(--fever-dark);
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
+    }
+
+    @media (min-width: 768px) {
+        .fever-section-title {
+            font-size: 1.35rem;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
     }
 
     .fever-section-title i {
@@ -215,30 +299,40 @@
     /* Compact Fever-style Multi-Item Gallery Carousel */
     .fever-gallery-box {
         background-color: #f3f4f6;
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: 12px;
+        padding: 16px 12px;
         position: relative;
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .fever-gallery-box {
+            border-radius: 16px;
+            padding: 24px;
+        }
     }
 
     .fever-gallery-label {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
         color: #4b5563;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
     }
 
     .fever-gallery-slider-wrap {
         position: relative;
         display: flex;
         align-items: center;
+        width: 100%;
     }
 
     .fever-gallery-track {
         display: flex;
-        gap: 14px;
+        gap: 10px;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         scroll-behavior: smooth;
         scrollbar-width: none;
         padding: 4px 2px;
@@ -250,10 +344,10 @@
     }
 
     .fever-gallery-card {
-        flex: 0 0 calc(25% - 11px);
-        min-width: 130px;
+        flex: 0 0 calc(50% - 6px);
+        min-width: 100px;
         aspect-ratio: 1 / 1;
-        border-radius: 12px;
+        border-radius: 10px;
         overflow: hidden;
         background-color: #000;
         cursor: pointer;
@@ -262,10 +356,18 @@
         transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    @media (max-width: 768px) {
+    @media (min-width: 576px) {
         .fever-gallery-card {
-            flex: 0 0 calc(45% - 8px);
-            min-width: 120px;
+            flex: 0 0 calc(33.333% - 8px);
+            min-width: 115px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .fever-gallery-card {
+            flex: 0 0 calc(25% - 11px);
+            min-width: 130px;
+            border-radius: 12px;
         }
     }
 
@@ -283,17 +385,17 @@
 
     .fever-gallery-video-badge {
         position: absolute;
-        top: 8px;
-        right: 8px;
+        top: 6px;
+        right: 6px;
         background: rgba(0, 0, 0, 0.65);
         color: #fff;
         border-radius: 50%;
-        width: 26px;
-        height: 26px;
+        width: 24px;
+        height: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
 
     .fever-slider-nav-btn {
@@ -304,15 +406,22 @@
         color: #111827;
         border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 50%;
-        width: 38px;
-        height: 38px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         z-index: 10;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         transition: all 0.2s;
+    }
+
+    @media (min-width: 768px) {
+        .fever-slider-nav-btn {
+            width: 38px;
+            height: 38px;
+        }
     }
 
     .fever-slider-nav-btn:hover {
@@ -321,11 +430,16 @@
     }
 
     .fever-slider-prev {
-        left: -16px;
+        left: -8px;
     }
 
     .fever-slider-next {
-        right: -16px;
+        right: -8px;
+    }
+
+    @media (min-width: 768px) {
+        .fever-slider-prev { left: -16px; }
+        .fever-slider-next { right: -16px; }
     }
 
     /* Lightbox Modal */
@@ -345,7 +459,7 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
     }
 
-    /* Sticky Sidebar Purchase Box */
+    /* Sticky Sidebar Purchase Box (Desktop) */
     .fever-purchase-box {
         position: sticky;
         top: 80px;
@@ -397,7 +511,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 12px 0;
+        padding: 10px 0;
         border-bottom: 1px solid var(--fever-gray-200);
         color: var(--fever-dark);
     }
@@ -405,10 +519,11 @@
         border-bottom: none;
     }
     .fever-info-pill i {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
         color: var(--fever-gold-dark);
-        width: 24px;
+        width: 22px;
         text-align: center;
+        flex-shrink: 0;
     }
 
     /* Embedded Map */
@@ -416,11 +531,18 @@
         border-radius: 12px;
         overflow: hidden;
         border: 1px solid var(--fever-gray-200);
-        height: 280px;
+        height: 240px;
         margin-top: 15px;
+        width: 100%;
     }
 
-    /* Mobile Sticky Action Bar */
+    @media (min-width: 768px) {
+        .fever-map-container {
+            height: 280px;
+        }
+    }
+
+    /* Mobile Sticky Action Bar (Clean, integrated 1-layer) */
     .fever-mobile-sticky-action {
         display: none;
         position: fixed;
@@ -428,17 +550,31 @@
         left: 0;
         right: 0;
         background: #ffffff;
-        border-top: 1px solid var(--fever-gray-200);
-        padding: 12px 20px;
+        border-top: 2px solid var(--fever-gold);
+        padding: 12px 16px;
         z-index: 1050;
-        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
     }
 
-    @media (max-width: 991px) {
+    @media (max-width: 991.98px) {
         .fever-mobile-sticky-action {
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .fever-mobile-sticky-action .btn-yellow {
+            background: linear-gradient(135deg, #D9BC73, #E8D399);
+            color: #0E1012;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 22px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(217, 188, 115, 0.35);
         }
     }
 </style>
@@ -1171,118 +1307,6 @@
                 </div>
             </div>
             @endif
-        </div>
-        {{-- <nav class="fixed-bottom navbar-dark" id="getTicketsBottom1">
-            @if ($ticket !=null)   
-                @if ($today < $ticket->date_time_end) 
-                    @if ($count_orders < $ticket->quantity)
-                        <div class="row" style="padding-top: 20px;">
-                            <div class="col-12 d-flex align-items-center justify-content-center">
-                                @if ($ticket->type == 'free')
-                                <h4>Free</h4>
-                                @endif
-                                @if ($ticket->type == 'paid')
-                                <h4></h4>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                                    <button type="button" class="btn btn-yellow btn-lg" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
-                                        Get Tickets
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="row" style="padding-top: 20px;">
-                            <div class="col-12 d-flex align-items-center justify-content-center">
-                                <h4>Sales Ended</h4>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                                    <button type="button" class="btn btn-yellow btn-lg" data-bs-toggle="modal" data-bs-target="#">
-                                        Get Details
-                                    </button>
-                                </div>
-                            </div>
-                        </div> 
-                    @endif     
-                @else
-                    <div class="row" style="padding-top: 20px;">
-                        <div class="col-12 d-flex align-items-center justify-content-center">
-                            <h4>Sales Ended</h4>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                                <button type="button" class="btn btn-yellow btn-lg" data-bs-toggle="modal" data-bs-target="#">
-                                    Get Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>       
-                @endif 
-            @else
-                <div class="row pt-5">
-                    <div class="col-12">
-                        <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                            <a type="button" class="btn btn-yellow btn-lg" href="{{ $event->link_external_sales }}" target="_blank">
-                                Get Tickets
-                            </a>
-                        </div>
-                    </div>
-                </div>    
-            @endif
-        </nav> --}}
-        
-        <!-- Mobile Bottom Get Tickets Button (only visible on mobile) -->
-        <div class="mobile-bottom-ticket d-lg-none">
-            <div class="container-fluid">
-                @if ($ticket != null)
-                    @php
-                        $today = now();
-                        $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
-                        $lowestPaidPrice = $tickets->where('type', 'paid')
-                            ->where('date_time_end', '>', $today)
-                            ->min('price');
-                        $hasFreeTickets = $tickets->where('type', 'free')
-                            ->where('date_time_end', '>', $today)
-                            ->isNotEmpty();
-                    @endphp
-                    
-                    @if ($hasAvailableTickets)
-                        {{-- Show "Free" ONLY for free events --}}
-                        @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
-                            <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
-                                <h4 style="margin: 0; color: #333;">Free</h4>
-                            </div>
-                        @endif
-                        
-                        <button type="button" class="btn btn-yellow btn-lg w-100" id="mobileGetTicketsBtn">
-                            Get Tickets
-                        </button>
-                    @else
-                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
-                            <h4 style="margin: 0; color: #333;">Sales Ended</h4>
-                        </div>
-                        <button type="button" class="btn btn-yellow btn-lg w-100">
-                            Get Details
-                        </button>
-                    @endif
-                @else
-                    {{-- External Sales Button for Mobile --}}
-                    <a type="button" class="btn btn-yellow btn-lg w-100" href="{{ $event->link_external_sales }}" target="_blank">
-                        Get Tickets
-                    </a>
-                @endif
-            </div>
-        </div>
-    </main>
     @include('layouts.footers.guest.footer')
 @endsection
 @push('js')
