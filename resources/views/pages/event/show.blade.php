@@ -212,93 +212,137 @@
         color: var(--fever-gold-dark);
     }
 
-    /* Gallery Carousel */
-    .fever-gallery-carousel {
+    /* Compact Fever-style Multi-Item Gallery Carousel */
+    .fever-gallery-box {
+        background-color: #f3f4f6;
+        border-radius: 16px;
+        padding: 24px;
         position: relative;
+    }
+
+    .fever-gallery-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #4b5563;
+        margin-bottom: 16px;
+    }
+
+    .fever-gallery-slider-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .fever-gallery-track {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        padding: 4px 2px;
         width: 100%;
+    }
+
+    .fever-gallery-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fever-gallery-card {
+        flex: 0 0 calc(25% - 11px);
+        min-width: 130px;
+        aspect-ratio: 1 / 1;
         border-radius: 12px;
         overflow: hidden;
         background-color: #000;
-        height: 420px;
+        cursor: pointer;
+        position: relative;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
     @media (max-width: 768px) {
-        .fever-gallery-carousel {
-            height: 280px;
+        .fever-gallery-card {
+            flex: 0 0 calc(45% - 8px);
+            min-width: 120px;
         }
     }
 
-    .fever-gallery-slide {
-        display: none;
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        opacity: 0;
-        transition: opacity 0.4s ease-in-out;
+    .fever-gallery-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
     }
 
-    .fever-gallery-slide.active {
+    .fever-gallery-thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
         display: block;
-        opacity: 1;
     }
 
-    .fever-gallery-item {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        background-color: #0E1012;
+    .fever-gallery-video-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.65);
+        color: #fff;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
     }
 
-    .fever-gallery-btn {
+    .fever-slider-nav-btn {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.65);
-        color: #ffffff;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.95);
+        color: #111827;
+        border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 50%;
-        width: 42px;
-        height: 42px;
+        width: 38px;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        z-index: 5;
+        z-index: 10;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
         transition: all 0.2s;
     }
 
-    .fever-gallery-btn:hover {
+    .fever-slider-nav-btn:hover {
         background: var(--fever-gold);
-        color: #0E1012;
+        color: #000;
     }
 
-    .fever-gallery-prev { left: 16px; }
-    .fever-gallery-next { right: 16px; }
-
-    .fever-gallery-dots {
-        position: absolute;
-        bottom: 14px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 8px;
-        z-index: 5;
+    .fever-slider-prev {
+        left: -16px;
     }
 
-    .fever-gdot {
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
-        transition: all 0.3s;
+    .fever-slider-next {
+        right: -16px;
     }
 
-    .fever-gdot.active {
-        background: var(--fever-gold);
-        transform: scale(1.3);
+    /* Lightbox Modal */
+    .fever-lightbox-modal .modal-content {
+        background-color: transparent;
+        border: none;
+    }
+    .fever-lightbox-modal .modal-body {
+        padding: 0;
+        text-align: center;
+    }
+    .fever-lightbox-media {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 12px;
+        object-fit: contain;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
     }
 
     /* Sticky Sidebar Purchase Box */
@@ -497,7 +541,7 @@
                 @endif
             </section>
 
-            {{-- Gallery Carousel Section (Images or Videos) --}}
+            {{-- Gallery Section (Compact Fever Multi-Item Carousel) --}}
             @php
                 $galleryItems = [];
                 if (!empty($event->gallery) && is_array($event->gallery)) {
@@ -508,40 +552,43 @@
                 }
             @endphp
             <section class="fever-section" id="gallery-section">
-                <h3 class="fever-section-title"><i class="fas fa-images"></i> Gallery</h3>
-                
-                @if(!empty($galleryItems))
-                    <div class="fever-gallery-carousel" id="eventGalleryCarousel">
-                        @foreach($galleryItems as $index => $item)
-                            <div class="fever-gallery-slide {{ $index === 0 ? 'active' : '' }}">
-                                @if(preg_match('/\.(mp4|webm|ogg|mov)$/i', $item))
-                                    <video class="fever-gallery-item" controls playsinline>
-                                        <source src="{{ asset('storage/' . $item) }}">
-                                    </video>
-                                @else
-                                    <img src="{{ asset('storage/' . $item) }}" class="fever-gallery-item" alt="Gallery item {{ $index + 1 }}">
-                                @endif
-                            </div>
-                        @endforeach
-
-                        @if(count($galleryItems) > 1)
-                            <button class="fever-gallery-btn fever-gallery-prev" onclick="prevGallerySlide()">
+                <div class="fever-gallery-box">
+                    <div class="fever-gallery-label">Gallery</div>
+                    
+                    @if(!empty($galleryItems))
+                        <div class="fever-gallery-slider-wrap">
+                            <button class="fever-slider-nav-btn fever-slider-prev" onclick="scrollGallery(-1)">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
-                            <button class="fever-gallery-btn fever-gallery-next" onclick="nextGallerySlide()">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
 
-                            <div class="fever-gallery-dots">
+                            <div class="fever-gallery-track" id="galleryTrack">
                                 @foreach($galleryItems as $index => $item)
-                                    <div class="fever-gdot {{ $index === 0 ? 'active' : '' }}" onclick="goToGallerySlide({{ $index }})"></div>
+                                    @php
+                                        $isVideo = preg_match('/\.(mp4|webm|ogg|mov)$/i', $item);
+                                    @endphp
+                                    <div class="fever-gallery-card" onclick="openLightbox('{{ asset('storage/' . $item) }}', {{ $isVideo ? 'true' : 'false' }})">
+                                        @if($isVideo)
+                                            <video class="fever-gallery-thumb" muted playsinline preload="metadata">
+                                                <source src="{{ asset('storage/' . $item) }}#t=0.5">
+                                            </video>
+                                            <div class="fever-gallery-video-badge">
+                                                <i class="fas fa-play"></i>
+                                            </div>
+                                        @else
+                                            <img src="{{ asset('storage/' . $item) }}" class="fever-gallery-thumb" alt="Gallery photo {{ $index + 1 }}" loading="lazy">
+                                        @endif
+                                    </div>
                                 @endforeach
                             </div>
-                        @endif
-                    </div>
-                @else
-                    <p class="text-muted">No gallery items available yet.</p>
-                @endif
+
+                            <button class="fever-slider-nav-btn fever-slider-next" onclick="scrollGallery(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    @else
+                        <p class="text-muted mb-0">No gallery items available yet.</p>
+                    @endif
+                </div>
             </section>
 
             {{-- Location & Map --}}
@@ -660,6 +707,22 @@
                     Get Tickets
                 </a>
             @endif
+        </div>
+    </div>
+</div>
+
+<!-- Modal Lightbox Gallery -->
+<div class="modal fade fever-lightbox-modal" id="galleryLightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="d-flex justify-content-end p-2">
+                <button type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal" style="border-radius: 50%; width: 36px; height: 36px; padding: 0;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="lightboxMediaContainer">
+                {{-- Dynamic content --}}
+            </div>
         </div>
     </div>
 </div>
@@ -1618,58 +1681,48 @@
     function prevSlide() { showSlide(currentSlide - 1); }
     function goToSlide(i) { showSlide(i); }
 
-    if (slides.length > 1) {
-        setInterval(nextSlide, 5000);
-    }
-
-    // Smooth tab scrolling and active state
-    document.querySelectorAll('.fever-tab-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) {
-                const offset = 80;
-                const bodyRect = document.body.getBoundingClientRect().top;
-                const elementRect = targetEl.getBoundingClientRect().top;
-                const elementPosition = elementRect - bodyRect;
-                const offsetPosition = elementPosition - offset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-
-                document.querySelectorAll('.fever-tab-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            }
-        });
-    });
-</script>
-
-
 <script>
-    let currentGallerySlide = 0;
-    const gSlides = document.querySelectorAll('.fever-gallery-slide');
-    const gDots = document.querySelectorAll('.fever-gdot');
-
-    function showGallerySlide(index) {
-        if (!gSlides.length) return;
-        if (index >= gSlides.length) currentGallerySlide = 0;
-        else if (index < 0) currentGallerySlide = gSlides.length - 1;
-        else currentGallerySlide = index;
-
-        gSlides.forEach((s, i) => {
-            s.classList.toggle('active', i === currentGallerySlide);
-        });
-        gDots.forEach((d, i) => {
-            d.classList.toggle('active', i === currentGallerySlide);
+    // Compact Fever-style Gallery Scroll & Lightbox
+    function scrollGallery(direction) {
+        const track = document.getElementById('galleryTrack');
+        if (!track) return;
+        const scrollAmount = track.clientWidth * 0.75;
+        track.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
         });
     }
 
-    function nextGallerySlide() { showGallerySlide(currentGallerySlide + 1); }
-    function prevGallerySlide() { showGallerySlide(currentGallerySlide - 1); }
-    function goToGallerySlide(i) { showGallerySlide(i); }
+    function openLightbox(mediaUrl, isVideo) {
+        const container = document.getElementById('lightboxMediaContainer');
+        if (!container) return;
+
+        if (isVideo) {
+            container.innerHTML = `
+                <video class="fever-lightbox-media" controls autoplay playsinline style="width: 100%; max-height: 80vh;">
+                    <source src="${mediaUrl}">
+                </video>
+            `;
+        } else {
+            container.innerHTML = `
+                <img src="${mediaUrl}" class="fever-lightbox-media" alt="Enlarged view">
+            `;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('galleryLightboxModal'));
+        modal.show();
+    }
+
+    // Stop video playback when lightbox closes
+    document.addEventListener('DOMContentLoaded', function() {
+        const lightboxEl = document.getElementById('galleryLightboxModal');
+        if (lightboxEl) {
+            lightboxEl.addEventListener('hidden.bs.modal', function () {
+                const container = document.getElementById('lightboxMediaContainer');
+                if (container) container.innerHTML = '';
+            });
+        }
+    });
 
     // Smooth tab scrolling and active state
     document.querySelectorAll('.fever-tab-link').forEach(link => {
