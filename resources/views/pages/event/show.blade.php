@@ -741,9 +741,11 @@
         </div>
     </div>
 
-    <div id="alert">
-        @include('components.alert')
-    </div>
+    @if(session()->has('succes') || session()->has('error') || (isset($errors) && $errors->any()))
+        <div id="alert">
+            @include('components.alert')
+        </div>
+    @endif
 
     {{-- Top of the Event: Single Video or Single Image (No carousel) with bottom-left text overlay --}}
     <div class="fever-hero-media-wrapper">

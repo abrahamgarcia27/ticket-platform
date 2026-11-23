@@ -1,3 +1,4 @@
+@if (session()->has('succes') || session()->has('error') || $errors->any())
 <div class="px-4 pt-4">
     @if ($message = session()->has('succes'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -17,3 +18,4 @@
         </div>
     @endif
 </div>
+@endif
