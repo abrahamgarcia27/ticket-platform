@@ -2,43 +2,65 @@
 
 @section('content')
 <style>
+    /* Estilos Fever-like en tema claro y elegante (fondo blanco con acentos dorados y oscuros) */
     :root {
         --fever-gold: #D9BC73;
-        --fever-gold-hover: #c4a75e;
-        --fever-dark-bg: #0E1012;
-        --fever-card-bg: rgba(255, 255, 255, 0.04);
-        --fever-border: rgba(255, 255, 255, 0.1);
-        --fever-text-muted: #8898aa;
+        --fever-gold-dark: #b89849;
+        --fever-gold-light: #fdfaf2;
+        --fever-dark: #111827;
+        --fever-gray-600: #4b5563;
+        --fever-gray-500: #6b7280;
+        --fever-gray-200: #e5e7eb;
+        --fever-gray-100: #f9fafb;
     }
 
     body {
-        background-color: var(--fever-dark-bg);
-        color: #f6f9fc;
+        background-color: #ffffff !important;
+        color: #1f2937 !important;
         font-family: 'Open Sans', sans-serif;
     }
 
     .fever-event-page {
+        background-color: #ffffff;
         padding-bottom: 90px;
     }
 
+    /* Top navigation header */
+    .fever-nav-header {
+        background-color: #0E1012;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .fever-nav-header .logo {
+        max-height: 40px;
+    }
+
+    /* Hero multimedia carousel */
     .fever-hero-section {
-        position: relative;
+        background-color: #0E1012;
         width: 100%;
-        background-color: #000;
+        position: relative;
         overflow: hidden;
     }
 
     .fever-carousel-container {
         position: relative;
         width: 100%;
-        max-width: 1200px;
+        max-width: 1100px;
         margin: 0 auto;
         height: 480px;
+        background-color: #0E1012;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     @media (max-width: 768px) {
         .fever-carousel-container {
-            height: 300px;
+            height: 320px;
         }
     }
 
@@ -50,7 +72,8 @@
         top: 0;
         left: 0;
         opacity: 0;
-        transition: opacity 0.5s ease-in-out;
+        transition: opacity 0.4s ease-in-out;
+        text-align: center;
     }
 
     .fever-carousel-slide.active {
@@ -61,27 +84,17 @@
     .fever-carousel-img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        object-position: center;
-    }
-
-    .fever-carousel-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 60%;
-        background: linear-gradient(to top, rgba(14, 16, 18, 1) 0%, rgba(14, 16, 18, 0.6) 50%, transparent 100%);
-        pointer-events: none;
+        object-fit: contain;
+        background-color: #0E1012;
     }
 
     .fever-carousel-btn {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.55);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.65);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
         border-radius: 50%;
         width: 44px;
         height: 44px;
@@ -95,7 +108,7 @@
 
     .fever-carousel-btn:hover {
         background: var(--fever-gold);
-        color: #000;
+        color: #0E1012;
     }
 
     .fever-carousel-prev { left: 20px; }
@@ -103,7 +116,7 @@
 
     .fever-carousel-dots {
         position: absolute;
-        bottom: 25px;
+        bottom: 16px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
@@ -115,33 +128,33 @@
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.5);
         cursor: pointer;
         transition: all 0.3s;
     }
 
     .fever-dot.active {
         background: var(--fever-gold);
-        transform: scale(1.2);
+        transform: scale(1.25);
     }
 
-    .fever-hero-content {
+    /* Event Title Header & Key Metadata (White Background) */
+    .fever-event-header-container {
         max-width: 1200px;
-        margin: -60px auto 0 auto;
-        padding: 0 20px;
-        position: relative;
-        z-index: 6;
+        margin: 0 auto;
+        padding: 32px 20px 20px 20px;
+        background-color: #ffffff;
     }
 
     .fever-badge-category {
         display: inline-block;
-        background: rgba(217, 188, 115, 0.15);
-        color: var(--fever-gold);
+        background-color: #fef9ed;
+        color: var(--fever-gold-dark);
         border: 1px solid var(--fever-gold);
-        padding: 4px 12px;
+        padding: 5px 14px;
         border-radius: 20px;
         font-size: 0.8rem;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 12px;
@@ -149,52 +162,57 @@
 
     .fever-title {
         font-size: 2.5rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 15px;
+        font-weight: 800;
+        color: var(--fever-dark);
+        margin-bottom: 16px;
         line-height: 1.2;
     }
 
     @media (max-width: 768px) {
         .fever-title {
-            font-size: 1.75rem;
+            font-size: 1.85rem;
         }
     }
 
     .fever-key-points {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
-        color: #ced4da;
+        gap: 24px;
+        color: var(--fever-gray-600);
         font-size: 0.95rem;
-        margin-bottom: 25px;
+        padding-bottom: 8px;
     }
 
     .fever-key-item {
         display: flex;
         align-items: center;
         gap: 8px;
+        font-weight: 500;
     }
 
     .fever-key-item i {
-        color: var(--fever-gold);
+        color: var(--fever-gold-dark);
+        font-size: 1.05rem;
     }
 
+    /* Sticky Navigation Tabs (Clean Light Theme) */
     .fever-sticky-tabs {
         position: sticky;
         top: 0;
-        background: rgba(14, 16, 18, 0.95);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid var(--fever-border);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid var(--fever-gray-200);
+        border-bottom: 1px solid var(--fever-gray-200);
         z-index: 100;
         padding: 0 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
 
     .fever-tabs-wrapper {
         max-width: 1200px;
         margin: 0 auto;
         display: flex;
-        gap: 30px;
+        gap: 32px;
         overflow-x: auto;
         scrollbar-width: none;
     }
@@ -203,7 +221,7 @@
     }
 
     .fever-tab-link {
-        color: var(--fever-text-muted);
+        color: var(--fever-gray-500);
         text-decoration: none;
         padding: 16px 0;
         font-weight: 600;
@@ -214,13 +232,14 @@
     }
 
     .fever-tab-link:hover, .fever-tab-link.active {
-        color: var(--fever-gold);
-        border-bottom-color: var(--fever-gold);
+        color: #000000;
+        border-bottom-color: var(--fever-gold-dark);
     }
 
+    /* Content Grid Layout */
     .fever-content-grid {
         max-width: 1200px;
-        margin: 30px auto 0 auto;
+        margin: 32px auto 0 auto;
         padding: 0 20px;
         display: grid;
         grid-template-columns: 1fr 380px;
@@ -233,54 +252,59 @@
         }
     }
 
+    /* Section Cards (Clean white card with subtle border) */
     .fever-section {
-        background: var(--fever-card-bg);
-        border: 1px solid var(--fever-border);
-        border-radius: 16px;
+        background: #ffffff;
+        border: 1px solid var(--fever-gray-200);
+        border-radius: 14px;
         padding: 28px;
-        margin-bottom: 30px;
+        margin-bottom: 28px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     }
 
     .fever-section-title {
-        font-size: 1.4rem;
+        font-size: 1.35rem;
         font-weight: 700;
-        color: #ffffff;
+        color: var(--fever-dark);
         margin-bottom: 20px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
     }
 
     .fever-section-title i {
-        color: var(--fever-gold);
+        color: var(--fever-gold-dark);
     }
 
+    /* Sticky Sidebar Purchase Box (Fever Style in Light Mode) */
     .fever-purchase-box {
         position: sticky;
         top: 80px;
-        background: rgba(22, 25, 29, 0.95);
-        border: 1px solid var(--fever-border);
+        background: #ffffff;
+        border: 1px solid var(--fever-gray-200);
         border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        padding: 26px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     }
 
     .fever-price-from {
         font-size: 0.85rem;
-        color: var(--fever-text-muted);
+        color: var(--fever-gray-500);
         text-transform: uppercase;
+        font-weight: 600;
         letter-spacing: 0.5px;
     }
 
     .fever-price-val {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--fever-gold);
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--fever-gold-dark);
+        margin: 4px 0 16px 0;
     }
 
     .fever-btn-buy {
         background: var(--fever-gold);
-        color: #000;
+        color: #0E1012;
         font-weight: 700;
         border: none;
         border-radius: 10px;
@@ -290,14 +314,14 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         transition: all 0.2s;
-        margin-top: 15px;
+        box-shadow: 0 4px 12px rgba(217, 188, 115, 0.35);
     }
 
     .fever-btn-buy:hover {
         background: var(--fever-gold-hover);
         color: #000;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(217, 188, 115, 0.3);
+        box-shadow: 0 6px 16px rgba(217, 188, 115, 0.45);
     }
 
     .fever-info-pill {
@@ -305,37 +329,53 @@
         align-items: center;
         gap: 12px;
         padding: 12px 0;
-        border-bottom: 1px solid var(--fever-border);
+        border-bottom: 1px solid var(--fever-gray-200);
+        color: var(--fever-dark);
     }
     .fever-info-pill:last-child {
         border-bottom: none;
     }
     .fever-info-pill i {
-        font-size: 1.1rem;
-        color: var(--fever-gold);
+        font-size: 1.15rem;
+        color: var(--fever-gold-dark);
         width: 24px;
         text-align: center;
     }
 
+    /* Embedded Map */
     .fever-map-container {
         border-radius: 12px;
         overflow: hidden;
-        border: 1px solid var(--fever-border);
+        border: 1px solid var(--fever-gray-200);
         height: 280px;
         margin-top: 15px;
     }
 
+    /* Ticket Card */
+    .fever-ticket-card {
+        background: var(--fever-gray-100);
+        border: 1px solid var(--fever-gray-200);
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 14px;
+        transition: border-color 0.2s;
+    }
+    .fever-ticket-card:hover {
+        border-color: var(--fever-gold);
+    }
+
+    /* Mobile Sticky Action Bar */
     .fever-mobile-sticky-action {
         display: none;
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        background: rgba(14, 16, 18, 0.98);
-        border-top: 1px solid var(--fever-border);
+        background: #ffffff;
+        border-top: 1px solid var(--fever-gray-200);
         padding: 12px 20px;
         z-index: 1050;
-        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
     }
 
     @media (max-width: 991px) {
@@ -348,9 +388,10 @@
 </style>
 
 <div class="fever-event-page">
-    <div class="header d-flex align-items-center justify-content-between px-4 py-3" style="background: rgba(0,0,0,0.6);">
+    {{-- Header Logo / Navigation --}}
+    <div class="fever-nav-header">
         <a href="/list-events">
-            <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo" style="max-height: 40px;">
+            <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo">
         </a>
         <a href="/list-events" class="btn btn-sm btn-outline-light mb-0">
             <i class="fas fa-arrow-left me-1"></i> All Events
@@ -361,19 +402,18 @@
         @include('components.alert')
     </div>
 
+    {{-- Hero multimedia carousel section --}}
     <div class="fever-hero-section">
         <div class="fever-carousel-container" id="eventHeroCarousel">
             @if($event->coverimage)
                 <div class="fever-carousel-slide active">
                     <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-carousel-img" alt="{{ $event->title }}">
-                    <div class="fever-carousel-overlay"></div>
                 </div>
             @endif
 
             @if($event->image)
                 <div class="fever-carousel-slide {{ !$event->coverimage ? 'active' : '' }}">
                     <img src="{{ asset('storage/' . $event->image) }}" class="fever-carousel-img" alt="{{ $event->title }}">
-                    <div class="fever-carousel-overlay"></div>
                 </div>
             @endif
 
@@ -395,7 +435,8 @@
         </div>
     </div>
 
-    <div class="fever-hero-content">
+    {{-- Event Header Details (White Background) --}}
+    <div class="fever-event-header-container">
         <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
         <h1 class="fever-title">{{ $event->title }}</h1>
         
@@ -429,6 +470,7 @@
         </div>
     </div>
 
+    {{-- Sticky Tabs --}}
     <nav class="fever-sticky-tabs">
         <div class="fever-tabs-wrapper">
             <a href="#overview" class="fever-tab-link active" id="tab-overview">Overview</a>
@@ -438,43 +480,46 @@
         </div>
     </nav>
 
+    {{-- Content Grid --}}
     <div class="fever-content-grid">
         <div class="fever-main-column">
+            {{-- Overview --}}
             <section class="fever-section" id="overview">
                 <h3 class="fever-section-title"><i class="fas fa-info-circle"></i> About this event</h3>
                 
                 @if($event->summary)
-                    <p class="lead text-light mb-4" style="font-size: 1.1rem; line-height: 1.6;">
+                    <p class="lead mb-4" style="font-size: 1.1rem; line-height: 1.6; color: #374151;">
                         {{ $event->summary }}
                     </p>
                 @endif
 
                 @if($event->about)
-                    <div class="about-html text-secondary">
+                    <div class="about-html" style="color: #4b5563; line-height: 1.7;">
                         {!! $event->about !!}
                     </div>
                 @else
-                    <p class="text-secondary">Join us for an unforgettable experience at {{ $event->ubication }}. Enjoy live music, curated atmosphere, and premium service.</p>
+                    <p style="color: #6b7280;">Join us for an unforgettable experience at {{ $event->ubication }}. Enjoy live music, curated atmosphere, and premium service.</p>
                 @endif
             </section>
 
+            {{-- Tickets Section --}}
             <section class="fever-section" id="tickets-section">
                 <h3 class="fever-section-title"><i class="fas fa-ticket-alt"></i> Tickets</h3>
                 
                 @if ($tickets->isNotEmpty())
                     <div class="tickets-list">
                         @foreach($tickets as $t)
-                            <div class="p-3 mb-3 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--fever-border);">
+                            <div class="fever-ticket-card">
                                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div>
-                                        <h5 class="mb-1 text-white">{{ $t->title }}</h5>
-                                        <span class="badge bg-gradient-dark text-capitalize">{{ $t->type }}</span>
+                                        <h5 class="mb-1 font-weight-bold" style="color: #111827;">{{ $t->title }}</h5>
+                                        <span class="badge bg-secondary text-capitalize">{{ $t->type }}</span>
                                         <div class="text-xs text-muted mt-1">
                                             Sales end: {{ date('F j, Y (g:i A)', strtotime($t->date_time_end)) }}
                                         </div>
                                     </div>
                                     <div class="text-end">
-                                        <div class="h4 mb-2 text-warning font-weight-bold">
+                                        <div class="h4 mb-2 font-weight-bold" style="color: var(--fever-gold-dark);">
                                             @if ($t->type == 'free')
                                                 Free
                                             @else
@@ -494,7 +539,7 @@
                         @endforeach
                     </div>
                 @elseif($event->link_external_sales)
-                    <div class="alert alert-dark text-white" role="alert">
+                    <div class="alert alert-light border text-dark" role="alert">
                         Tickets for this event are handled via an external partner.
                         <div class="mt-3">
                             <a href="{{ $event->link_external_sales }}" target="_blank" class="btn btn-yellow">Get Tickets Externally</a>
@@ -505,12 +550,13 @@
                 @endif
             </section>
 
+            {{-- Location & Map --}}
             <section class="fever-section" id="location">
                 <h3 class="fever-section-title"><i class="fas fa-map-marked-alt"></i> Location</h3>
                 <div class="fever-info-pill">
                     <i class="fas fa-building"></i>
                     <div>
-                        <strong>{{ $event->ubication }}</strong>
+                        <strong style="color: #111827;">{{ $event->ubication }}</strong>
                         <div class="text-sm text-muted">{{ $location }}</div>
                     </div>
                 </div>
@@ -520,19 +566,20 @@
                         width="100%"
                         height="100%"
                         frameborder="0"
-                        style="border:0; filter: invert(90%) hue-rotate(180deg);"
+                        style="border:0;"
                         src="https://maps.google.com/maps?q={{ urlencode($location) }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
                         allowfullscreen>
                     </iframe>
                 </div>
 
                 <div class="mt-3 text-end">
-                    <a href="{{ $event->maps_url ?: 'https://maps.google.com/?q=' . urlencode($location) }}" target="_blank" class="btn btn-sm btn-outline-warning mb-0">
+                    <a href="{{ $event->maps_url ?: 'https://maps.google.com/?q=' . urlencode($location) }}" target="_blank" class="btn btn-sm btn-outline-dark mb-0">
                         <i class="fas fa-directions me-1"></i> Open in Google Maps
                     </a>
                 </div>
             </section>
 
+            {{-- Organizer --}}
             <section class="fever-section" id="organizer">
                 <h3 class="fever-section-title"><i class="fas fa-user-tie"></i> Organizer</h3>
                 <div class="d-flex align-items-center gap-3">
@@ -540,19 +587,20 @@
                         <img src="{{ $event->user && $event->user->image ? asset('storage/' . $event->user->image) : asset('img/logos/logo.png') }}" alt="organizer" class="border-radius-lg shadow-sm w-100">
                     </div>
                     <div>
-                        <h5 class="text-white mb-0">{{ $event->user ? $event->user->username : 'Event Organizer' }}</h5>
+                        <h5 class="mb-0 font-weight-bold" style="color: #111827;">{{ $event->user ? $event->user->username : 'Event Organizer' }}</h5>
                         <p class="text-sm text-muted mb-0">Event Host</p>
                     </div>
                 </div>
 
                 <div class="mt-4">
-                    <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                         <i class="far fa-envelope me-1"></i> Contact Organizer
                     </button>
                 </div>
             </section>
         </div>
 
+        {{-- Right Column Sticky Purchase Box --}}
         <div class="fever-sidebar-column d-none d-lg-block">
             <div class="fever-purchase-box">
                 <div class="fever-price-from">Tickets starting from</div>
@@ -569,15 +617,15 @@
                 <div class="my-3">
                     <div class="fever-info-pill">
                         <i class="far fa-calendar"></i>
-                        <span class="text-sm">{{ date('M j, Y', strtotime($event->date_time_start)) }}</span>
+                        <span class="text-sm" style="color: #374151;">{{ date('M j, Y', strtotime($event->date_time_start)) }}</span>
                     </div>
                     <div class="fever-info-pill">
                         <i class="far fa-clock"></i>
-                        <span class="text-sm">{{ date('g:i A', strtotime($event->date_time_start)) }}</span>
+                        <span class="text-sm" style="color: #374151;">{{ date('g:i A', strtotime($event->date_time_start)) }}</span>
                     </div>
                     <div class="fever-info-pill">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span class="text-sm text-truncate" style="max-width: 250px;">{{ $event->ubication }}</span>
+                        <span class="text-sm text-truncate" style="max-width: 250px; color: #374151;">{{ $event->ubication }}</span>
                     </div>
                 </div>
 
@@ -594,10 +642,11 @@
         </div>
     </div>
 
+    {{-- Mobile Sticky Action Bar --}}
     <div class="fever-mobile-sticky-action">
         <div>
             <div class="text-xs text-muted">From</div>
-            <div class="h5 mb-0 text-warning font-weight-bold">
+            <div class="h5 mb-0 font-weight-bold" style="color: var(--fever-gold-dark);">
                 @if($hasFree && !$minPrice)
                     Free
                 @elseif($minPrice)
@@ -1498,6 +1547,59 @@
     });
 </script>
 @endif
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.fever-carousel-slide');
+    const dots = document.querySelectorAll('.fever-dot');
+
+    function showSlide(index) {
+        if (!slides.length) return;
+        if (index >= slides.length) currentSlide = 0;
+        else if (index < 0) currentSlide = slides.length - 1;
+        else currentSlide = index;
+
+        slides.forEach((s, i) => {
+            s.classList.toggle('active', i === currentSlide);
+        });
+        dots.forEach((d, i) => {
+            d.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function nextSlide() { showSlide(currentSlide + 1); }
+    function prevSlide() { showSlide(currentSlide - 1); }
+    function goToSlide(i) { showSlide(i); }
+
+    if (slides.length > 1) {
+        setInterval(nextSlide, 5000);
+    }
+
+    // Smooth tab scrolling and active state
+    document.querySelectorAll('.fever-tab-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                const offset = 80;
+                const bodyRect = document.body.getBoundingClientRect().top;
+                const elementRect = targetEl.getBoundingClientRect().top;
+                const elementPosition = elementRect - bodyRect;
+                const offsetPosition = elementPosition - offset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                document.querySelectorAll('.fever-tab-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+</script>
+
 
 <script>
     let currentSlide = 0;
