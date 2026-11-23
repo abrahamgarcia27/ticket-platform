@@ -310,12 +310,12 @@
 
     @media (max-width: 768px) {
         .fever-hero-video-controls {
-            bottom: 24px;
+            bottom: 95px;
             right: 16px;
         }
         .fever-hero-caption-overlay {
-            padding: 100px 65px 24px 16px;
-            background: linear-gradient(to top, rgba(14, 16, 18, 0.96) 0%, rgba(14, 16, 18, 0.75) 45%, rgba(14, 16, 18, 0.3) 75%, transparent 100%);
+            padding: 100px 65px 95px 16px;
+            background: linear-gradient(to top, rgba(14, 16, 18, 0.96) 0%, rgba(14, 16, 18, 0.75) 50%, rgba(14, 16, 18, 0.3) 78%, transparent 100%);
         }
         .fever-hero-caption-overlay .fever-title {
             font-size: 1.45rem;
