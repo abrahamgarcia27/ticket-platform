@@ -54,6 +54,17 @@
                             <label for="price" class="form-control-label">Price</label>
                             <input class="form-control" type="text" name="price" id="price" placeholder="$" required>
                         </div>
+                        <div class="form-group" id="discountGroup">
+                            <label for="discount" class="form-control-label">Discount Percentage (Optional)</label>
+                            <div class="input-group">
+                                <input class="form-control @error('discount') is-invalid @enderror" type="number" step="0.01" min="0" max="100" name="discount" id="discount" placeholder="e.g. 20" value="{{ old('discount') }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted">Enter the discount percentage if this ticket has a special offer (e.g. 20 to display -20%). The checkout price will still be the value entered above in Price.</small>
+                            @error('discount')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <div class="form-check form-switch" id="feeSwitchGroup" style="padding-bottom: 15px;">
                             <input class="form-check-input" type="checkbox" role="switch" id="has_fee" name="has_fee">
                             <label class="form-check-label" for="has_fee">Do you want to add fees?</label>

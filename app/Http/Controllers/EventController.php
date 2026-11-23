@@ -48,10 +48,11 @@ class EventController extends Controller
     {   
         $request->validate([
             'date_time_start' => 'required|date',
-            'date_time_end' => 'required|date|after:date_time_start'
+            'date_time_end' => 'required|date|after:date_time_start',
+            'rating' => 'nullable|numeric|min:1|max:5'
         ]);
 
-        $all = $request->except(['_token', 'image']);
+        $all = $request->except(['_token', 'image', 'coverimage', 'cover_video', 'gallery']);
         $all['created_by'] = Auth::id();
         
         if (!$request->has('external_sales')) {
@@ -69,6 +70,22 @@ class EventController extends Controller
             $image = $request->file('coverimage')->store('uploads','public');
             Event::find($event->id)->update([
                 'coverimage' => $image         
+            ]);
+        }
+        if ($request->hasFile('cover_video')) {
+            $video = $request->file('cover_video')->store('uploads/videos','public');
+            Event::find($event->id)->update([
+                'cover_video' => $video         
+            ]);
+        }
+        if ($request->hasFile('gallery')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery') as $file) {
+                $path = $file->store('uploads/gallery', 'public');
+                $galleryPaths[] = $path;
+            }
+            Event::find($event->id)->update([
+                'gallery' => $galleryPaths
             ]);
         }
         $id = $event->id; 
@@ -170,10 +187,11 @@ class EventController extends Controller
     {
         $request->validate([
             'date_time_start' => 'required|date',
-            'date_time_end' => 'required|date|after:date_time_start'
+            'date_time_end' => 'required|date|after:date_time_start',
+            'rating' => 'nullable|numeric|min:1|max:5'
         ]);
 
-        $all = $request->except(['_token', 'image']);
+        $all = $request->except(['_token', 'image', 'coverimage', 'cover_video', 'gallery']);
         $event = Event::find($id);
         if (!$request->has('external_sales')) {
             $all['link_external_sales'] = null;
@@ -191,6 +209,25 @@ class EventController extends Controller
             $image = $request->file('coverimage')->store('uploads','public');
             Event::find($event->id)->update([
                 'coverimage' => $image         
+            ]);
+        }
+        if ($request->hasFile('cover_video')) {
+            if ($event->cover_video) {
+                Storage::delete('public/'.$event->cover_video);
+            }
+            $video = $request->file('cover_video')->store('uploads/videos','public');
+            Event::find($event->id)->update([
+                'cover_video' => $video         
+            ]);
+        }
+        if ($request->hasFile('gallery')) {
+            $currentGallery = is_array($event->gallery) ? $event->gallery : [];
+            foreach ($request->file('gallery') as $file) {
+                $path = $file->store('uploads/gallery', 'public');
+                $currentGallery[] = $path;
+            }
+            Event::find($event->id)->update([
+                'gallery' => $currentGallery
             ]);
         }
         if (env('APP_ENV') == 'production' && $event->google_event_id !== null) {

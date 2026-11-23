@@ -70,12 +70,29 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="image" class="form-control-label">Cover Image</label>
-                            <input class="form-control" type="file" name="coverimage" id="coverimage" required value="{{ old('coverimage') }}">
+                            <label for="rating" class="form-control-label">Event Rating (1.0 to 5.0 with decimals)</label>
+                            <input class="form-control @error('rating') is-invalid @enderror" type="number" step="0.1" min="1.0" max="5.0" name="rating" id="rating" placeholder="e.g. 4.8" value="{{ old('rating') }}">
+                            <small class="form-text text-muted">Event score displayed in stars on the event page (e.g. 4.5, 4.8, 5.0).</small>
+                            @error('rating')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="form-group">
-                            <label for="image" class="form-control-label">Main Event Image</label>
+                            <label for="coverimage" class="form-control-label">Cover Image</label>
+                            <input class="form-control" type="file" name="coverimage" id="coverimage" value="{{ old('coverimage') }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="cover_video" class="form-control-label">Cover Video (opcional - MP4 / WebM)</label>
+                            <input class="form-control" type="file" name="cover_video" id="cover_video" accept="video/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="image" class="form-control-label">Main Event Image / Flyer</label>
                             <input class="form-control" type="file" name="image" id="image" required value="{{ old('image') }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="gallery" class="form-control-label">Event Gallery (Imágenes o Videos para carrusel)</label>
+                            <input class="form-control" type="file" name="gallery[]" id="gallery" multiple accept="image/*,video/*">
+                            <small class="form-text text-muted">Puedes seleccionar múltiples archivos para el carrusel de galería.</small>
                         </div>
                         <div class="form-group">
                             <label for="about" class="form-control-label">About Event</label>

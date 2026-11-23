@@ -402,9 +402,9 @@
             }
         }
 
-        /* Mobile Navigation Top Bar */
+        /* Mobile Navigation Top Bar (only for pages that use mobile-top-nav) */
         @media (max-width: 991.98px) {
-            .mobile-top-nav {
+            body:not(.fever-event-body) .mobile-top-nav {
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -417,11 +417,11 @@
                 backdrop-filter: blur(10px);
             }
 
-            .mobile-top-nav .container-fluid {
+            body:not(.fever-event-body) .mobile-top-nav .container-fluid {
                 padding: 0 15px;
             }
 
-            .mobile-top-nav .nav-link {
+            body:not(.fever-event-body) .mobile-top-nav .nav-link {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -439,7 +439,7 @@
                 overflow: hidden;
             }
 
-            .mobile-top-nav .nav-link::before {
+            body:not(.fever-event-body) .mobile-top-nav .nav-link::before {
                 content: '';
                 position: absolute;
                 top: 0;
@@ -453,19 +453,19 @@
                 z-index: -1;
             }
 
-            .mobile-top-nav .nav-link:hover::before,
-            .mobile-top-nav .nav-link.temp-active::before {
+            body:not(.fever-event-body) .mobile-top-nav .nav-link:hover::before,
+            body:not(.fever-event-body) .mobile-top-nav .nav-link.temp-active::before {
                 opacity: 1;
             }
 
-            .mobile-top-nav .nav-link:hover,
-            .mobile-top-nav .nav-link.temp-active {
+            body:not(.fever-event-body) .mobile-top-nav .nav-link:hover,
+            body:not(.fever-event-body) .mobile-top-nav .nav-link.temp-active {
                 color: #fff;
                 transform: translateY(-2px);
                 box-shadow: 0 6px 20px rgba(217, 188, 115, 0.4);
             }
 
-            .mobile-top-nav .nav-link span {
+            body:not(.fever-event-body) .mobile-top-nav .nav-link span {
                 z-index: 1;
                 position: relative;
                 text-transform: uppercase;
@@ -473,7 +473,7 @@
             }
 
             /* Mobile Bottom Get Tickets Button */
-            .mobile-bottom-ticket {
+            body:not(.fever-event-body) .mobile-bottom-ticket {
                 position: fixed;
                 bottom: 0px; /* Lowered to extend more towards bottom */
                 left: 0;
@@ -486,7 +486,7 @@
                 backdrop-filter: blur(10px);
             }
 
-            .mobile-bottom-ticket .btn-yellow {
+            body:not(.fever-event-body) .mobile-bottom-ticket .btn-yellow {
                 background: linear-gradient(135deg, #D9BC73, #E8D399);
                 border: none;
                 border-radius: 20px;
@@ -499,13 +499,13 @@
                 font-size: 0.9rem;
             }
 
-            .mobile-bottom-ticket .btn-yellow:hover {
+            body:not(.fever-event-body) .mobile-bottom-ticket .btn-yellow:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 8px 25px rgba(217, 188, 115, 0.5);
             }
 
             /* Adjust main content padding for fixed navbars */
-            .main-content {
+            body:not(.fever-event-body) .main-content {
                 padding-top: 60px !important;
                 padding-bottom: 0 !important; /* Use margin-bottom on last element instead */
             }
@@ -516,17 +516,17 @@
             }
 
             /* Control exact scroll limit - account for increased height */
-            .main-content .row:last-of-type {
+            body:not(.fever-event-body) .main-content .row:last-of-type {
                 margin-bottom: 110px !important; /* Increased for even taller navbar */
             }
 
             /* Remove conflicting bottom margin */
-            .main-content {
+            body:not(.fever-event-body) .main-content {
                 margin-bottom: 0 !important; /* Remove extra margin, use precise control above */
             }
 
             /* Adjust the get tickets bottom bar position */
-            #getTicketsBottom1 {
+            body:not(.fever-event-body) #getTicketsBottom1 {
                 bottom: 0px !important; /* Directly at bottom now */
             }
         }

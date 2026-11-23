@@ -39,7 +39,8 @@ class TicketController extends Controller
     {
         $request->validate([
             'date_time_start' => 'required',
-            'date_time_end' => 'required'
+            'date_time_end' => 'required',
+            'discount' => 'nullable|numeric|min:0|max:100'
         ]);
         
         $all = $request->except(['_token']);
@@ -91,7 +92,8 @@ class TicketController extends Controller
     {
         $request->validate([
             'date_time_start' => 'required',
-            'date_time_end' => 'required'
+            'date_time_end' => 'required',
+            'discount' => 'nullable|numeric|min:0|max:100'
         ]);
         
         $all = $request->except(['_token']);

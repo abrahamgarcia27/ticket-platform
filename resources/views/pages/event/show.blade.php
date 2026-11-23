@@ -1,263 +1,1197 @@
-@extends('layouts.app')
+@extends('layouts.app', ['class' => 'fever-event-body'])
 
 @section('content')
-    <main class="main-content mt-0">
-        <!-- Mobile Top Navigation (only visible on mobile) -->
-        <nav class="mobile-top-nav d-lg-none">
-            <div class="container-fluid">
-                <ul class="nav justify-content-around">
-                    <li class="nav-item">
-                        <a class="nav-link" id="aMobileInfo" href="#whenandwhere">
-                            <span>Info</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="aMobileDetails" href="#about">
-                            <span>Details</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="aMobileOrganizer" href="#organizer">
-                            <span>Organizer</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        
-        <div class="header">
+<style>
+    /* Estilos Fever-like en tema claro y elegante - Ultra responsivo (320px+) */
+    :root {
+        --fever-gold: #D9BC73;
+        --fever-gold-dark: #b89849;
+        --fever-gold-light: #fdfaf2;
+        --fever-dark: #111827;
+        --fever-gray-600: #4b5563;
+        --fever-gray-500: #6b7280;
+        --fever-gray-200: #e5e7eb;
+        --fever-gray-100: #f9fafb;
+    }
+
+    /* Reset preventivo contra desbordamiento */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        max-width: 100vw;
+        overflow-x: hidden !important;
+    }
+
+    body {
+        background-color: #ffffff !important;
+        color: #1f2937 !important;
+        font-family: 'Open Sans', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .fever-event-page {
+        background-color: #ffffff;
+        padding-bottom: 90px;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+
+    /* Top navigation header */
+    .fever-nav-header {
+        background-color: #0E1012;
+        padding: 12px 16px;
+        width: 100%;
+        z-index: 100;
+    }
+
+    @media (min-width: 992px) {
+        .fever-nav-header {
+            padding: 12px 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .fever-nav-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
+            z-index: 100;
+        }
+    }
+
+    .fever-nav-header-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .fever-nav-header .logo {
+        max-height: 36px;
+        width: auto;
+    }
+
+    /* Top Hero Multimedia (Single Video OR Single Image) */
+    .fever-hero-media-wrapper {
+        background-color: #0E1012;
+        width: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        min-height: 220px;
+        max-height: 520px;
+    }
+
+    .fever-hero-media-content {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .fever-hero-video {
+        width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        background-color: #0E1012;
+        display: block;
+        pointer-events: none; /* Disables right click context / pause on click */
+    }
+
+    @media (max-width: 768px) {
+        .fever-hero-media-wrapper {
+            height: 100vh;
+            height: 100dvh;
+            min-height: 100vh;
+            min-height: 100dvh;
+            max-height: none;
+        }
+        .fever-hero-media-content {
+            height: 100%;
+            width: 100%;
+        }
+        .fever-hero-video,
+        .fever-hero-image {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: none !important;
+            object-fit: cover !important;
+            object-position: center center !important;
+        }
+    }
+
+    /* Fever floating action buttons on video */
+    .fever-hero-video-controls {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 999;
+        pointer-events: auto;
+    }
+
+    .fever-hero-control-btn {
+        background: rgba(0, 0, 0, 0.6);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        padding: 0;
+    }
+
+    .fever-hero-control-btn:hover {
+        background: var(--fever-gold);
+        color: #000000;
+        transform: scale(1.08);
+    }
+
+    .fever-hero-control-btn i {
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 576px) {
+        .fever-hero-video-controls {
+            bottom: 12px;
+            right: 12px;
+            gap: 8px;
+        }
+        .fever-hero-control-btn {
+            width: 34px;
+            height: 34px;
+        }
+        .fever-hero-control-btn i {
+            font-size: 0.82rem;
+        }
+    }
+
+    .fever-hero-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        background-color: #0E1012;
+    }
+
+    /* Hero Text Overlay (Bottom-Left inside video/image, text in white) */
+    .fever-hero-caption-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 60px 70px 20px 16px;
+        background: linear-gradient(to top, rgba(14, 16, 18, 0.92) 0%, rgba(14, 16, 18, 0.6) 55%, transparent 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        pointer-events: none;
+        z-index: 20;
+    }
+
+    @media (min-width: 992px) {
+        .fever-hero-caption-overlay {
+            padding: 70px 80px 24px 20px;
+        }
+    }
+
+    .fever-hero-caption-overlay > * {
+        pointer-events: auto;
+    }
+
+    .fever-hero-caption-overlay .fever-badge-category {
+        background-color: rgba(217, 188, 115, 0.2);
+        color: #f7e7be;
+        border: 1px solid var(--fever-gold);
+        margin-bottom: 8px;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .fever-hero-caption-overlay .fever-title {
+        color: #ffffff;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .fever-hero-caption-overlay .fever-key-points {
+        color: rgba(255, 255, 255, 0.9);
+        gap: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .fever-hero-caption-overlay .fever-key-points i {
+        color: var(--fever-gold);
+    }
+
+    .fever-rating-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        margin-bottom: 6px;
+    }
+
+    .fever-rating-stars {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        color: var(--fever-gold);
+        font-size: 0.95rem;
+    }
+
+    .fever-rating-number {
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 0.95rem;
+        margin-left: 4px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .fever-rating-scale {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+
+    /* Discount Badge (Fever style: vibrant pink/magenta pill) */
+    .fever-discount-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #e11d48;
+        color: #ffffff !important;
+        font-weight: 800;
+        border-radius: 6px;
+        padding: 2px 7px;
+        font-size: 0.78rem;
+        letter-spacing: 0.2px;
+        line-height: 1.2;
+        box-shadow: 0 2px 6px rgba(225, 29, 72, 0.35);
+        vertical-align: middle;
+    }
+
+    .fever-discount-badge-sm {
+        font-size: 0.7rem;
+        padding: 1px 5px;
+        border-radius: 4px;
+    }
+
+    .fever-original-price {
+        text-decoration: line-through;
+        opacity: 0.65;
+        font-size: 0.85em;
+        margin-right: 4px;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .fever-hero-video-controls {
+            bottom: 95px;
+            right: 16px;
+        }
+        .fever-hero-caption-overlay {
+            padding: 100px 65px 95px 16px;
+            background: linear-gradient(to top, rgba(14, 16, 18, 0.96) 0%, rgba(14, 16, 18, 0.75) 50%, rgba(14, 16, 18, 0.3) 78%, transparent 100%);
+        }
+        .fever-hero-caption-overlay .fever-title {
+            font-size: 1.45rem;
+            margin-bottom: 8px;
+        }
+        .fever-hero-caption-overlay .fever-key-points {
+            font-size: 0.85rem;
+            gap: 6px 14px;
+        }
+        .fever-hero-caption-overlay .fever-badge-category {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+        .fever-rating-container {
+            margin-top: 1px;
+            margin-bottom: 4px;
+            gap: 4px;
+        }
+        .fever-rating-stars {
+            font-size: 0.8rem;
+            gap: 1.5px;
+        }
+        .fever-rating-number {
+            font-size: 0.8rem;
+        }
+        .fever-rating-scale {
+            font-size: 0.72rem;
+        }
+    }
+
+    /* Event Title Header & Key Metadata */
+    .fever-event-header-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px 16px 16px;
+        background-color: #ffffff;
+    }
+
+    @media (min-width: 768px) {
+        .fever-event-header-container {
+            padding: 32px 20px 20px 20px;
+        }
+    }
+
+    .fever-badge-category {
+        display: inline-block;
+        background-color: #fef9ed;
+        color: var(--fever-gold-dark);
+        border: 1px solid var(--fever-gold);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .fever-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--fever-dark);
+        margin-bottom: 12px;
+        line-height: 1.25;
+        word-break: break-word;
+    }
+
+    @media (min-width: 768px) {
+        .fever-title {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+        }
+    }
+
+    .fever-key-points {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 18px;
+        color: var(--fever-gray-600);
+        font-size: 0.88rem;
+        padding-bottom: 6px;
+    }
+
+    @media (min-width: 768px) {
+        .fever-key-points {
+            gap: 20px 24px;
+            font-size: 0.95rem;
+        }
+    }
+
+    .fever-key-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+    }
+
+    .fever-key-item i {
+        color: var(--fever-gold-dark);
+        font-size: 0.95rem;
+    }
+
+    /* Sticky Navigation Tabs (Responsive & Touch-friendly) */
+    .fever-sticky-tabs {
+        position: sticky;
+        top: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid var(--fever-gray-200);
+        border-bottom: 1px solid var(--fever-gray-200);
+        z-index: 100;
+        padding: 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        width: 100%;
+    }
+
+    .fever-tabs-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 16px;
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    @media (min-width: 992px) {
+        .fever-tabs-wrapper {
+            padding: 0 20px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .fever-tabs-wrapper {
+            gap: 32px;
+        }
+    }
+
+    .fever-tabs-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fever-tab-link {
+        color: var(--fever-gray-500);
+        text-decoration: none;
+        padding: 12px 0;
+        font-weight: 600;
+        font-size: 0.88rem;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    @media (min-width: 768px) {
+        .fever-tab-link {
+            padding: 16px 0;
+            font-size: 0.95rem;
+        }
+    }
+
+    .fever-tab-link:hover, .fever-tab-link.active {
+        color: #000000;
+        border-bottom-color: var(--fever-gold-dark);
+    }
+
+    /* Content Grid Layout */
+    .fever-content-grid {
+        width: 100%;
+        max-width: 1200px;
+        margin: 20px auto 0 auto;
+        padding: 0 16px;
+        display: grid;
+        grid-template-columns: 100%;
+        gap: 24px;
+    }
+
+    @media (min-width: 992px) {
+        .fever-content-grid {
+            margin-top: 32px;
+            padding: 0 20px;
+            grid-template-columns: 1fr 380px;
+            gap: 40px;
+        }
+    }
+
+    .fever-main-column {
+        min-width: 0; /* Prevents flex/grid blowouts */
+        width: 100%;
+    }
+
+    /* Section Cards */
+    .fever-section {
+        background: #ffffff;
+        border: 1px solid var(--fever-gray-200);
+        border-radius: 14px;
+        padding: 18px 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+        .fever-section {
+            padding: 28px;
+            margin-bottom: 28px;
+        }
+    }
+
+    .fever-section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--fever-dark);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    @media (min-width: 768px) {
+        .fever-section-title {
+            font-size: 1.35rem;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+    }
+
+    .fever-section-title i {
+        color: var(--fever-gold-dark);
+    }
+
+    /* Compact Fever-style Multi-Item Gallery Carousel */
+    .fever-gallery-box {
+        background-color: #f3f4f6;
+        border-radius: 12px;
+        padding: 16px 12px;
+        position: relative;
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .fever-gallery-box {
+            border-radius: 16px;
+            padding: 24px;
+        }
+    }
+
+    .fever-gallery-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #4b5563;
+        margin-bottom: 12px;
+    }
+
+    .fever-gallery-slider-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .fever-gallery-track {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        padding: 4px 2px;
+        width: 100%;
+    }
+
+    .fever-gallery-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .fever-gallery-card {
+        flex: 0 0 calc(50% - 6px);
+        min-width: 100px;
+        aspect-ratio: 1 / 1;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #000;
+        cursor: pointer;
+        position: relative;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    @media (min-width: 576px) {
+        .fever-gallery-card {
+            flex: 0 0 calc(33.333% - 8px);
+            min-width: 115px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .fever-gallery-card {
+            flex: 0 0 calc(25% - 11px);
+            min-width: 130px;
+            border-radius: 12px;
+        }
+    }
+
+    .fever-gallery-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .fever-gallery-thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .fever-gallery-video-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background: rgba(0, 0, 0, 0.65);
+        color: #fff;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+    }
+
+    .fever-slider-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.95);
+        color: #111827;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s;
+    }
+
+    @media (min-width: 768px) {
+        .fever-slider-nav-btn {
+            width: 38px;
+            height: 38px;
+        }
+    }
+
+    .fever-slider-nav-btn:hover {
+        background: var(--fever-gold);
+        color: #000;
+    }
+
+    .fever-slider-prev {
+        left: -8px;
+    }
+
+    .fever-slider-next {
+        right: -8px;
+    }
+
+    @media (min-width: 768px) {
+        .fever-slider-prev { left: -16px; }
+        .fever-slider-next { right: -16px; }
+    }
+
+    /* Lightbox Modal */
+    .fever-lightbox-modal .modal-content {
+        background-color: transparent;
+        border: none;
+    }
+    .fever-lightbox-modal .modal-body {
+        padding: 0;
+        text-align: center;
+    }
+    .fever-lightbox-media {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 12px;
+        object-fit: contain;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Sticky Sidebar Purchase Box (Desktop) */
+    .fever-purchase-box {
+        position: sticky;
+        top: 80px;
+        background: #ffffff;
+        border: 1px solid var(--fever-gray-200);
+        border-radius: 16px;
+        padding: 26px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .fever-price-from {
+        font-size: 0.85rem;
+        color: var(--fever-gray-500);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .fever-price-val {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--fever-gold-dark);
+        margin: 4px 0 16px 0;
+    }
+
+    .fever-btn-buy {
+        background: var(--fever-gold);
+        color: #0E1012;
+        font-weight: 700;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 20px;
+        width: 100%;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(217, 188, 115, 0.35);
+    }
+
+    .fever-btn-buy:hover {
+        background: var(--fever-gold-hover);
+        color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(217, 188, 115, 0.45);
+    }
+
+    .fever-info-pill {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--fever-gray-200);
+        color: var(--fever-dark);
+    }
+    .fever-info-pill:last-child {
+        border-bottom: none;
+    }
+    .fever-info-pill i {
+        font-size: 1.1rem;
+        color: var(--fever-gold-dark);
+        width: 22px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    /* Embedded Map */
+    .fever-map-container {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--fever-gray-200);
+        height: 240px;
+        margin-top: 15px;
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .fever-map-container {
+            height: 280px;
+        }
+    }
+
+    /* Mobile Sticky Action Bar (Clean, integrated 1-layer) */
+    .fever-mobile-sticky-action {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border-top: 2px solid var(--fever-gold);
+        padding: 12px 16px;
+        z-index: 1050;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+    }
+
+    @media (max-width: 991.98px) {
+        .fever-mobile-sticky-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .fever-mobile-sticky-action .btn-yellow {
+            background: linear-gradient(135deg, #D9BC73, #E8D399);
+            color: #0E1012;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 22px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(217, 188, 115, 0.35);
+        }
+    }
+</style>
+
+<div class="fever-event-page">
+    {{-- Header Logo / Navigation --}}
+    <div class="fever-nav-header">
+        <div class="fever-nav-header-inner">
             <a href="/list-events">
                 <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo">
             </a>
+            <a href="/list-events" class="btn btn-sm btn-outline-light mb-0">
+                <i class="fas fa-arrow-left me-1"></i> All Events
+            </a>
         </div>
+    </div>
+
+    @if(session()->has('succes') || session()->has('error') || (isset($errors) && $errors->any()))
         <div id="alert">
             @include('components.alert')
         </div>
-        <div class="card-transparent shadow-lg mt-0">
-            <div class="card-body p-3">
-                <div class="card-header pb-0">
-                    <div class="d-flex align-items-center">
-                        <h5 class="mb-0">{{ date('F j, Y', strtotime($event->date_time_start)) }}</h5>
-                    </div>
-                    <div class="d-flex align-items-center" style="padding-top: 15px;">
-                        <h3 class="mb-0" style="text-align: left;">{{ $event->title }}</h3>
-                    </div>
-                    <div class="event-summary-container" style="padding-top: 25px;">
-                        <div class="event-summary-content">
-                            {{ $event->summary }}
-                        </div>
-                    </div>
-                </div> 
-                <div class="card-body pb-0">                 
-                    <nav class="navbar sticky-top navbar-dark nav-event">
-                        <div class="col-12" id="navDesktop">
-                            <ul class="nav justify-content-around" id="mi-ul">
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aInfo" href="#whenandwhere">Info</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aDetails" href="#about">Details</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aOrganizer" href="#organizer">Organizer</a>
-                                </li>
-                            </ul>  
-                        </div>
-                        <div class="col-12" id="navPhone" style="display: none;">
-                            <ul class="nav justify-content-around">
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aInfo2" href="#whenandwhere">Info</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aDetails2" href="#about">Details</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="aOrganizer2" href="#organizer">Organizer</a>
-                                </li>
-                            </ul>  
-                        </div>
-                    </nav>
-                    <!-- Section divider -->
-                    <div class="section-divider"></div>
-                    <div class="row" id="whenandwhere">
-                        <div class="col-6" id="whDesktop">
-                            <div class="row">
-                                <h4 style="padding-bottom: 20px">When and where</h4>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Date</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="fas fa-door-open" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Doors</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('h:s a', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <a class="" href="{{ $event->maps_url }}" target="_blank"><i class="fas fa-map-pin" style="padding-right: 10px"></i></a>
-                                            <a href="{{ $event->maps_url }}" target="_blank"><h6 class="mb-0">Location</h6></a>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ $location  }}</p>
-                                        </div>
-                                    </div>
-                                </div>  
-                            </div>
-                        </div>
-                        <div class="col-12" id="whPhone">
-                            <div class="row">
-                                <h4 style="padding-bottom: 20px">When and where</h4>
-                                <div class="col-sm-4">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="far fa-calendar" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Date</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('F j, Y', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 locationDiv">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <i class="fas fa-door-open" style="padding-right: 10px"></i>
-                                            <h6 class="mb-0">Doors</h6>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ date('h:s a', strtotime($event->date_time_start)) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 locationDiv">
-                                    <div class="card-transparent">
-                                        <div class="d-flex align-items-center justify-content-start">
-                                            <a class="" href="{{ $event->maps_url }}" target="_blank"><i class="fas fa-map-pin" style="padding-right: 10px"></i></a>
-                                            <a href="{{ $event->maps_url }}" target="_blank"><h6 class="mb-0">Location</h6></a>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <p class="mb-0" style="font-size: 0.80rem">{{ $location }}</p>
-                                        </div>
-                                    </div>
-                                </div>  
-                            </div>
-                        </div>
-                        <div class="col-6 d-flex align-items-center justify-content-end" id="cardGetTickets">
-                            @if ($tickets->isNotEmpty())    
-                            <div class="card-transpatent" style="width: 20rem;">
-                                @php
-                                    $hasAvailableTickets = $tickets->some(function($ticket) use ($today) {
-                                        return $today < $ticket->date_time_end && $ticket->orders_count < $ticket->quantity;
-                                    });
-                                    
-                                    $lowestPaidPrice = $tickets->where('type', 'paid')
-                                        ->where('date_time_end', '>', $today)
-                                        ->min('price');
-                                    
-                                    $hasFreeTickets = $tickets->where('type', 'free')
-                                        ->where('date_time_end', '>', $today)
-                                        ->isNotEmpty();
-                                @endphp
+    @endif
 
-                                @if ($hasAvailableTickets)
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
-                                                <h4>Free</h4>
-                                            @elseif ($lowestPaidPrice)
-                                                <h4></h4>
-                                            @endif
-                                        </div>
-                                        <div class="d-grid gap-2" style="padding-top: 10px">
-                                            <button type="button" class="btn btn-yellow" data-bs-toggle="modal" data-bs-target="#getTickets">
-                                                Get Tickets
-                                            </button>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <h4>Sales Ended</h4>
-                                        </div>
-                                        <div class="d-grid gap-2" style="padding-top: 10px">
-                                            <button type="button" class="btn btn-yellow" data-bs-toggle="modal" data-bs-target="#">
-                                                Get Details
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
+    {{-- Top of the Event: Single Video or Single Image (No carousel) with bottom-left text overlay --}}
+    <div class="fever-hero-media-wrapper">
+        <div class="fever-hero-media-content">
+            @if($event->cover_video)
+                <video class="fever-hero-video" id="feverHeroVideo" autoplay muted loop playsinline preload="auto">
+                    <source src="{{ asset('storage/' . $event->cover_video) }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+
+                {{-- Fever floating controls: Mute/Unmute audio toggle --}}
+                <div class="fever-hero-video-controls">
+                    <button type="button" class="fever-hero-control-btn" id="feverAudioToggleBtn" onclick="window.toggleHeroVideoAudio(event)" title="Activar/Silenciar sonido">
+                        <i class="fas fa-volume-mute" id="feverAudioIcon" style="pointer-events: none;"></i>
+                    </button>
+                </div>
+            @elseif($event->coverimage)
+                <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-hero-image" alt="{{ $event->title }}">
+            @elseif($event->image)
+                <img src="{{ asset('storage/' . $event->image) }}" class="fever-hero-image" alt="{{ $event->title }}">
+            @endif
+
+            {{-- Text overlay at bottom-left of video/hero --}}
+            <div class="fever-hero-caption-overlay">
+                <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
+                <h1 class="fever-title">{{ $event->title }}</h1>
+
+                <div class="fever-key-points">
+                    <div class="fever-key-item">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>{{ date('F j, Y', strtotime($event->date_time_start)) }}</span>
+                    </div>
+                    <div class="fever-key-item">
+                        <i class="far fa-clock"></i>
+                        <span>{{ date('g:i A', strtotime($event->date_time_start)) }} - {{ date('g:i A', strtotime($event->date_time_end)) }}</span>
+                    </div>
+                    <div class="fever-key-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ $event->ubication }} ({{ $event->address_locality }}, {{ $event->address_region }})</span>
+                    </div>
+                    @php
+                        $minPaidTicket = $tickets->where('type', 'paid')->sortBy('price')->first();
+                        $minPrice = $minPaidTicket ? $minPaidTicket->price : null;
+                        $minDiscount = $minPaidTicket ? $minPaidTicket->discount : null;
+                        $hasFree = $tickets->where('type', 'free')->isNotEmpty();
+                    @endphp
+                    <div class="fever-key-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        @if($hasFree && !$minPrice)
+                            <span>Free Admission</span>
+                        @elseif($minPrice)
+                            <span>Tickets from ${{ number_format($minPrice, 2) }}</span>
+                            @if($minDiscount && $minDiscount > 0)
+                                <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($minDiscount, 1), '0'), '.') }}%</span>
+                            @endif
                         @else
-                            <div class="card-transpatent" style="width: 20rem;">
-                                <div class="card-body">
-                                    <div class="d-grid gap-2" style="padding-top: 10px">
-                                        <a type="button" class="btn btn-yellow" href="{{ $event->link_external_sales }}" target="_blank">
-                                            Get Tickets
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            <span>Available Tickets</span>
                         @endif
-                        </div>
-                        
                     </div>
-                    <div class="row" style="padding-top: 40px" id="about">
-                        <div class="card-transparent" style="width: 40rem">
-                            <h4 style="padding-bottom: 20px">About this event</h4>  
-                            <img src="{{ asset('storage/' .  $event->image) }}" class="card-img-bottom" alt="">
-                            <div class="about-html">{!! $event->about !!}</div>
+                </div>
+
+                @if($event->rating)
+                    @php
+                        $ratingVal = (float)$event->rating;
+                        $fullStars = floor($ratingVal);
+                        $hasHalf = ($ratingVal - $fullStars) >= 0.3 && ($ratingVal - $fullStars) <= 0.7;
+                        if (($ratingVal - $fullStars) > 0.7) {
+                            $fullStars++;
+                            $hasHalf = false;
+                        }
+                        $emptyStars = 5 - $fullStars - ($hasHalf ? 1 : 0);
+                    @endphp
+                    <div class="fever-rating-container">
+                        <div class="fever-rating-stars">
+                            @for($i = 0; $i < $fullStars; $i++)
+                                <i class="fas fa-star"></i>
+                            @endfor
+                            @if($hasHalf)
+                                <i class="fas fa-star-half-alt"></i>
+                            @endif
+                            @for($i = 0; $i < $emptyStars; $i++)
+                                <i class="far fa-star"></i>
+                            @endfor
                         </div>
+                        <span class="fever-rating-number">{{ number_format($ratingVal, 1) }}</span>
+                        <span class="fever-rating-scale">/ 5.0</span>
                     </div>
-                    <div class="row" style="padding-top: 40px" id="organizer">
-                        <div class="card-transparent" style="width: 40rem">                          
-                            <h4 style="padding-bottom: 20px">Organizer</h4>                           
-                            <div class="card-body" >
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <div class="avatar avatar-xl">
-                                        <img src="{{ asset('storage/' .  $event->user->image) }}" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 20px">
-                                <p class="mb-0" style="font-size: 0.80rem">Organized by</p>  
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center">
-                                <h6>{{ $event->user->username }}</h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 40px">
-                                <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                    Contact
-                                </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="padding-top: 40px" id="organizer">
-                        <div class="card-transparent" style="width: 40rem">                          
-                            <h4 style="padding-bottom: 20px">Other events you may like</h4>                           
-                            <div class="card-body d-flex flex-column" style="min-height: 10vh; justify-content: space-between;">
-                                <div class="d-flex align-items-center justify-content-center" style="padding-top: 10px; padding-bottom: 5px;">
-                                    <a href="/list-events" class="btn btn-dark">View Events</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>   
+                @endif
             </div>
-            <!-- Modal Contact -->
+        </div>
+    </div>
+
+    {{-- Sticky Tabs (Overview, Gallery, Location, Organizer) --}}
+    <nav class="fever-sticky-tabs">
+        <div class="fever-tabs-wrapper">
+            <a href="#overview" class="fever-tab-link active" id="tab-overview">Overview</a>
+            <a href="#gallery-section" class="fever-tab-link" id="tab-gallery">Gallery</a>
+            <a href="#location" class="fever-tab-link" id="tab-location">Location</a>
+            <a href="#organizer" class="fever-tab-link" id="tab-organizer">Organizer</a>
+        </div>
+    </nav>
+
+    {{-- Content Grid --}}
+    <div class="fever-content-grid">
+        <div class="fever-main-column">
+            {{-- Overview --}}
+            <section class="fever-section" id="overview">
+                <h3 class="fever-section-title"><i class="fas fa-info-circle"></i> About this event</h3>
+                
+                @if($event->summary)
+                    <p class="lead mb-4" style="font-size: 1.1rem; line-height: 1.6; color: #374151;">
+                        {{ $event->summary }}
+                    </p>
+                @endif
+
+                @if($event->about)
+                    <div class="about-html" style="color: #4b5563; line-height: 1.7;">
+                        {!! $event->about !!}
+                    </div>
+                @else
+                    <p style="color: #6b7280;">Join us for an unforgettable experience at {{ $event->ubication }}. Enjoy live music, curated atmosphere, and premium service.</p>
+                @endif
+            </section>
+
+            {{-- Gallery Section (Compact Fever Multi-Item Carousel) --}}
+            @php
+                $galleryItems = [];
+                if (!empty($event->gallery) && is_array($event->gallery)) {
+                    foreach ($event->gallery as $gItem) {
+                        if (is_string($gItem) && !empty($gItem)) {
+                            $galleryItems[] = $gItem;
+                        }
+                    }
+                }
+                if (empty($galleryItems)) {
+                    if ($event->image) $galleryItems[] = $event->image;
+                    if ($event->coverimage) $galleryItems[] = $event->coverimage;
+                }
+            @endphp
+            <section class="fever-section" id="gallery-section">
+                <div class="fever-gallery-box">
+                    <div class="fever-gallery-label">Gallery</div>
+                    
+                    @if(!empty($galleryItems))
+                        <div class="fever-gallery-slider-wrap">
+                            <button class="fever-slider-nav-btn fever-slider-prev" onclick="scrollGallery(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+
+                            <div class="fever-gallery-track" id="galleryTrack">
+                                @foreach($galleryItems as $index => $item)
+                                    @php
+                                        $isVideo = preg_match('/\.(mp4|webm|ogg|mov)$/i', $item);
+                                    @endphp
+                                    <div class="fever-gallery-card" onclick="openLightbox('{{ asset('storage/' . $item) }}', {{ $isVideo ? 'true' : 'false' }})">
+                                        @if($isVideo)
+                                            <video class="fever-gallery-thumb" muted playsinline preload="metadata">
+                                                <source src="{{ asset('storage/' . $item) }}#t=0.5">
+                                            </video>
+                                            <div class="fever-gallery-video-badge">
+                                                <i class="fas fa-play"></i>
+                                            </div>
+                                        @else
+                                            <img src="{{ asset('storage/' . $item) }}" class="fever-gallery-thumb" alt="Gallery photo {{ $index + 1 }}" loading="lazy">
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <button class="fever-slider-nav-btn fever-slider-next" onclick="scrollGallery(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    @else
+                        <p class="text-muted mb-0">No gallery items available yet.</p>
+                    @endif
+                </div>
+            </section>
+
+            {{-- Location & Map --}}
+            <section class="fever-section" id="location">
+                <h3 class="fever-section-title"><i class="fas fa-map-marked-alt"></i> Location</h3>
+                <div class="fever-info-pill">
+                    <i class="fas fa-building"></i>
+                    <div>
+                        <strong style="color: #111827;">{{ $event->ubication }}</strong>
+                        <div class="text-sm text-muted">{{ $location }}</div>
+                    </div>
+                </div>
+
+                <div class="fever-map-container">
+                    <iframe
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        style="border:0;"
+                        src="https://maps.google.com/maps?q={{ urlencode($location) }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+
+                <div class="mt-3 text-end">
+                    <a href="{{ $event->maps_url ?: 'https://maps.google.com/?q=' . urlencode($location) }}" target="_blank" class="btn btn-sm btn-outline-dark mb-0">
+                        <i class="fas fa-directions me-1"></i> Open in Google Maps
+                    </a>
+                </div>
+            </section>
+
+            {{-- Organizer --}}
+            <section class="fever-section" id="organizer">
+                <h3 class="fever-section-title"><i class="fas fa-user-tie"></i> Organizer</h3>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar avatar-lg">
+                        <img src="{{ $event->user && $event->user->image ? asset('storage/' . $event->user->image) : asset('img/logos/logo.png') }}" alt="organizer" class="border-radius-lg shadow-sm w-100">
+                    </div>
+                    <div>
+                        <h5 class="mb-0 font-weight-bold" style="color: #111827;">{{ $event->user ? $event->user->username : 'Event Organizer' }}</h5>
+                        <p class="text-sm text-muted mb-0">Event Host</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        <i class="far fa-envelope me-1"></i> Contact Organizer
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        {{-- Right Column Sticky Purchase Box --}}
+        <div class="fever-sidebar-column d-none d-lg-block">
+            <div class="fever-purchase-box">
+                <div class="fever-price-from d-flex align-items-center justify-content-between">
+                    <span>Tickets starting from</span>
+                    @if($minDiscount && $minDiscount > 0)
+                        <span class="fever-discount-badge">-{{ rtrim(rtrim(number_format($minDiscount, 1), '0'), '.') }}%</span>
+                    @endif
+                </div>
+                <div class="fever-price-val d-flex align-items-baseline gap-2">
+                    @if($hasFree && !$minPrice)
+                        Free
+                    @elseif($minPrice)
+                        @if($minDiscount && $minDiscount > 0 && $minDiscount < 100)
+                            @php
+                                $originalPrice = $minPrice / (1 - ($minDiscount / 100));
+                            @endphp
+                            <span class="fever-original-price" style="color: var(--fever-gray-500);">${{ number_format($originalPrice, 2) }}</span>
+                        @endif
+                        <span>${{ number_format($minPrice, 2) }}</span>
+                    @else
+                        --
+                    @endif
+                </div>
+
+                <div class="my-3">
+                    <div class="fever-info-pill">
+                        <i class="far fa-calendar"></i>
+                        <span class="text-sm" style="color: #374151;">{{ date('M j, Y', strtotime($event->date_time_start)) }}</span>
+                    </div>
+                    <div class="fever-info-pill">
+                        <i class="far fa-clock"></i>
+                        <span class="text-sm" style="color: #374151;">{{ date('g:i A', strtotime($event->date_time_start)) }}</span>
+                    </div>
+                    <div class="fever-info-pill">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="text-sm text-truncate" style="max-width: 250px; color: #374151;">{{ $event->ubication }}</span>
+                    </div>
+                </div>
+
+                @if ($tickets->isNotEmpty())
+                    <button type="button" class="fever-btn-buy" data-bs-toggle="modal" data-bs-target="#getTickets">
+                        Get Tickets
+                    </button>
+                @elseif($event->link_external_sales)
+                    <a href="{{ $event->link_external_sales }}" target="_blank" class="fever-btn-buy text-center d-block text-decoration-none">
+                        Get Tickets
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    {{-- Mobile Sticky Action Bar --}}
+    <div class="fever-mobile-sticky-action">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-xs text-muted">From</span>
+                @if($minDiscount && $minDiscount > 0)
+                    <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($minDiscount, 1), '0'), '.') }}%</span>
+                @endif
+            </div>
+            <div class="h5 mb-0 font-weight-bold d-flex align-items-baseline gap-1" style="color: var(--fever-gold-dark);">
+                @if($hasFree && !$minPrice)
+                    Free
+                @elseif($minPrice)
+                    @if($minDiscount && $minDiscount > 0 && $minDiscount < 100)
+                        @php
+                            $originalPrice = $minPrice / (1 - ($minDiscount / 100));
+                        @endphp
+                        <span class="fever-original-price" style="color: var(--fever-gray-500); font-size: 0.75em;">${{ number_format($originalPrice, 2) }}</span>
+                    @endif
+                    <span>${{ number_format($minPrice, 2) }}</span>
+                @else
+                    --
+                @endif
+            </div>
+        </div>
+        <div>
+            @if ($tickets->isNotEmpty())
+                <button type="button" class="btn btn-yellow mb-0" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
+                    Get Tickets
+                </button>
+            @elseif($event->link_external_sales)
+                <a href="{{ $event->link_external_sales }}" target="_blank" class="btn btn-yellow mb-0">
+                    Get Tickets
+                </a>
+            @endif
+        </div>
+    </div>
+</div>
+
+<!-- Modal Lightbox Gallery -->
+<div class="modal fade fever-lightbox-modal" id="galleryLightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="d-flex justify-content-end p-2">
+                <button type="button" class="btn btn-sm btn-dark" data-bs-dismiss="modal" style="border-radius: 50%; width: 36px; height: 36px; padding: 0;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="lightboxMediaContainer">
+                {{-- Dynamic content --}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Contact -->
             <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content modal-border">
@@ -339,13 +1273,22 @@
                                         </div>
                                         <div class="col-3">
                                             <div class="d-flex flex-column align-items-end">
-                                                <h6 class="mb-2">
-                                                    @if ($ticket->type == 'free')
-                                                        Free
-                                                    @else
-                                                        ${{ number_format($ticket->price, 2) }}
+                                                <div class="d-flex align-items-center gap-1 mb-2">
+                                                    @if($ticket->discount && $ticket->discount > 0)
+                                                        <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($ticket->discount, 1), '0'), '.') }}%</span>
+                                                        @if($ticket->discount < 100)
+                                                            @php $origModalPrice = $ticket->price / (1 - ($ticket->discount / 100)); @endphp
+                                                            <span class="fever-original-price" style="color: #6b7280; font-size: 0.8em;">${{ number_format($origModalPrice, 2) }}</span>
+                                                        @endif
                                                     @endif
-                                                </h6>
+                                                    <h6 class="mb-0">
+                                                        @if ($ticket->type == 'free')
+                                                            Free
+                                                        @else
+                                                            ${{ number_format($ticket->price, 2) }}
+                                                        @endif
+                                                    </h6>
+                                                </div>
                                                 <select class="form-select mb-2 ticket-select" data-ticket-id="{{ $ticket->id }}" data-ticket-price="{{ $ticket->price }}" data-ticket-title="{{ $ticket->title }}" data-ticket-type="{{ $ticket->type }}" @if($ticket->orders_count >= $ticket->quantity) disabled @endif>
                                                     @for($i = 0; $i <= min(10, $ticket->quantity - $ticket->count_orders); $i++)
                                                         <option value="{{ $i }}">{{ $i }}</option>
@@ -439,7 +1382,14 @@
                                                     
                                                     <div class="ticket-controls-mobile">
                                                         <div class="ticket-info-section">
-                                                            <div class="ticket-price-mobile">
+                                                            <div class="ticket-price-mobile d-flex align-items-center gap-1">
+                                                                @if($ticket->discount && $ticket->discount > 0)
+                                                                    <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($ticket->discount, 1), '0'), '.') }}%</span>
+                                                                    @if($ticket->discount < 100)
+                                                                        @php $origMobPrice = $ticket->price / (1 - ($ticket->discount / 100)); @endphp
+                                                                        <span class="fever-original-price" style="color: #6b7280; font-size: 0.75em;">${{ number_format($origMobPrice, 2) }}</span>
+                                                                    @endif
+                                                                @endif
                                                                 @if ($ticket->type == 'free')
                                                                     Free
                                                                 @else
@@ -696,118 +1646,6 @@
                 </div>
             </div>
             @endif
-        </div>
-        {{-- <nav class="fixed-bottom navbar-dark" id="getTicketsBottom1">
-            @if ($ticket !=null)   
-                @if ($today < $ticket->date_time_end) 
-                    @if ($count_orders < $ticket->quantity)
-                        <div class="row" style="padding-top: 20px;">
-                            <div class="col-12 d-flex align-items-center justify-content-center">
-                                @if ($ticket->type == 'free')
-                                <h4>Free</h4>
-                                @endif
-                                @if ($ticket->type == 'paid')
-                                <h4></h4>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                                    <button type="button" class="btn btn-yellow btn-lg" data-bs-toggle="modal" data-bs-target="#getTicketsMobile">
-                                        Get Tickets
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="row" style="padding-top: 20px;">
-                            <div class="col-12 d-flex align-items-center justify-content-center">
-                                <h4>Sales Ended</h4>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                                    <button type="button" class="btn btn-yellow btn-lg" data-bs-toggle="modal" data-bs-target="#">
-                                        Get Details
-                                    </button>
-                                </div>
-                            </div>
-                        </div> 
-                    @endif     
-                @else
-                    <div class="row" style="padding-top: 20px;">
-                        <div class="col-12 d-flex align-items-center justify-content-center">
-                            <h4>Sales Ended</h4>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                                <button type="button" class="btn btn-yellow btn-lg" data-bs-toggle="modal" data-bs-target="#">
-                                    Get Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>       
-                @endif 
-            @else
-                <div class="row pt-5">
-                    <div class="col-12">
-                        <div class="d-grid gap-2" style="padding-left: 20px; padding-right:20px;">
-                            <a type="button" class="btn btn-yellow btn-lg" href="{{ $event->link_external_sales }}" target="_blank">
-                                Get Tickets
-                            </a>
-                        </div>
-                    </div>
-                </div>    
-            @endif
-        </nav> --}}
-        
-        <!-- Mobile Bottom Get Tickets Button (only visible on mobile) -->
-        <div class="mobile-bottom-ticket d-lg-none">
-            <div class="container-fluid">
-                @if ($ticket != null)
-                    @php
-                        $today = now();
-                        $hasAvailableTickets = $tickets->where('date_time_end', '>', $today)->isNotEmpty();
-                        $lowestPaidPrice = $tickets->where('type', 'paid')
-                            ->where('date_time_end', '>', $today)
-                            ->min('price');
-                        $hasFreeTickets = $tickets->where('type', 'free')
-                            ->where('date_time_end', '>', $today)
-                            ->isNotEmpty();
-                    @endphp
-                    
-                    @if ($hasAvailableTickets)
-                        {{-- Show "Free" ONLY for free events --}}
-                        @if ($hasFreeTickets && !$lowestPaidPrice || $lowestPaidPrice == 0)
-                            <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
-                                <h4 style="margin: 0; color: #333;">Free</h4>
-                            </div>
-                        @endif
-                        
-                        <button type="button" class="btn btn-yellow btn-lg w-100" id="mobileGetTicketsBtn">
-                            Get Tickets
-                        </button>
-                    @else
-                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom: 10px;">
-                            <h4 style="margin: 0; color: #333;">Sales Ended</h4>
-                        </div>
-                        <button type="button" class="btn btn-yellow btn-lg w-100">
-                            Get Details
-                        </button>
-                    @endif
-                @else
-                    {{-- External Sales Button for Mobile --}}
-                    <a type="button" class="btn btn-yellow btn-lg w-100" href="{{ $event->link_external_sales }}" target="_blank">
-                        Get Tickets
-                    </a>
-                @endif
-            </div>
-        </div>
-    </main>
     @include('layouts.footers.guest.footer')
 @endsection
 @push('js')
@@ -1134,4 +1972,131 @@
     });
 </script>
 @endif
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.fever-carousel-slide');
+    const dots = document.querySelectorAll('.fever-dot');
+
+    function showSlide(index) {
+        if (!slides.length) return;
+        if (index >= slides.length) currentSlide = 0;
+        else if (index < 0) currentSlide = slides.length - 1;
+        else currentSlide = index;
+
+        slides.forEach((s, i) => {
+            s.classList.toggle('active', i === currentSlide);
+        });
+        dots.forEach((d, i) => {
+            d.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function nextSlide() { showSlide(currentSlide + 1); }
+    function prevSlide() { showSlide(currentSlide - 1); }
+    function goToSlide(i) { showSlide(i); }
+
+    if (slides.length > 1) {
+        setInterval(nextSlide, 5000);
+    }
+
+    // Smooth tab scrolling and active state
+    document.querySelectorAll('.fever-tab-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                const offset = 80;
+                const bodyRect = document.body.getBoundingClientRect().top;
+                const elementRect = targetEl.getBoundingClientRect().top;
+                const elementPosition = elementRect - bodyRect;
+                const offsetPosition = elementPosition - offset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                document.querySelectorAll('.fever-tab-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+</script>
+
+
+<script>
+    // Fever Hero Video Mute/Unmute toggle (Exposed globally)
+    window.toggleHeroVideoAudio = function(e) {
+        if (e) {
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        }
+        var video = document.getElementById('feverHeroVideo');
+        var icon = document.getElementById('feverAudioIcon');
+        if (!video) return;
+
+        if (video.muted) {
+            video.muted = false;
+            video.defaultMuted = false;
+            video.volume = 1.0;
+            var p = video.play();
+            if (p !== undefined) {
+                p.catch(function(err) {
+                    console.log("Audio play error:", err);
+                });
+            }
+            if (icon) {
+                icon.className = "fas fa-volume-up";
+            }
+            console.log("[Audio] UNMUTED - sound is ON");
+        } else {
+            video.muted = true;
+            if (icon) {
+                icon.className = "fas fa-volume-mute";
+            }
+            console.log("[Audio] MUTED - sound is OFF");
+        }
+    };
+
+    // Compact Fever-style Gallery Scroll & Lightbox
+    window.scrollGallery = function(direction) {
+        const track = document.getElementById('galleryTrack');
+        if (!track) return;
+        const scrollAmount = track.clientWidth * 0.75;
+        track.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    };
+
+    window.openLightbox = function(mediaUrl, isVideo) {
+        const container = document.getElementById('lightboxMediaContainer');
+        if (!container) return;
+
+        if (isVideo) {
+            container.innerHTML = '<video class="fever-lightbox-media" controls autoplay playsinline style="width: 100%; max-height: 80vh;"><source src="' + mediaUrl + '"></video>';
+        } else {
+            container.innerHTML = '<img src="' + mediaUrl + '" class="fever-lightbox-media" alt="Enlarged view">';
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('galleryLightboxModal'));
+        modal.show();
+    };
+
+    // Stop video playback when lightbox closes & attach click handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        const lightboxEl = document.getElementById('galleryLightboxModal');
+        if (lightboxEl) {
+            lightboxEl.addEventListener('hidden.bs.modal', function () {
+                const container = document.getElementById('lightboxMediaContainer');
+                if (container) container.innerHTML = '';
+            });
+        }
+
+
+    });
+</script>
+
 @endpush
