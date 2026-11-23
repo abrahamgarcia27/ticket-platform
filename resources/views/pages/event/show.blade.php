@@ -45,11 +45,23 @@
         background-color: #0E1012;
         padding: 12px 16px;
         width: 100%;
+        z-index: 100;
     }
 
     @media (min-width: 992px) {
         .fever-nav-header {
             padding: 12px 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .fever-nav-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
+            z-index: 100;
         }
     }
 
@@ -80,13 +92,6 @@
         max-height: 520px;
     }
 
-    @media (max-width: 576px) {
-        .fever-hero-media-wrapper {
-            min-height: 180px;
-            max-height: 300px;
-        }
-    }
-
     .fever-hero-media-content {
         width: 100%;
         max-width: 1200px;
@@ -104,6 +109,28 @@
         background-color: #0E1012;
         display: block;
         pointer-events: none; /* Disables right click context / pause on click */
+    }
+
+    @media (max-width: 768px) {
+        .fever-hero-media-wrapper {
+            height: 100vh;
+            height: 100dvh;
+            min-height: 100vh;
+            min-height: 100dvh;
+            max-height: none;
+        }
+        .fever-hero-media-content {
+            height: 100%;
+            width: 100%;
+        }
+        .fever-hero-video,
+        .fever-hero-image {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: none !important;
+            object-fit: cover !important;
+            object-position: center center !important;
+        }
     }
 
     /* Fever floating action buttons on video */
@@ -281,17 +308,22 @@
         font-weight: 500;
     }
 
-    @media (max-width: 576px) {
+    @media (max-width: 768px) {
+        .fever-hero-video-controls {
+            bottom: 24px;
+            right: 16px;
+        }
         .fever-hero-caption-overlay {
-            padding: 30px 55px 12px 14px;
+            padding: 100px 65px 24px 16px;
+            background: linear-gradient(to top, rgba(14, 16, 18, 0.96) 0%, rgba(14, 16, 18, 0.75) 45%, rgba(14, 16, 18, 0.3) 75%, transparent 100%);
         }
         .fever-hero-caption-overlay .fever-title {
-            font-size: 1.25rem;
-            margin-bottom: 6px;
+            font-size: 1.45rem;
+            margin-bottom: 8px;
         }
         .fever-hero-caption-overlay .fever-key-points {
-            font-size: 0.78rem;
-            gap: 5px 10px;
+            font-size: 0.85rem;
+            gap: 6px 14px;
         }
         .fever-hero-caption-overlay .fever-badge-category {
             font-size: 0.65rem;
