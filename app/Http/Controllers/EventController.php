@@ -51,7 +51,7 @@ class EventController extends Controller
             'date_time_end' => 'required|date|after:date_time_start'
         ]);
 
-        $all = $request->except(['_token', 'image']);
+        $all = $request->except(['_token', 'image', 'coverimage', 'cover_video', 'gallery']);
         $all['created_by'] = Auth::id();
         
         if (!$request->has('external_sales')) {
@@ -189,7 +189,7 @@ class EventController extends Controller
             'date_time_end' => 'required|date|after:date_time_start'
         ]);
 
-        $all = $request->except(['_token', 'image']);
+        $all = $request->except(['_token', 'image', 'coverimage', 'cover_video', 'gallery']);
         $event = Event::find($id);
         if (!$request->has('external_sales')) {
             $all['link_external_sales'] = null;

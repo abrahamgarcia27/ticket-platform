@@ -545,8 +545,13 @@
             @php
                 $galleryItems = [];
                 if (!empty($event->gallery) && is_array($event->gallery)) {
-                    $galleryItems = $event->gallery;
-                } else {
+                    foreach ($event->gallery as $gItem) {
+                        if (is_string($gItem) && !empty($gItem)) {
+                            $galleryItems[] = $gItem;
+                        }
+                    }
+                }
+                if (empty($galleryItems)) {
                     if ($event->image) $galleryItems[] = $event->image;
                     if ($event->coverimage) $galleryItems[] = $event->coverimage;
                 }

@@ -100,13 +100,15 @@
                             @if ($event->gallery && is_array($event->gallery))
                                 <div class="row mt-2 g-2">
                                     @foreach($event->gallery as $item)
-                                        <div class="col-3">
-                                            @if(preg_match('/\.(mp4|webm|ogg|mov)$/i', $item))
-                                                <video src="{{ asset('storage/' . $item) }}" controls style="width: 100%; height: 80px; object-fit: cover; border-radius: 6px;"></video>
-                                            @else
-                                                <img src="{{ asset('storage/' . $item) }}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 6px;">
-                                            @endif
-                                        </div>
+                                        @if(is_string($item) && !empty($item))
+                                            <div class="col-3">
+                                                @if(preg_match('/\.(mp4|webm|ogg|mov)$/i', $item))
+                                                    <video src="{{ asset('storage/' . $item) }}" controls style="width: 100%; height: 80px; object-fit: cover; border-radius: 6px;"></video>
+                                                @else
+                                                    <img src="{{ asset('storage/' . $item) }}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 6px;">
+                                                @endif
+                                            </div>
+                                        @endif
                                     @endforeach
                                 </div>
                             @endif
