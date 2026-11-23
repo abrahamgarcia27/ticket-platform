@@ -67,6 +67,14 @@
                             <input class="form-control" type="text" name="date_time_end" id="dateTime" value="{{ $event->date_time_end }}" required>
                         </div>
                         <div class="form-group">
+                            <label for="rating" class="form-control-label">Calificación del Evento (1.0 a 5.0 con decimales)</label>
+                            <input class="form-control @error('rating') is-invalid @enderror" type="number" step="0.1" min="1.0" max="5.0" name="rating" id="rating" placeholder="Ej. 4.8" value="{{ old('rating', $event->rating) }}">
+                            <small class="form-text text-muted">Puntuación del evento que se mostrará en estrellas (ej. 4.5, 4.8, 5.0).</small>
+                            @error('rating')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="form-group">
                             <label for="coverimage" class="form-control-label">Cover Event Image</label>
                             <input class="form-control" type="file" name="coverimage" id="coverimage">
                         </div>

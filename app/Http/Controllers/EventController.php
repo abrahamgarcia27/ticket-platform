@@ -48,7 +48,8 @@ class EventController extends Controller
     {   
         $request->validate([
             'date_time_start' => 'required|date',
-            'date_time_end' => 'required|date|after:date_time_start'
+            'date_time_end' => 'required|date|after:date_time_start',
+            'rating' => 'nullable|numeric|min:1|max:5'
         ]);
 
         $all = $request->except(['_token', 'image', 'coverimage', 'cover_video', 'gallery']);
@@ -186,7 +187,8 @@ class EventController extends Controller
     {
         $request->validate([
             'date_time_start' => 'required|date',
-            'date_time_end' => 'required|date|after:date_time_start'
+            'date_time_end' => 'required|date|after:date_time_start',
+            'rating' => 'nullable|numeric|min:1|max:5'
         ]);
 
         $all = $request->except(['_token', 'image', 'coverimage', 'cover_video', 'gallery']);

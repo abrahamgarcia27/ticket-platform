@@ -26,6 +26,7 @@ class Event extends Model
         'date_time_end',
         'coverimage',
         'cover_video',
+        'rating',
         'image',
         'gallery',
         'summary',

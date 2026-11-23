@@ -220,6 +220,36 @@
         color: var(--fever-gold);
     }
 
+    .fever-rating-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        margin-bottom: 6px;
+    }
+
+    .fever-rating-stars {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        color: var(--fever-gold);
+        font-size: 0.95rem;
+    }
+
+    .fever-rating-number {
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 0.95rem;
+        margin-left: 4px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .fever-rating-scale {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+
     @media (max-width: 576px) {
         .fever-hero-caption-overlay {
             padding: 30px 55px 12px 14px;
@@ -237,6 +267,21 @@
             padding: 3px 8px;
             margin-bottom: 4px;
             white-space: nowrap;
+        }
+        .fever-rating-container {
+            margin-top: 1px;
+            margin-bottom: 4px;
+            gap: 4px;
+        }
+        .fever-rating-stars {
+            font-size: 0.8rem;
+            gap: 1.5px;
+        }
+        .fever-rating-number {
+            font-size: 0.8rem;
+        }
+        .fever-rating-scale {
+            font-size: 0.72rem;
         }
     }
 
@@ -772,7 +817,7 @@
             <div class="fever-hero-caption-overlay">
                 <span class="fever-badge-category"><i class="fas fa-star me-1"></i> Featured Event</span>
                 <h1 class="fever-title">{{ $event->title }}</h1>
-                
+
                 <div class="fever-key-points">
                     <div class="fever-key-item">
                         <i class="far fa-calendar-alt"></i>
@@ -801,6 +846,34 @@
                         @endif
                     </div>
                 </div>
+
+                @if($event->rating)
+                    @php
+                        $ratingVal = (float)$event->rating;
+                        $fullStars = floor($ratingVal);
+                        $hasHalf = ($ratingVal - $fullStars) >= 0.3 && ($ratingVal - $fullStars) <= 0.7;
+                        if (($ratingVal - $fullStars) > 0.7) {
+                            $fullStars++;
+                            $hasHalf = false;
+                        }
+                        $emptyStars = 5 - $fullStars - ($hasHalf ? 1 : 0);
+                    @endphp
+                    <div class="fever-rating-container">
+                        <div class="fever-rating-stars">
+                            @for($i = 0; $i < $fullStars; $i++)
+                                <i class="fas fa-star"></i>
+                            @endfor
+                            @if($hasHalf)
+                                <i class="fas fa-star-half-alt"></i>
+                            @endif
+                            @for($i = 0; $i < $emptyStars; $i++)
+                                <i class="far fa-star"></i>
+                            @endfor
+                        </div>
+                        <span class="fever-rating-number">{{ number_format($ratingVal, 1) }}</span>
+                        <span class="fever-rating-scale">/ 5.0</span>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
