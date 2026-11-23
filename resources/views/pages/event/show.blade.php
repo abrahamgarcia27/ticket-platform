@@ -89,6 +89,61 @@
         max-height: 500px;
         object-fit: contain;
         background-color: #0E1012;
+        display: block;
+        pointer-events: none; /* Disables right click context / pause on click */
+    }
+
+    /* Fever floating action buttons on video */
+    .fever-hero-video-controls {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 10;
+    }
+
+    .fever-hero-control-btn {
+        background: rgba(0, 0, 0, 0.6);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        padding: 0;
+    }
+
+    .fever-hero-control-btn:hover {
+        background: var(--fever-gold);
+        color: #000000;
+        transform: scale(1.08);
+    }
+
+    .fever-hero-control-btn i {
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 576px) {
+        .fever-hero-video-controls {
+            bottom: 12px;
+            right: 12px;
+            gap: 8px;
+        }
+        .fever-hero-control-btn {
+            width: 34px;
+            height: 34px;
+        }
+        .fever-hero-control-btn i {
+            font-size: 0.82rem;
+        }
     }
 
     .fever-hero-image {
@@ -598,10 +653,17 @@
     <div class="fever-hero-media-wrapper">
         <div class="fever-hero-media-content">
             @if($event->cover_video)
-                <video class="fever-hero-video" controls autoplay muted loop playsinline>
+                <video class="fever-hero-video" id="feverHeroVideo" autoplay muted loop playsinline preload="auto">
                     <source src="{{ asset('storage/' . $event->cover_video) }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
+
+                {{-- Fever floating controls: Mute/Unmute audio toggle --}}
+                <div class="fever-hero-video-controls">
+                    <button type="button" class="fever-hero-control-btn" id="feverAudioToggleBtn" onclick="toggleHeroVideoAudio()" title="Activar/Silenciar sonido">
+                        <i class="fas fa-volume-mute" id="feverAudioIcon"></i>
+                    </button>
+                </div>
             @elseif($event->coverimage)
                 <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-hero-image" alt="{{ $event->title }}">
             @elseif($event->image)
@@ -1711,6 +1773,23 @@
     function goToSlide(i) { showSlide(i); }
 
 <script>
+    // Fever Hero Video Mute/Unmute toggle
+    function toggleHeroVideoAudio() {
+        const video = document.getElementById('feverHeroVideo');
+        const icon = document.getElementById('feverAudioIcon');
+        if (!video || !icon) return;
+
+        if (video.muted) {
+            video.muted = false;
+            icon.classList.remove('fa-volume-mute');
+            icon.classList.add('fa-volume-up');
+        } else {
+            video.muted = true;
+            icon.classList.remove('fa-volume-up');
+            icon.classList.add('fa-volume-mute');
+        }
+    }
+
     // Compact Fever-style Gallery Scroll & Lightbox
     function scrollGallery(direction) {
         const track = document.getElementById('galleryTrack');
