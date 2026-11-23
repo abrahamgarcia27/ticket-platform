@@ -54,6 +54,17 @@
                             <label for="price" class="form-control-label">Price</label>
                             <input class="form-control" type="text" name="price" id="price" placeholder="$" {{ $ticket->type == 'free' ? 'disabled' : ''}} value="{{ $ticket->price }}" required>
                         </div>
+                        <div class="form-group" id="discountGroup" style="{{ $ticket->type == 'free' ? 'display: none;' : '' }}">
+                            <label for="discount" class="form-control-label">% de Descuento (opcional)</label>
+                            <div class="input-group">
+                                <input class="form-control @error('discount') is-invalid @enderror" type="number" step="0.01" min="0" max="100" name="discount" id="discount" placeholder="Ej. 20" value="{{ old('discount', $ticket->discount) }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted">Ingresa el porcentaje de descuento si este ticket tiene oferta (ej. 20 para mostrar -20%). El precio a cobrar seguirá siendo el ingresado arriba en Price.</small>
+                            @error('discount')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <div class="form-check form-switch" id="feeSwitchGroup" style="padding-bottom: 15px;">
                             <input class="form-check-input" type="checkbox" role="switch" id="has_fee" name="has_fee" {{ $ticket->fees->isNotEmpty() ? 'checked' : '' }}>
                             <label class="form-check-label" for="has_fee">Do you want to add fees?</label>

@@ -250,6 +250,37 @@
         font-weight: 500;
     }
 
+    /* Discount Badge (Fever style: vibrant pink/magenta pill) */
+    .fever-discount-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #e11d48;
+        color: #ffffff !important;
+        font-weight: 800;
+        border-radius: 6px;
+        padding: 2px 7px;
+        font-size: 0.78rem;
+        letter-spacing: 0.2px;
+        line-height: 1.2;
+        box-shadow: 0 2px 6px rgba(225, 29, 72, 0.35);
+        vertical-align: middle;
+    }
+
+    .fever-discount-badge-sm {
+        font-size: 0.7rem;
+        padding: 1px 5px;
+        border-radius: 4px;
+    }
+
+    .fever-original-price {
+        text-decoration: line-through;
+        opacity: 0.65;
+        font-size: 0.85em;
+        margin-right: 4px;
+        font-weight: 500;
+    }
+
     @media (max-width: 576px) {
         .fever-hero-caption-overlay {
             padding: 30px 55px 12px 14px;
@@ -832,7 +863,9 @@
                         <span>{{ $event->ubication }} ({{ $event->address_locality }}, {{ $event->address_region }})</span>
                     </div>
                     @php
-                        $minPrice = $tickets->where('type', 'paid')->min('price');
+                        $minPaidTicket = $tickets->where('type', 'paid')->sortBy('price')->first();
+                        $minPrice = $minPaidTicket ? $minPaidTicket->price : null;
+                        $minDiscount = $minPaidTicket ? $minPaidTicket->discount : null;
                         $hasFree = $tickets->where('type', 'free')->isNotEmpty();
                     @endphp
                     <div class="fever-key-item">
@@ -841,6 +874,9 @@
                             <span>Free Admission</span>
                         @elseif($minPrice)
                             <span>Tickets from ${{ number_format($minPrice, 2) }}</span>
+                            @if($minDiscount && $minDiscount > 0)
+                                <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($minDiscount, 1), '0'), '.') }}%</span>
+                            @endif
                         @else
                             <span>Available Tickets</span>
                         @endif
@@ -1018,12 +1054,23 @@
         {{-- Right Column Sticky Purchase Box --}}
         <div class="fever-sidebar-column d-none d-lg-block">
             <div class="fever-purchase-box">
-                <div class="fever-price-from">Tickets starting from</div>
-                <div class="fever-price-val">
+                <div class="fever-price-from d-flex align-items-center justify-content-between">
+                    <span>Tickets starting from</span>
+                    @if($minDiscount && $minDiscount > 0)
+                        <span class="fever-discount-badge">-{{ rtrim(rtrim(number_format($minDiscount, 1), '0'), '.') }}%</span>
+                    @endif
+                </div>
+                <div class="fever-price-val d-flex align-items-baseline gap-2">
                     @if($hasFree && !$minPrice)
                         Free
                     @elseif($minPrice)
-                        ${{ number_format($minPrice, 2) }}
+                        @if($minDiscount && $minDiscount > 0 && $minDiscount < 100)
+                            @php
+                                $originalPrice = $minPrice / (1 - ($minDiscount / 100));
+                            @endphp
+                            <span class="fever-original-price" style="color: var(--fever-gray-500);">${{ number_format($originalPrice, 2) }}</span>
+                        @endif
+                        <span>${{ number_format($minPrice, 2) }}</span>
                     @else
                         --
                     @endif
@@ -1060,12 +1107,23 @@
     {{-- Mobile Sticky Action Bar --}}
     <div class="fever-mobile-sticky-action">
         <div>
-            <div class="text-xs text-muted">From</div>
-            <div class="h5 mb-0 font-weight-bold" style="color: var(--fever-gold-dark);">
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-xs text-muted">From</span>
+                @if($minDiscount && $minDiscount > 0)
+                    <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($minDiscount, 1), '0'), '.') }}%</span>
+                @endif
+            </div>
+            <div class="h5 mb-0 font-weight-bold d-flex align-items-baseline gap-1" style="color: var(--fever-gold-dark);">
                 @if($hasFree && !$minPrice)
                     Free
                 @elseif($minPrice)
-                    ${{ number_format($minPrice, 2) }}
+                    @if($minDiscount && $minDiscount > 0 && $minDiscount < 100)
+                        @php
+                            $originalPrice = $minPrice / (1 - ($minDiscount / 100));
+                        @endphp
+                        <span class="fever-original-price" style="color: var(--fever-gray-500); font-size: 0.75em;">${{ number_format($originalPrice, 2) }}</span>
+                    @endif
+                    <span>${{ number_format($minPrice, 2) }}</span>
                 @else
                     --
                 @endif
@@ -1183,13 +1241,22 @@
                                         </div>
                                         <div class="col-3">
                                             <div class="d-flex flex-column align-items-end">
-                                                <h6 class="mb-2">
-                                                    @if ($ticket->type == 'free')
-                                                        Free
-                                                    @else
-                                                        ${{ number_format($ticket->price, 2) }}
+                                                <div class="d-flex align-items-center gap-1 mb-2">
+                                                    @if($ticket->discount && $ticket->discount > 0)
+                                                        <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($ticket->discount, 1), '0'), '.') }}%</span>
+                                                        @if($ticket->discount < 100)
+                                                            @php $origModalPrice = $ticket->price / (1 - ($ticket->discount / 100)); @endphp
+                                                            <span class="fever-original-price" style="color: #6b7280; font-size: 0.8em;">${{ number_format($origModalPrice, 2) }}</span>
+                                                        @endif
                                                     @endif
-                                                </h6>
+                                                    <h6 class="mb-0">
+                                                        @if ($ticket->type == 'free')
+                                                            Free
+                                                        @else
+                                                            ${{ number_format($ticket->price, 2) }}
+                                                        @endif
+                                                    </h6>
+                                                </div>
                                                 <select class="form-select mb-2 ticket-select" data-ticket-id="{{ $ticket->id }}" data-ticket-price="{{ $ticket->price }}" data-ticket-title="{{ $ticket->title }}" data-ticket-type="{{ $ticket->type }}" @if($ticket->orders_count >= $ticket->quantity) disabled @endif>
                                                     @for($i = 0; $i <= min(10, $ticket->quantity - $ticket->count_orders); $i++)
                                                         <option value="{{ $i }}">{{ $i }}</option>
@@ -1283,7 +1350,14 @@
                                                     
                                                     <div class="ticket-controls-mobile">
                                                         <div class="ticket-info-section">
-                                                            <div class="ticket-price-mobile">
+                                                            <div class="ticket-price-mobile d-flex align-items-center gap-1">
+                                                                @if($ticket->discount && $ticket->discount > 0)
+                                                                    <span class="fever-discount-badge fever-discount-badge-sm">-{{ rtrim(rtrim(number_format($ticket->discount, 1), '0'), '.') }}%</span>
+                                                                    @if($ticket->discount < 100)
+                                                                        @php $origMobPrice = $ticket->price / (1 - ($ticket->discount / 100)); @endphp
+                                                                        <span class="fever-original-price" style="color: #6b7280; font-size: 0.75em;">${{ number_format($origMobPrice, 2) }}</span>
+                                                                    @endif
+                                                                @endif
                                                                 @if ($ticket->type == 'free')
                                                                     Free
                                                                 @else
