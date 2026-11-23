@@ -44,6 +44,18 @@
     .fever-nav-header {
         background-color: #0E1012;
         padding: 12px 16px;
+        width: 100%;
+    }
+
+    @media (min-width: 992px) {
+        .fever-nav-header {
+            padding: 12px 20px;
+        }
+    }
+
+    .fever-nav-header-inner {
+        max-width: 1200px;
+        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -77,7 +89,7 @@
 
     .fever-hero-media-content {
         width: 100%;
-        max-width: 1100px;
+        max-width: 1200px;
         margin: 0 auto;
         position: relative;
         display: flex;
@@ -161,7 +173,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: 50px 80px 24px 24px;
+        padding: 60px 70px 20px 16px;
         background: linear-gradient(to top, rgba(14, 16, 18, 0.92) 0%, rgba(14, 16, 18, 0.6) 55%, transparent 100%);
         display: flex;
         flex-direction: column;
@@ -169,6 +181,12 @@
         text-align: left;
         pointer-events: none;
         z-index: 20;
+    }
+
+    @media (min-width: 992px) {
+        .fever-hero-caption-overlay {
+            padding: 70px 80px 24px 20px;
+        }
     }
 
     .fever-hero-caption-overlay > * {
@@ -180,6 +198,10 @@
         color: #f7e7be;
         border: 1px solid var(--fever-gold);
         margin-bottom: 8px;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
     }
 
     .fever-hero-caption-overlay .fever-title {
@@ -200,20 +222,21 @@
 
     @media (max-width: 576px) {
         .fever-hero-caption-overlay {
-            padding: 35px 60px 14px 14px;
+            padding: 30px 55px 12px 14px;
         }
         .fever-hero-caption-overlay .fever-title {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             margin-bottom: 6px;
         }
         .fever-hero-caption-overlay .fever-key-points {
             font-size: 0.78rem;
-            gap: 6px 12px;
+            gap: 5px 10px;
         }
         .fever-hero-caption-overlay .fever-badge-category {
-            font-size: 0.68rem;
-            padding: 2px 8px;
+            font-size: 0.65rem;
+            padding: 3px 8px;
             margin-bottom: 4px;
+            white-space: nowrap;
         }
     }
 
@@ -302,6 +325,12 @@
         padding: 0 16px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         width: 100%;
+    }
+
+    @media (min-width: 992px) {
+        .fever-sticky-tabs {
+            padding: 0 20px;
+        }
     }
 
     .fever-tabs-wrapper {
@@ -701,12 +730,14 @@
 <div class="fever-event-page">
     {{-- Header Logo / Navigation --}}
     <div class="fever-nav-header">
-        <a href="/list-events">
-            <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo">
-        </a>
-        <a href="/list-events" class="btn btn-sm btn-outline-light mb-0">
-            <i class="fas fa-arrow-left me-1"></i> All Events
-        </a>
+        <div class="fever-nav-header-inner">
+            <a href="/list-events">
+                <img src="{{ asset('img/logos/logo.png') }}" alt="Logo" class="logo">
+            </a>
+            <a href="/list-events" class="btn btn-sm btn-outline-light mb-0">
+                <i class="fas fa-arrow-left me-1"></i> All Events
+            </a>
+        </div>
     </div>
 
     <div id="alert">
