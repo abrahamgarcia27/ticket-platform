@@ -75,7 +75,7 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="coverimage" class="form-control-label">Cover Event Image</label>
+                            <label for="coverimage" class="form-control-label">Cover Event Image (Desktop)</label>
                             <input class="form-control" type="file" name="coverimage" id="coverimage">
                         </div>
                         @if ($event->coverimage)
@@ -93,7 +93,7 @@
                             @endif
                         </div>
                         <div class="form-group">
-                            <label for="image" class="form-control-label">Main Event Image</label>
+                            <label for="image" class="form-control-label">Main Event Image / Flyer Mobile</label>
                             <input class="form-control" type="file" name="image" id="image">
                         </div>
                         @if ($event->image)
