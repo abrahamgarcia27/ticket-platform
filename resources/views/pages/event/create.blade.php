@@ -78,7 +78,7 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="coverimage" class="form-control-label">Cover Image</label>
+                            <label for="coverimage" class="form-control-label">Cover Event Image (Desktop)</label>
                             <input class="form-control" type="file" name="coverimage" id="coverimage" value="{{ old('coverimage') }}">
                         </div>
                         <div class="form-group">
@@ -86,7 +86,7 @@
                             <input class="form-control" type="file" name="cover_video" id="cover_video" accept="video/*">
                         </div>
                         <div class="form-group">
-                            <label for="image" class="form-control-label">Main Event Image / Flyer</label>
+                            <label for="image" class="form-control-label">Main Event Image / Flyer Mobile</label>
                             <input class="form-control" type="file" name="image" id="image" required value="{{ old('image') }}">
                         </div>
                         <div class="form-group">

@@ -873,6 +873,11 @@
                         <i class="fas fa-volume-mute" id="feverAudioIcon" style="pointer-events: none;"></i>
                     </button>
                 </div>
+            @elseif($event->coverimage && $event->image)
+                {{-- Desktop / Tablet (md+): Cover Image --}}
+                <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-hero-image d-none d-md-block" alt="{{ $event->title }}">
+                {{-- Mobile (<md): Main Event Image --}}
+                <img src="{{ asset('storage/' . $event->image) }}" class="fever-hero-image d-block d-md-none" alt="{{ $event->title }}">
             @elseif($event->coverimage)
                 <img src="{{ asset('storage/' . $event->coverimage) }}" class="fever-hero-image" alt="{{ $event->title }}">
             @elseif($event->image)
